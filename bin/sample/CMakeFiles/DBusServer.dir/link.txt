@@ -1,0 +1,1 @@
+/usr/bin/c++      CMakeFiles/DBusServer.dir/Server.o  -o DBusServer -rdynamic -ldbus-1 

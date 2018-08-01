@@ -1,0 +1,1 @@
+/usr/bin/c++   -Wall -Wextra -std=c++14 -ldbus-1 -pthread -g -O0   CMakeFiles/DBus_sample.dir/main.cpp.o CMakeFiles/DBus_sample.dir/src/BusConnection.cpp.o CMakeFiles/DBus_sample.dir/src/DBusServer.cpp.o CMakeFiles/DBus_sample.dir/src/DBusInterface.cpp.o CMakeFiles/DBus_sample.dir/src/DBusClient.cpp.o  -o DBus_sample /usr/lib/x86_64-linux-gnu/libdbus-1.so -lglib-2.0 

@@ -1,0 +1,1 @@
+/usr/bin/c++      CMakeFiles/DBusClient.dir/Client.o  -o DBusClient -rdynamic -ldbus-1 
