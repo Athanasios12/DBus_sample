@@ -20,14 +20,15 @@ namespace DBUS
         bool connect();
         bool disconnect();
 
-        bool checkLastMethodCall(const std::string& clientBusName, const DBusInterface::DBusMethod& method) const;
+        bool checkLastMethodCall(const std::string& clientBusName, const std::__cxx11::string &methodName) const;
     private:
         void pollForMsgs();
-        void processMethodCall(DBusMessage *msg);
+        bool processMethodCall(DBusMessage *msg);
 
         std::thread m_rxThread;
-        std::pair<std::string, DBusInterface::DBusMethod> m_lastMethodCall;
+        std::pair<std::string, std::string> m_lastMethodCall; // clientBus name  and method name
         bool m_listening;
+        bool m_runThread;
     };
 }
 

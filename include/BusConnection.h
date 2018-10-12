@@ -26,7 +26,7 @@ namespace DBUS
         DBusBusType getBusType() const;
         std::vector<DBusInterface> getInterfaceList() const;
         bool isConnected() const;
-    private:
+    protected:
         std::string m_busName;
         DBusBusType m_busType;
         std::vector<DBusInterface> m_interfaceList;

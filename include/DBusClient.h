@@ -1,6 +1,7 @@
 #ifndef DBUSCLIENT_H
 #define DBUSCLIENT_H
 #include "BusConnection.h"
+#include "DBusArgumentPack.h"
 
 namespace DBUS
 {
@@ -10,20 +11,16 @@ namespace DBUS
         DBusClient();
         DBusClient(const std::string& busName, DBusBusType busType);
         ~DBusClient();
-        DBusClient& operator=(const DBusServer& other) = delete;
-        DBusClient(const DBusServer& other) = delete;
+        DBusClient& operator=(const DBusClient& other) = delete;
+        DBusClient(const DBusClient& other) = delete;
         DBusClient(DBusClient &&other);
-        DBusClient& operator=(DBusServer&& other);
+        DBusClient& operator=(DBusClient&& other);
 
         bool connect();
         bool disconnect();
 
-        DBusInterface::DBusMethodReply callServerMethod(const std::string &serverBusName,
-                                                        const std::string &interface,
-                                                        const std::string &object,
-                                                        DBusInterface::DBusMethod &method);
-
-    private:
+        DBusMethodReply callServerMethod(const std::string &serverBusName,
+                                         const DBusArgumentPack &methodInputArgs);
 
     };
 }

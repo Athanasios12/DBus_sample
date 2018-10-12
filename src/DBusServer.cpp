@@ -1,11 +1,12 @@
 #include "DBusServer.h"
+#include "DBusBasicArgument.h"
+#include "DBusArgumentFactory.h"
 #include <utility>
 #include <mutex>
 
 namespace
 {
     std::mutex m_rxThread_Mutex;
-    bool m_runThread;
     const uint16_t POLLING_PERIOD = 200; //ms
 }
 
@@ -13,6 +14,7 @@ namespace DBUS
 {
     DBusServer::DBusServer():
         BusConnection(),
+        m_listening(false),
         m_runThread(false)
     {
 
@@ -20,6 +22,7 @@ namespace DBUS
 
     DBusServer::DBusServer(const std::string &busName, DBusBusType busType):
         BusConnection(busName, busType),
+        m_listening(false),
         m_runThread(false)
     {
 
@@ -30,20 +33,24 @@ namespace DBUS
         disconnect();
     }
 
-    DBusServer::DBusServer(DBusServer&& other):
+    DBusServer::DBusServer(DBusServer&& other)
     {
         if(this != &other)
         {
-            disconnect();
             other.disconnect();
-            BusConnection(static_cast<BusConnection&&>(other));
+            BusConnection::operator=(std::move(other));
         }
     }
 
     DBusServer &DBusServer::operator=(DBusServer&& other)
     {
-        DBusServer& retVal = static_cast<DBusServer&>(BusConnection::operator=(static_cast<BusConnection&&>(other)));
-        return retVal;
+        if(this != &other)
+        {
+            disconnect();
+            other.disconnect();
+            BusConnection::operator=(std::move(other));
+        }
+        return *this;
     }
 
     bool DBusServer::connect()
@@ -57,7 +64,7 @@ namespace DBUS
                 m_listening = true;
             }
         }
-        return m_connected && m_listening;
+        return (isConnected() && m_listening);
     }
 
     bool DBusServer::disconnect()
@@ -71,13 +78,13 @@ namespace DBUS
             m_listening = false;
         }
         BusConnection::disconnect();
-        return !(m_connected && m_listening);
+        return !(isConnected() && m_listening);
     }
 
-    bool DBusServer::checkLastMethodCall(const std::string& clientBusName, const DBusInterface::DBusMethod& method) const
+    bool DBusServer::checkLastMethodCall(const std::string& clientBusName, const std::string& methodName) const
     {
         bool methodCalled = false;
-        if(m_lastMethodCall.first == clientBusName && m_lastMethodCall.second == method)
+        if(m_lastMethodCall.first == clientBusName && m_lastMethodCall.second == methodName)
         {
             methodCalled = true;
         }
@@ -94,11 +101,11 @@ namespace DBUS
             if(runPolling)
             {
                 //process incoming messages
-                dbus_connection_read_write_dispatch (conn, 0);
+                dbus_connection_read_write_dispatch (m_connection, 0);
                 DBusMessage *message = dbus_connection_pop_message (m_connection);
                 if(message)
                 {
-                   processMethodCall(message);
+                    processMethodCall(message);
                 }
             }
             m_rxThread_Mutex.unlock();
@@ -108,7 +115,7 @@ namespace DBUS
 
 
 
-    void DBusServer::processMethodCall(DBusMessage *msg)
+    bool DBusServer::processMethodCall(DBusMessage *msg)
     {
         bool methodProcessed = false;
         //search server interfaces for called method
@@ -118,46 +125,57 @@ namespace DBUS
             {
                 for(auto && method : object.m_methods)
                 {
-                    if (dbus_message_is_method_call(msg, interface.m_name.c_str(), method.m_name.c_str()))
+                    if (dbus_message_is_method_call(msg, interface.getName().c_str(), method.getName().c_str()))
                     {
                         //extract input arguments
                         DBusMessageIter argIter;
                         dbus_message_iter_init(msg, &argIter);
-                        if(DBusInterface::extractDBusMessageArgData(method, &argIter))
+                        //extract input arguments
+                        if(method.extractMsgInputArguments(&argIter))
                         {
-                            //all arguments extracted, call binding
-                            DBusInterface::DBusMethodReply reply = method.callBinding();
-                            //reply to method call if reply requested
-                            if(!dbus_message_get_no_reply(msg))
+                            //get Client bus name - should be last element of methods args
+                            auto clientBusName = DBusArgumentFactory::getArgument(DBusArgument::ArgType::String);
+                            if(clientBusName->getArgType() == dbus_message_iter_get_arg_type(&argIter))
                             {
-                                DBusMessage *replyMsg = nullptr;
-                                if(reply.m_valid)
+                                if(DBusInterface::extractDBusMessageArgData(clientBusName.get(), &argIter))
                                 {
-                                    replyMsg= dbus_message_new_method_return(msg);
-                                    if(replyMsg)
+                                    std::string clientName{static_cast<const char*>(static_cast<DBusBasicArgument*>(clientBusName.get())->getArgValuePtr())};
+                                    m_lastMethodCall = std::make_pair(clientName, method.getName());
+                                    //all arguments extracted, call binding
+                                    DBusMethodReply reply = method.callBinding();
+                                    //reply to method call if reply requested
+                                    if(!dbus_message_get_no_reply(msg))
                                     {
-                                        //create and initialize reply msg iterator
-                                        DBusMessageIter replyIter;
-                                        dbus_message_iter_init_append(replyMsg, &replyIter);
-                                        if(reply.m_valid)
+                                        DBusMessage *replyMsg = nullptr;
+                                        if(reply.isValid())
                                         {
-                                            DBusInterface::createDBusReply(reply.m_return, &replyIter);
-                                            //send reply
-                                            dbus_connection_send(m_connection, replyMsg, NULL);
-                                            methodProcessed = true;
+                                            replyMsg = dbus_message_new_method_return(msg);
+                                            if(replyMsg)
+                                            {
+                                                //create and initialize reply msg iterator
+                                                DBusMessageIter replyIter;
+                                                dbus_message_iter_init_append(replyMsg, &replyIter);
+                                                DBusInterface::appendArg(reply.getReturn(), &replyIter);
+                                                //send reply
+                                                dbus_connection_send(m_connection, replyMsg, NULL);
+                                                methodProcessed = true;
+                                            }
                                         }
-                                    }
-                                }
-                                else
-                                {
-                                    std::string errorMsg = std::string("Error in input to method ") + method.m_name;
-                                    dbus_error_msg = dbus_message_new_error(msg, DBUS_ERROR_FAILED, errorMsg);
-                                    if (dbus_error_msg)
-                                    {
-                                        dbus_connection_send(m_connection, dbus_error_msg, NULL);
+                                        else
+                                        {
+                                            std::string errorMsg = std::string("Error in input to method ") + method.getName();
+                                            DBusMessage *dbus_error_msg = dbus_message_new_error(msg, DBUS_ERROR_FAILED, errorMsg.c_str());
+                                            if (dbus_error_msg)
+                                            {
+                                                dbus_connection_send(m_connection, dbus_error_msg, NULL);
+                                            }
+                                            dbus_message_unref(dbus_error_msg);
+                                        }
+                                        dbus_message_unref(replyMsg);
                                     }
                                 }
                             }
+
                         }
                         break;
                     }

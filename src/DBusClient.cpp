@@ -1,4 +1,6 @@
 #include "DBusClient.h"
+#include "DBusArgumentFactory.h"
+#include "DBusBasicArgument.h"
 
 namespace DBUS
 {
@@ -41,51 +43,47 @@ namespace DBUS
         return BusConnection::disconnect();
     }
 
-    bool DBusClient::processDbusReply(const DBUS::DBusInterface::DBusMethod &method, DBusMessageIter *iterator)
+    DBusMethodReply DBusClient::callServerMethod(const std::string &serverBusName,
+                                                 const DBusArgumentPack &methodInputArgs)
     {
-        //placeholder
-        char *s;
-        if (dbus_message_get_args (reply, &dbus_error, DBUS_TYPE_STRING, &s, DBUS_TYPE_INVALID)) {
-            printf ("%s\n", s);
-        }
-        else
-        {
-             fprintf (stderr, "Did not get arguments in reply\n");
-             exit (1);
-        }
-        return true;
-    }
-
-    DBusInterface::DBusMethodReply DBusClient::callServerMethod(const std::string &serverBusName,
-                                                                const std::string &interface,
-                                                                const std::string &object,
-                                                                DBusInterface::DBusMethod &method)
-    {
-        DBusInterface::DBusMethodReply reply;
-        DBusMessage *request = dbus_message_new_method_call(serverBusName.c_str(), object.c_str(), interface.c_str(), method.m_name.c_str());
+        DBusMethodReply reply{methodInputArgs.getReturnType()};
+        DBusMessage *request = dbus_message_new_method_call(serverBusName.c_str(),
+                                                            methodInputArgs.getObjectName().c_str(),
+                                                            methodInputArgs.getInterfaceName().c_str(),
+                                                            methodInputArgs.getMethodName().c_str());
         if(request)
         {
             DBusMessageIter iter;
             dbus_message_iter_init_append(request, &iter);
-            if(DBusInterface::appendMethodArgs(method, &iter))
+            //checks if all method args are set with correct values, otherwise does not proceed will server comm
+            if(methodInputArgs.appendArgsToDBusMsg(&iter))
             {
-                DBusPendingCall *pending_return = dbus_connection_send_with_reply(m_connection, request, &pending_return, -1);
-                if(pending_return)
+                //append client bus name at the end of the message
+                auto clientBusName = DBusArgumentFactory::getArgument(DBusArgument::ArgType::String);
+                static_cast<DBusBasicArgument*>(clientBusName.get())->setArgValue(m_busName.c_str());
+                DBusInterface::appendArg(clientBusName.get(), &iter);
+                //send with reply request
+                DBusPendingCall *pending_return = nullptr;
+                if(dbus_connection_send_with_reply(m_connection, request, &pending_return, -1))
                 {
-                    dbus_pending_call_block(pending_return);
-                    DBusMessage *replyMsg = dbus_pending_call_steal_reply(pending_return);
-                    if(replyMsg)
+                    if(pending_return)
                     {
-                        DBusMessageIter replyItr;
-                        dbus_message_iter_init(replyMsg, &replyItr);
-                        DBusInterface::processDBusReply(method, replyItr);
-                        dbus_message_unref(replyMsg);
+                        dbus_pending_call_block(pending_return);
+                        DBusMessage *replyMsg = dbus_pending_call_steal_reply(pending_return);
+                        if(replyMsg)
+                        {
+                            DBusMessageIter replyItr;
+                            dbus_message_iter_init(replyMsg, &replyItr);
+                            reply.processDBusMsgReply(&replyItr);
+                            dbus_message_unref(replyMsg);
+                        }
                     }
-                    dbus_pending_call_unref(pending_return);
                 }
+                dbus_pending_call_unref(pending_return);
             }
-            dbus_message_unref(request);
         }
+        dbus_message_unref(request);
+        return reply;
     }
 
 }

@@ -49,7 +49,7 @@ link_directories (${GLIB_LIBRARY_DIRS})
 ##############
 
 
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -std=c++14 -ldbus-1 -pthread")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wshadow-compatible-local -std=c++17 -ldbus-1 -pthread")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 

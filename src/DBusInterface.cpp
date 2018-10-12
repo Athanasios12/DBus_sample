@@ -1,5 +1,10 @@
 #include "DBusInterface.h"
+
+#include "DBusMethod.h"
+#include "DBusArray.h"
+#include <variant>
 #include <algorithm>
+#include "DBusArgumentFactory.h"
 
 namespace DBUS
 {
@@ -48,241 +53,118 @@ namespace DBUS
         return *interObject;
     }
 
-    bool DBusInterface::processDBusContainerType(DBusInterface::DBusArgument &containerArg, DBusMessageIter *iterator) const
+    bool DBusInterface::appendArg(DBusArgument *arg, DBusMessageIter *iterator)
     {
-        bool isEmpty = true;
+        bool argAdded = false;
+        //don't forget defining this for array dict. dict entry strict and variant
+        if(arg)
+        {
+            if(!arg->argIsContainerType())
+            {
+                auto retValPtr = static_cast<DBusBasicArgument*>(arg)->getArgValuePtr();
+                if(retValPtr)
+                {
+                    dbus_message_iter_append_basic(iterator, static_cast<int>(arg->getArgType()), retValPtr);
+                    argAdded = true;
+                }
+            }
+            else
+            {
+                if(arg->getArgType() != DBusArgument::ArgType::Invalid)
+                {
+                    DBusMessageIter subIter;
+                    DBusContainerArg *cArg = static_cast<DBusContainerArg*>(arg); // wrong cast of dict entry - not child of dbuscontainer arg
+                    dbus_message_iter_open_container(iterator, cArg->getArgType(), cArg->getContainerSignature(), &subIter);
+                    bool allSubArgsAppended = true;
+                    for(auto subArgItr = cArg->getFirstArgItr(); subArgItr != cArg->getLastArgItr(); subArgItr++)
+                    {
+                        if(!appendArg(subArgItr->get(), &subIter))
+                        {
+                            allSubArgsAppended = false;
+                            break;
+                        }
+                    }
+                    argAdded = allSubArgsAppended;
+                    dbus_message_iter_close_container(iterator, &subIter);
+                }
+            }
+        }
+        return argAdded;
+    }
+
+    bool DBusInterface::extractDBusBasicArg(DBusBasicArgument &bArg, DBusMessageIter *argIter)
+    {
+        bool argMatched = false;
+        if(bArg.getArgType() != DBusArgument::ArgType::Invalid)
+        {
+            dbus_message_iter_get_basic(argIter, bArg.getArgValuePtr());
+            argMatched = true;
+        }
+        return argMatched;
+    }
+
+    bool DBusInterface::processDBusContainerArg(DBusContainerArg *cArg, DBusMessageIter *iterator)
+    {
+        bool containerProcessed = true;
         size_t numOfElements = dbus_message_iter_get_element_count(iterator);
         if(numOfElements > 0)
         {
-            isEmpty = false;
-            int type = dbus_message_iter_get_arg_type(iterator);
-            uint32_t i = 0;
-            while(type != DBUS_TYPE_INVALID)
+            size_t elemNum = 0;
+            auto type = dbus_message_iter_get_arg_type(iterator);
+            while(type != DBusArgument::ArgType::Invalid)
             {
-                DBusArgument arg;
-                arg.m_argType = type;
-                switch(type)
+                auto subArg = DBusArgumentFactory::getArgument(static_cast<DBusArgument::ArgType>(type));
+                if(subArg.get())
                 {
-                case DBUS_TYPE_BYTE:
-                    dbus_message_iter_get_basic(iterator, &arg.m_argVal.dByte);
-                    break;
-                case DBUS_TYPE_BOOLEAN:
-                    dbus_message_iter_get_basic(iterator, &arg.m_argVal.dBool);
-                    break;
-                case DBUS_TYPE_INT16:
-                    dbus_message_iter_get_basic(iterator, &arg.m_argVal.dInt16);
-                    break;
-                case DBUS_TYPE_UINT16:
-                    dbus_message_iter_get_basic(iterator, &arg.m_argVal.dUint16);
-                    break;
-                case DBUS_TYPE_INT32:
-                    dbus_message_iter_get_basic(iterator, &arg.m_argVal.dInt32);
-                    break;
-                case DBUS_TYPE_UINT32:
-                    dbus_message_iter_get_basic(iterator, &arg.m_argVal.dUint32);
-                    break;
-                case DBUS_TYPE_INT64:
-                    dbus_message_iter_get_basic(iterator, &arg.m_argVal.dInt64);
-                    break;
-                case DBUS_TYPE_UINT64:
-                    dbus_message_iter_get_basic(iterator, &arg.m_argVal.dUint64);
-                    break;
-                case DBUS_TYPE_DOUBLE:
-                    dbus_message_iter_get_basic(iterator, &arg.m_argVal.dDouble);
-                    break;
-                case DBUS_TYPE_STRING:
-                    dbus_message_iter_get_basic(iterator, &arg.m_argVal.dString);
-                    break;
-                case DBUS_TYPE_VARIANT:
-                case DBUS_TYPE_DICT_ENTRY:
-                case DBUS_TYPE_ARRAY:
-                case DBUS_TYPE_STRUCT:
-                    DBusMessageIter subIterator;
-                    dbus_message_iter_recurse(iterator, &subIterator);
-                    processDBusContainerType(arg, subiterator);
-                    break;
+                    if(!subArg->argIsContainerType())
+                    {
+                        DBusBasicArgument *bPtr = static_cast<DBusBasicArgument*>(subArg.get());
+                        if(extractDBusBasicArg(*bPtr, iterator))
+                        {
+                            cArg->addArgument(subArg.release());
+                        }
+                    }
+                    else
+                    {
+                        DBusMessageIter subIterator;
+                        dbus_message_iter_recurse(iterator, &subIterator);
+                        processDBusContainerArg(static_cast<DBusContainerArg*>(subArg.get()), &subIterator);
+                    }
+                    ++elemNum;
                 }
-                containerArg.m_argVal.dContainer.push_back(arg);
                 dbus_message_iter_next(iterator);
+
                 type = dbus_message_iter_get_arg_type(iterator);
-                ++i;
+            }
+            if(elemNum != numOfElements)
+            {
+                containerProcessed = false;
             }
         }
-        return isEmpty;
+        return containerProcessed;
     }
 
-    bool DBusInterface::appendMethodArgs(DBusInterface::DBusMethod &method, DBusMessageIter *iterator) const
+    bool DBusInterface::extractDBusMessageArgData(DBusArgument *arg, DBusMessageIter *argIter)
     {
-        //TDO
-        bool processed = true;
-        for(auto && arg : method.m_args)
+        bool argExtracted = false;
+        auto argType = arg->getArgType();
+        if(argType != DBusArgument::ArgType::Invalid)
         {
-            switch(retArg.m_argType)
+            if(argType == dbus_message_iter_get_arg_type(argIter))
             {
-            case DBUS_TYPE_BYTE:
-                dbus_message_iter_append_basic(iterator, retArg.m_argType, &retArg.m_argVal.dByte);
-                break;
-            case DBUS_TYPE_BOOLEAN:
-                dbus_message_iter_append_basic(iterator, retArg.m_argType, &retArg.m_argVal.dBool);
-                break;
-            case DBUS_TYPE_INT16:
-                dbus_message_iter_append_basic(iterator, retArg.m_argType, &retArg.m_argVal.dInt16);
-                break;
-            case DBUS_TYPE_UINT16:
-                dbus_message_iter_append_basic(iterator, retArg.m_argType, &retArg.m_argVal.dUint16);
-                break;
-            case DBUS_TYPE_INT32:
-                dbus_message_iter_append_basic(iterator, retArg.m_argType, &retArg.m_argVal.dInt32);
-                break;
-            case DBUS_TYPE_UINT32:
-                dbus_message_iter_append_basic(iterator, retArg.m_argType, &retArg.m_argVal.dUint32);
-                break;
-            case DBUS_TYPE_INT64:
-                dbus_message_iter_append_basic(iterator, retArg.m_argType, &retArg.m_argVal.dInt64);
-                break;
-            case DBUS_TYPE_UINT64:
-                dbus_message_iter_append_basic(iterator, retArg.m_argType, &retArg.m_argVal.dUint64);
-                break;
-            case DBUS_TYPE_DOUBLE:
-                dbus_message_iter_append_basic(iterator, retArg.m_argType, &arg.m_argVal.dDouble);
-                break;
-            case DBUS_TYPE_STRING:
-                dbus_message_iter_append_basic(iterator, retArg.m_argType, &arg.m_argVal.dString);
-                break;
-            case DBUS_TYPE_DICT_ENTRY:
-            case DBUS_TYPE_VARIANT:
-            case DBUS_TYPE_ARRAY:
-            case DBUS_TYPE_STRUCT:
-                DBusMessageIter subIter;
-                dbus_message_iter_open_container(iterator, retArg.m_argType, NULL, &subIter);
-                for(auto & arg : retArg.m_argVal.dContainer)
+                if(!arg->argIsContainerType())
                 {
-                    processDBusReply(arg, &subIter);
+                    argExtracted = extractDBusBasicArg(*(static_cast<DBusBasicArgument*>(arg)), argIter);
                 }
-                dbus_message_iter_close_container(iterator, &subIter);
-                break;
-            default:
-                processed = false;
-                break;
-            }
-        }
-        return processed;
-    }
-
-    bool DBusInterface::createDBusReply(const DBusInterface::DBusArgument &retArg, DBusMessageIter *iterator) const
-    {
-        bool replyCreated = true;
-        switch(retArg.m_argType)
-        {
-        case DBUS_TYPE_BYTE:
-            dbus_message_iter_append_basic(iterator, retArg.m_argType, &retArg.m_argVal.dByte);
-            break;
-        case DBUS_TYPE_BOOLEAN:
-            dbus_message_iter_append_basic(iterator, retArg.m_argType, &retArg.m_argVal.dBool);
-            break;
-        case DBUS_TYPE_INT16:
-            dbus_message_iter_append_basic(iterator, retArg.m_argType, &retArg.m_argVal.dInt16);
-            break;
-        case DBUS_TYPE_UINT16:
-            dbus_message_iter_append_basic(iterator, retArg.m_argType, &retArg.m_argVal.dUint16);
-            break;
-        case DBUS_TYPE_INT32:
-            dbus_message_iter_append_basic(iterator, retArg.m_argType, &retArg.m_argVal.dInt32);
-            break;
-        case DBUS_TYPE_UINT32:
-            dbus_message_iter_append_basic(iterator, retArg.m_argType, &retArg.m_argVal.dUint32);
-            break;
-        case DBUS_TYPE_INT64:
-            dbus_message_iter_append_basic(iterator, retArg.m_argType, &retArg.m_argVal.dInt64);
-            break;
-        case DBUS_TYPE_UINT64:
-            dbus_message_iter_append_basic(iterator, retArg.m_argType, &retArg.m_argVal.dUint64);
-            break;
-        case DBUS_TYPE_DOUBLE:
-            dbus_message_iter_append_basic(iterator, retArg.m_argType, &arg.m_argVal.dDouble);
-            break;
-        case DBUS_TYPE_STRING:
-            dbus_message_iter_append_basic(iterator, retArg.m_argType, &arg.m_argVal.dString);
-            break;
-        case DBUS_TYPE_DICT_ENTRY:
-
-        case DBUS_TYPE_VARIANT:
-        case DBUS_TYPE_ARRAY:
-        case DBUS_TYPE_STRUCT:
-            DBusMessageIter subIter;
-            dbus_message_iter_open_container(iterator, retArg.m_argType, NULL, &subIter);
-            for(auto & arg : retArg.m_argVal.dContainer)
-            {
-                processDBusReply(arg, &subIter);
-            }
-            dbus_message_iter_close_container(iterator, &subIter);
-            break;
-        default:
-            replyCreated = false;
-            break;
-        }
-        return replyCreated;
-    }
-
-    bool DBusInterface::extractDBusMessageArgData(DBusInterface::DBusMethod &method, DBusMessageIter *argIter) const
-    {
-        //extract input arguments
-        uint16_t numOfMatchedArgs = 0;
-        for(auto &arg : method.m_args)
-        {
-            if(arg.m_type == dbus_message_iter_get_arg_type(argIter))
-            {
-                switch(arg.m_type)
+                else
                 {
-                case DBUS_TYPE_BYTE:
-                    dbus_message_iter_get_basic(argIter, &arg.m_argVal.dByte);
-                    break;
-                case DBUS_TYPE_BOOLEAN:
-                    dbus_message_iter_get_basic(argIter, &arg.m_argVal.dBool);
-                    break;
-                case DBUS_TYPE_INT16:
-                    dbus_message_iter_get_basic(argIter, &arg.m_argVal.dInt16);
-                    break;
-                case DBUS_TYPE_UINT16:
-                    dbus_message_iter_get_basic(argIter, &arg.m_argVal.dUint16);
-                    break;
-                case DBUS_TYPE_INT32:
-                    dbus_message_iter_get_basic(argIter, &arg.m_arg.m_argVal.dInt32);
-                    break;
-                case DBUS_TYPE_UINT32:
-                    dbus_message_iter_get_basic(argIter, &arg.m_argVal.dUint32);
-                    break;
-                case DBUS_TYPE_INT64:
-                    dbus_message_iter_get_basic(argIter, &arg.m_argVal.dInt64);
-                    break;
-                case DBUS_TYPE_UINT64:
-                    dbus_message_iter_get_basic(argIter, &arg.m_argVal.dUint64);
-                    break;
-                case DBUS_TYPE_DOUBLE:
-                    dbus_message_iter_get_basic(argIter, &arg.m_argVal.dDouble);
-                    break;
-                case DBUS_TYPE_STRING:
-                    dbus_message_iter_get_basic(argIter, &arg.m_argVal.dString);
-                    break;
-                case DBUS_TYPE_VARIANT:
-                case DBUS_TYPE_ARRAY:
-                case DBUS_TYPE_STRUCT:
-                case DBUS_TYPE_DICT_ENTRY:
                     //container types handled separately - recursive calls
                     DBusMessageIter subIter;
-                    dbus_message_iter_recurse(argIter, subIter);
-                    DBusInterface::processDBusContainerType(arg, subIter);
-                    break;
-                }
-                dbus_message_iter_next(argIter);
-                ++numOfMatchedArgs;
+                    dbus_message_iter_recurse(argIter, &subIter);
+                    argExtracted = processDBusContainerArg(static_cast<DBusContainerArg*>(arg), &subIter);
+                }                
             }
         }
-        return (numOfMatchedArgs == method.m_args.size());
-    }
-
-    bool DBusInterface::processDBusReply(DBusInterface::DBusMethod &method, DBusMessageIter *replyIter) const
-    {
-        //TDO
+        return argExtracted;
     }
 }

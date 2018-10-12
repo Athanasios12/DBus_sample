@@ -2,122 +2,19 @@
 #define DBUSINTERFACE_H
 #include <vector>
 #include <string>
-#include <algorithm>
+#include <dbus/dbus.h>
 #include <functional>
-#include  <dbus/dbus.h>
+#include "DBusMethod.h"
+#include "DBusMethodReply.h"
+#include "DBusArgument.h"
+#include "DBusBasicArgument.h"
+#include "DBusContainerArg.h"
 
 namespace DBUS
 {
     class DBusInterface
     {
     public:
-        struct DBusArgument
-        {
-            union Dbus_Type
-            {
-                dbus_uint16_t   dUint16;
-                dbus_int16_t    dInt16;
-                dbus_uint32_t   dUint32;
-                dbus_int32_t    dInt32;
-                dbus_uint64_t   dUint64;
-                dbus_int64_t    dInt64;
-                double          dDouble;
-                uint8_t         dByte;
-                dbus_bool_t     dBool;
-                char*           dString;
-                std::vector<DBusArgument> dContainer; //array, object or dictionary
-            };
-
-            Dbus_Type m_argVal;
-            int m_argType;
-            DBusArgument():
-                m_argType(DBUS_TYPE_INVALID)
-            {
-
-            }
-
-            bool operator==(const DBusArgument& other) const
-            {
-                return ((other.m_argType == m_argType) && (other.dUint64 == dUint64));
-            }
-        };
-
-        struct DBusMethodReply
-        {
-            uint32_t m_id;
-            std::string m_serverName;
-            DBusArgument m_return;
-            bool m_valid;
-
-            DBusMethodReply():
-                m_valid(false)
-            {
-
-            }
-
-            bool operator==(const DBusMethodReply& other) const
-            {
-                return (other.m_id == m_id);
-            }
-
-
-        };
-
-        struct DBusMethod
-        {
-        public:
-            std::string m_name;
-            std::string m_objectName;
-            std::string m_interfaceName;
-            std::vector<DBusArgument> m_args;
-
-            DBusMethod()
-            {
-
-            }
-
-            DBusMethod(const std::string& name):
-                m_name(name)
-            {
-
-            }
-
-            bool operator==(const DBusMethod& other) const
-            {
-                return (other.m_name == m_name);
-            }
-
-            bool argCheck()
-            {
-                bool valid = true;
-                for (auto && arg : m_args)
-                {
-                    if(DBUS_TYPE_INVALID == arg.m_argType)
-                    {
-                        valid = false;
-                        break;
-                    }
-                }
-                return valid;
-            }
-
-            DBusMethodReply callBinding()
-            {
-                DBusMethodReply reply;
-                reply.valid = false;
-                //check if all arguments are valid
-                if(argCheck())
-                {
-                    //call binding
-                    reply = m_binding(m_args);
-                }
-                return reply;
-            }
-
-        private:
-            std::function<DBusMethodReply(std::vector<DBusArgument>)> m_binding;
-        };
-
         struct DBusObject
         {
             std::string m_name;
@@ -134,16 +31,41 @@ namespace DBUS
                 bool methodAdded = false;
                 if(std::find(m_methods.begin(), m_methods.end(), method) == std::end(m_methods))
                 {
-                    method.m_objectName = m_name;
+                    method.setObjectName(m_name);
+                    method.setInterfaceName(m_interfaceName);
                     m_methods.push_back(method);
                     methodAdded = true;
                 }
                 return methodAdded;
             }
 
+            bool setMethodArg(const std::string &methodName, std::vector<std::unique_ptr<DBusArgument>> &args)
+            {
+                bool argSet = false;
+                auto method = std::find_if(m_methods.begin(), m_methods.end(),
+                             [&methodName](const DBusMethod &method)
+                            {
+                                return (method.getName() == methodName);
+                            });
+                if(method != std::end(m_methods))
+                {
+                    bool allArgsSet = true;
+                    for(size_t i = 0; i < args.size(); i++)
+                    {
+                        if(!method->setArg(args[i], i))
+                        {
+                            allArgsSet = false;
+                            break;
+                        }
+                    }
+                    argSet = allArgsSet;
+                }
+                return argSet;
+            }
+
             bool operator==(const DBusObject& other) const
             {
-                return (other.m_name == m_name);
+                return ((other.m_name == m_name) && (other.m_interfaceName == m_interfaceName));
             }
         };
 
@@ -157,14 +79,16 @@ namespace DBUS
         //getters
         std::string getName() const;
         DBusObject getObject(const std::string &name) const;
+
         //static methods
-        static bool processDBusContainerType(const DBusInterface::DBusArgument &containerArg, DBusMessageIter *iterator) const;
-        static bool appendMethodArgs(DBUS::DBusInterface::DBusMethod &method, DBusMessageIter *iterator) const;
-        static bool createDBusReply(const DBusInterface::DBusArgument &retArg, DBusMessageIter *iterator) const;
-        static bool extractDBusMessageArgData(DBusInterface::DBusMethod &method, DBusMessageIter *argIter) const;
+        static bool processDBusContainerArg(DBusContainerArg *containerArg, DBusMessageIter *iterator);
+        static bool extractDBusBasicArg(DBusBasicArgument &bArg, DBusMessageIter *argIter);
+        static bool extractDBusMessageArgData(DBusArgument *arg, DBusMessageIter *argIter);
+        static bool appendArg(DBusArgument *arg, DBusMessageIter *iterator);
+
+        std::vector<DBusObject> m_objects;//make private and instead provide iterators
     private:
         std::string m_name;
-        std::vector<DBusObject> m_objects;
     };
 }
 #endif // DBUSINTERFACE_H

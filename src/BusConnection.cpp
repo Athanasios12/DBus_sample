@@ -69,7 +69,6 @@ namespace DBUS
     {
         if(this != &other)
         {
-            disconnect();
             other.disconnect();
             m_interfaceList.clear();
             if(!other.m_interfaceList.empty())
@@ -79,7 +78,7 @@ namespace DBUS
             }
             m_busName = other.m_busName;
             m_busType = other.m_busType;
-            m_connection = other.m_connection;
+            m_connection = nullptr;
             other.m_busName.clear();
             other.m_busType = DBUS_BUS_SYSTEM;
             other.m_connection = nullptr;
