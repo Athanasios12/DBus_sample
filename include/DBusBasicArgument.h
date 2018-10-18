@@ -35,9 +35,8 @@ namespace DBUS
     bool DBusBasicArgument::setArgValue(T value)
     {
         bool argSet = false;
-        auto index = getArgTypeIndex(m_argType);
-        argValType argVariant;
-        setArgVariant(argVariant, value);
+        auto index = getArgTypeIndex(m_argType);        
+        auto argVariant = getSetArgVariant(value);
         if(index == static_cast<decltype(index)>(argVariant.index()))
         {
             m_arg = value;
@@ -53,20 +52,12 @@ namespace DBUS
         auto index = getArgTypeIndex(argType);        
         if(index >= 0)
         {
-            argValType argVariant;
-            if((argType == ArgType::String))
-            {
-                argVariant = const_cast<char*>(value);
-            }
-            else
-            {
-                argVariant = value;
-            }
+            auto argVariant = getSetArgVariant(value);
             if(index == static_cast<decltype(index)>(argVariant.index()))
             {
                 m_argType = argType;
                 m_arg = argVariant;
-                setSignature();
+                m_signature = getArgTypeSignature(argType);
                 argReset = true;
             }
         }

@@ -57,7 +57,7 @@ namespace DBUS
     {
         bool argAdded = false;
         //don't forget defining this for array dict. dict entry strict and variant
-        if(arg)
+        if(arg && iterator)
         {
             if(!arg->argIsContainerType())
             {
@@ -106,39 +106,41 @@ namespace DBUS
     bool DBusInterface::processDBusContainerArg(DBusContainerArg *cArg, DBusMessageIter *iterator)
     {
         bool containerProcessed = true;
-        size_t numOfElements = dbus_message_iter_get_element_count(iterator);
-        if(numOfElements > 0)
+        if(cArg && iterator)
         {
-            size_t elemNum = 0;
-            auto type = dbus_message_iter_get_arg_type(iterator);
-            while(type != DBusArgument::ArgType::Invalid)
+            size_t numOfElements = dbus_message_iter_get_element_count(iterator);
+            if(numOfElements > 0)
             {
-                auto subArg = DBusArgumentFactory::getArgument(static_cast<DBusArgument::ArgType>(type));
-                if(subArg.get())
+                size_t elemNum = 0;
+                auto type = dbus_message_iter_get_arg_type(iterator);
+                while(type != DBusArgument::ArgType::Invalid)
                 {
-                    if(!subArg->argIsContainerType())
+                    auto subArg = DBusArgumentFactory::getArgument(static_cast<DBusArgument::ArgType>(type));
+                    if(subArg.get())
                     {
-                        DBusBasicArgument *bPtr = static_cast<DBusBasicArgument*>(subArg.get());
-                        if(extractDBusBasicArg(*bPtr, iterator))
+                        if(!subArg->argIsContainerType())
                         {
-                            cArg->addArgument(subArg.release());
+                            DBusBasicArgument *bPtr = static_cast<DBusBasicArgument*>(subArg.get());
+                            if(extractDBusBasicArg(*bPtr, iterator))
+                            {
+                                cArg->addArgument(subArg.release());
+                            }
                         }
+                        else
+                        {
+                            DBusMessageIter subIterator;
+                            dbus_message_iter_recurse(iterator, &subIterator);
+                            processDBusContainerArg(static_cast<DBusContainerArg*>(subArg.get()), &subIterator);
+                        }
+                        ++elemNum;
                     }
-                    else
-                    {
-                        DBusMessageIter subIterator;
-                        dbus_message_iter_recurse(iterator, &subIterator);
-                        processDBusContainerArg(static_cast<DBusContainerArg*>(subArg.get()), &subIterator);
-                    }
-                    ++elemNum;
+                    dbus_message_iter_next(iterator);
+                    type = dbus_message_iter_get_arg_type(iterator);
                 }
-                dbus_message_iter_next(iterator);
-
-                type = dbus_message_iter_get_arg_type(iterator);
-            }
-            if(elemNum != numOfElements)
-            {
-                containerProcessed = false;
+                if(elemNum != numOfElements)
+                {
+                    containerProcessed = false;
+                }
             }
         }
         return containerProcessed;

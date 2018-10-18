@@ -4,6 +4,7 @@
 #include <variant>
 #include <cstdint>
 #include <string>
+#include <optional>
 
 namespace DBUS
 {
@@ -16,10 +17,10 @@ namespace DBUS
                                 dbus_int32_t,
                                 dbus_uint64_t,
                                 dbus_int64_t,
+                                bool,
                                 double,
                                 uint8_t,
-                                char*,
-                                bool,
+                                std::string,
                                 DBusArgument*> argValType;
 
         enum ArgType
@@ -52,17 +53,17 @@ namespace DBUS
 
         int getArgTypeIndex(ArgType type) const;
         template <typename Val>
-        int setArgVariant(argValType &var, Val value) const
+        argValType getSetArgVariant(Val value) const
         {
-            var = value;
-            return var.index();
+            argValType var = value;
+            return var;
         }
 
         virtual ArgType getArgType() const;
         virtual const char* getSignature() const;
         virtual bool argIsContainerType() const = 0;
     protected:
-        void setSignature();
+        static std::string getArgTypeSignature(ArgType argType);
         ArgType m_argType;
         std::string m_signature;
     };

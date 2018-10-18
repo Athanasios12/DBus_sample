@@ -115,7 +115,12 @@ namespace DBUS
 
     const char *DBusArray::getContainerSignature() const
     {
-        return m_containedSignature.c_str();
+        const char *retPtr = nullptr;
+        if(!m_signature.empty())
+        {
+            retPtr = m_containedSignature.c_str();
+        }
+        return retPtr;
     }
 
     bool DBusArray::containedSignatureMatch(DBusArgument *arg)

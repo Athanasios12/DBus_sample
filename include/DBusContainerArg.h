@@ -28,6 +28,7 @@ namespace DBUS
         virtual const char* getContainerSignature() const;
         SubArgs::iterator getFirstArgItr();
         SubArgs::iterator getLastArgItr();
+        std::size_t getSize() const;
     protected:
         SubArgs m_subArgs;
         std::string m_containedSignature;

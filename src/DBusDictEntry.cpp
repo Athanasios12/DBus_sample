@@ -5,27 +5,37 @@ namespace DBUS
 {
     const char DICT_ENTRY_START_CHAR = '{';
     const char DICT_ENTRY_END_CHAR = '}';
+    const size_t KEY_IDX = 0;
+    const size_t VALUE_IDX = 1;
+    const size_t DICT_ENTRY_SIZE = 2;
+
+    //Add check for basic non container type for key and value
 
     void DBusDictEntry::initializeEntryArgs()
     {
-        m_subArgs.resize(std::size_t(2));
+        m_subArgs.resize(std::size_t(DICT_ENTRY_SIZE));
     }
 
     DBusDictEntry::DBusDictEntry():
-        DBusContainerArg(ArgType::Dictionary_Entry),
-        m_key(nullptr),
-        m_value(nullptr)
+        DBusContainerArg(ArgType::Dictionary_Entry)
     {
         initializeEntryArgs();
     }
 
-    DBusDictEntry::DBusDictEntry(std::unique_ptr<DBusBasicArgument> &key, std::unique_ptr<DBusBasicArgument> &value):
+    DBusDictEntry::DBusDictEntry(DBusArgument *key, DBusArgument *value):
+        DBusContainerArg(ArgType::Dictionary_Entry)
+    {
+        initializeEntryArgs();
+        setKey(key);
+        setValue(value);
+    }
+
+    DBusDictEntry::DBusDictEntry(std::unique_ptr<DBusArgument> &key, std::unique_ptr<DBusArgument> &value):
          DBusContainerArg(ArgType::Dictionary_Entry)
     {
         initializeEntryArgs();
         setKey(key);
         setValue(value);
-        setEntrySignature();
     }
 
     DBusDictEntry::DBusDictEntry(const DBusDictEntry &other):
@@ -33,19 +43,21 @@ namespace DBUS
     {
         if(this != &other)
         {
-            initializeEntryArgs();
-            auto keyCopy = DBusArgumentFactory::getArgCopy(other.m_key.get());
-            auto valueCopy = DBusArgumentFactory::getArgCopy(other.m_value.get());
-            m_key.reset(static_cast<DBusBasicArgument*>(keyCopy.release()));
-            m_value.reset(static_cast<DBusBasicArgument*>(valueCopy.release()));
-            setEntrySignature();
+            m_keySet = other.m_keySet;
+            m_valSet = other.m_valSet;
         }
     }
 
     DBusDictEntry::DBusDictEntry(DBusDictEntry &&other):
         DBusContainerArg(std::forward<DBusDictEntry>(other))
     {
-
+        if(this != &other)
+        {
+            m_keySet = other.m_keySet;
+            m_valSet = other.m_valSet;
+            other.m_keySet = false;
+            other.m_valSet = false;
+        }
     }
 
     DBusDictEntry& DBusDictEntry::operator=(const DBusDictEntry &other)
@@ -53,6 +65,8 @@ namespace DBUS
         if(this != &other)
         {
             DBusContainerArg::operator=(other);
+            m_keySet = other.m_keySet;
+            m_valSet = other.m_valSet;
         }
         return *this;
     }
@@ -64,10 +78,8 @@ namespace DBUS
             DBusContainerArg::operator=(std::forward<DBusDictEntry>(other));
             m_keySet = other.m_keySet;
             m_valSet = other.m_valSet;
-            //dokonczyc przerabianie dict entry - constructory operator=& i &&,
-            //addArgument - dodanie kontrolowane klucza i wartosci, max 2 elementy,
-            //add Argument nie moze dodawac jesli zostaly ustawione, wtedy nalezy uzyc setkey i setvalue
-            //zamiast tego. msubargs ma max rozmiar 2 - zdefiniuj jao const lokalny global
+            other.m_keySet = false;
+            other.m_valSet = false;
         }
         return *this;
     }
@@ -82,13 +94,25 @@ namespace DBUS
         bool addedNewArg = false;
         if(arg)
         {
-            if(!m_keySet)
+            if(!arg->argIsContainerType())
             {
-                if(arg->getArgType())
-            }
-            else if(!m_valSet)
-            {
-
+                if(!m_keySet)
+                {
+                    m_subArgs[KEY_IDX] = DBusArgumentFactory::getArgCopy(arg);
+                    m_keySet = true;
+                    addedNewArg = true;
+                }
+                else if(!m_valSet)
+                {
+                    m_subArgs[VALUE_IDX] = DBusArgumentFactory::getArgCopy(arg);
+                    m_valSet = true;
+                    addedNewArg = true;
+                }
+                if(addedNewArg && m_keySet && m_valSet)
+                {
+                    setEntrySignature();
+                }
+                //else both key and val has been set, use setkey, setval instead
             }
         }
         return addedNewArg;
@@ -100,8 +124,13 @@ namespace DBUS
         bool keyValid = false;
         if(key.get())
         {
-            m_key = std::move(key);
+            m_subArgs[KEY_IDX] = std::move(key);
             keyValid = true;
+            m_keySet = true;
+            if(m_valSet)
+            {
+                setEntrySignature();
+            }
         }
         return keyValid;
     }
@@ -111,25 +140,83 @@ namespace DBUS
         bool valueValid = false;
         if(value.get())
         {
-            m_value = std::move(value);
+            m_subArgs[VALUE_IDX] = std::move(value);
             valueValid = true;
+            m_valSet = true;
+            if(m_keySet)
+            {
+                setEntrySignature();
+            }
         }
         return valueValid;
     }
 
-    bool DBusDictEntry::argIsContainerType() const
+    bool DBusDictEntry::setKey(DBusArgument *key)
     {
-        return true;
+        bool keyValid = false;
+        if(key)
+        {
+            if(!key->argIsContainerType())
+            {
+                m_subArgs[KEY_IDX] = std::move(DBusArgumentFactory::getArgCopy(key));
+                keyValid = true;
+                m_keySet = true;
+                if(m_valSet)
+                {
+                    setEntrySignature();
+                }
+            }
+        }
+        return keyValid;
     }
 
-    DBusBasicArgument* DBusDictEntry::getKey()
+    bool DBusDictEntry::setValue(DBusArgument *value)
     {
-        return m_key.get();
+        bool valueValid = false;
+        if(value)
+        {
+            if(!value->argIsContainerType())
+            {
+                m_subArgs[VALUE_IDX] = std::move(DBusArgumentFactory::getArgCopy(value));
+                valueValid = true;
+                m_valSet = true;
+                if(m_keySet)
+                {
+                    setEntrySignature();
+                }
+            }
+        }
+        return valueValid;
     }
 
-    DBusBasicArgument* DBusDictEntry::getValue()
+    DBusArgument::ArgType DBusDictEntry::getKeyType() const
     {
-        return m_value.get();
+        auto type = ArgType::Invalid;
+        if(m_keySet)
+        {
+            type = m_subArgs[KEY_IDX]->getArgType();
+        }
+        return type;
+    }
+
+    DBusArgument::ArgType DBusDictEntry::getValueType() const
+    {
+        auto type = ArgType::Invalid;
+        if(m_valSet)
+        {
+            type = m_subArgs[VALUE_IDX]->getArgType();
+        }
+        return type;
+    }
+
+    bool DBusDictEntry::getKeySet() const
+    {
+        return m_keySet;
+    }
+
+    bool DBusDictEntry::getValueSet() const
+    {
+        return m_valSet;
     }
 
     void DBusDictEntry::setEntrySignature()
@@ -147,6 +234,18 @@ namespace DBUS
                 }
             }
         }
+    }
+
+    std::string DBusDictEntry::createEntrySignature(ArgType key, ArgType value)
+    {
+        std::string signature;
+        auto keyString = getArgTypeSignature(key);
+        auto valueString = getArgTypeSignature(value);
+        if(!keyString.empty() && !valueString.empty())
+        {
+            signature = DICT_ENTRY_START_CHAR + keyString + valueString + DICT_ENTRY_END_CHAR;
+        }
+        return signature;
     }
 
 }

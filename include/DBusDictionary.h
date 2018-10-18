@@ -30,6 +30,8 @@ namespace DBUS
         const char* getContainerSignature() const final;
 
         ArgType getArgType() const;
+        std::pair<ArgType, ArgType> getEntryType() const;
+        bool isInitialized() const;
     private:
         bool  m_initialized;
         std::pair<ArgType, ArgType> m_entryType;
@@ -39,35 +41,32 @@ namespace DBUS
     bool DBusDictionary::addEntry(Key key, Value value)
     {
         bool entryAdded = false;
-        //check if types match
-        argValType keyVariant;
-        argValType valVariant;
-        setArgVariant(keyVariant, key);
-        setArgVariant(valVariant, value);
-        fprintf(stderr, "\nKey index : %d\nValue index: %d\n", keyVariant.index(), valVariant.index());
-        if(static_cast<int>(keyVariant.index()) == getArgTypeIndex(m_entryType.first))
+        if(m_initialized)
         {
-            if(static_cast<int>(valVariant.index()) == getArgTypeIndex(m_entryType.second))
+            //check if types match
+            auto keyVariant = getSetArgVariant(key);
+            auto valVariant = getSetArgVariant(value);
+            //fprintf(stderr, "\nKey index : %d\nValue index: %d\n", keyVariant.index(), valVariant.index());
+            if(static_cast<int>(keyVariant.index()) == getArgTypeIndex(m_entryType.first))
             {
-                auto keyArg = std::make_unique<DBusBasicArgument>(DBusBasicArgument{m_entryType.first});
-                if(keyArg)
+                if(static_cast<int>(valVariant.index()) == getArgTypeIndex(m_entryType.second))
                 {
-                    if(keyArg->setArgValue(key))
+                    std::unique_ptr<DBusArgument> keyArg{new DBusBasicArgument{m_entryType.first}};
+                    if(keyArg)
                     {
-                        //key matches the entry type
-                        auto valArg = std::make_unique<DBusBasicArgument>(DBusBasicArgument{m_entryType.second});
-                        if(valArg)
+                        if(static_cast<DBusBasicArgument*>(keyArg.get())->setArgValue(key))
                         {
-                            //check if value matches entry type
-                            if(valArg->setArgValue<decltype(value)>(value))
+                            //key matches the entry type
+                            std::unique_ptr<DBusArgument> valArg{new DBusBasicArgument{m_entryType.second}};
+                            if(valArg)
                             {
-                                std::unique_ptr<DBusArgument> newEntry{new DBusDictEntry{keyArg, valArg}};
-                                if(m_subArgs.size() == 0)
+                                //check if value matches entry type
+                                if(static_cast<DBusBasicArgument*>(valArg.get())->setArgValue<decltype(value)>(value))
                                 {
-                                    m_containedSignature = newEntry->getSignature();
+                                    std::unique_ptr<DBusArgument> newEntry{new DBusDictEntry{keyArg, valArg}};
+                                    m_subArgs.push_back(std::move(newEntry));
+                                    entryAdded = true;
                                 }
-                                m_subArgs.push_back(std::move(newEntry));
-                                entryAdded = true;
                             }
                         }
                     }

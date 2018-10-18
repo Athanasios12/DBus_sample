@@ -1,4 +1,5 @@
 #include "DBusDictionary.h"
+#include "DBusDictEntry.h"
 
 namespace DBUS
 {
@@ -15,6 +16,8 @@ namespace DBUS
         m_initialized{true}
     {
         m_entryType = std::make_pair(keyType, valType);
+        m_containedSignature = DBusDictEntry::createEntrySignature(keyType, valType);
+        m_signature += m_containedSignature;
     }
 
     DBusDictionary::DBusDictionary(const DBusDictionary &other):
@@ -36,6 +39,7 @@ namespace DBUS
             m_entryType = other.m_entryType;
             other.m_initialized = false;
             other.m_entryType = std::make_pair(ArgType::Invalid, ArgType::Invalid);
+            other.m_signature = getArgTypeSignature(ArgType::Dictionary);
         }
     }
 
@@ -90,23 +94,29 @@ namespace DBUS
 
     bool DBusDictionary::addArgument(DBusArgument *arg)
     {
-        bool addedNewArg = false;
+        bool addedNewArg = false;        
         if(arg)
         {
             if(arg->getArgType() == ArgType::Dictionary_Entry)
             {
-                if((static_cast<DBusDictEntry*>(arg)->getKey()->getArgType() == m_entryType.first) &&
-                    (static_cast<DBusDictEntry*>(arg)->getValue()->getArgType() == m_entryType.second)    )
+                auto entry = static_cast<DBusDictEntry*>(arg);
+                if(entry->getKeySet() && entry->getValueSet())
                 {
-                    auto newArg = DBusArgumentFactory::getArgCopy(arg);
-                    if(newArg)
+                    if(!m_initialized)
                     {
-                        if(m_subArgs.size() == 0)
+                        m_entryType = std::make_pair(entry->getKeyType(), entry->getValueType());
+                        m_containedSignature = entry->getSignature();
+                        m_signature += m_containedSignature;
+                        m_initialized = true;
+                    }
+                    if((entry->getKeyType() == m_entryType.first) && (entry->getValueType() == m_entryType.second))
+                    {
+                        auto newArg = DBusArgumentFactory::getArgCopy(arg);
+                        if(newArg)
                         {
-                            m_containedSignature = newArg->getSignature();
+                            m_subArgs.push_back(std::move(newArg));
+                            addedNewArg = true;
                         }
-                        m_subArgs.push_back(std::move(newArg));
-                        addedNewArg = true;
                     }
                 }
             }
@@ -114,16 +124,19 @@ namespace DBUS
         return addedNewArg;
     }
 
-    bool DBusDictionary::setEntryType(DBusArgument::ArgType keyType, ArgType valType)
+    bool DBusDictionary::setEntryType(ArgType keyType, ArgType valType)
     {
         bool entryTypeSet = false;
         if(!m_initialized)
         {
             //type has not been set yet
-            entryTypeSet = (getArgTypeIndex(keyType) >= 0);
+            entryTypeSet = (getArgTypeIndex(keyType) >= 0) && (getArgTypeIndex(valType) >= 0);
             if(entryTypeSet)
             {
                 m_entryType = std::make_pair(keyType, valType);
+                m_containedSignature = DBusDictEntry::createEntrySignature(keyType, valType);
+                m_signature += m_containedSignature;
+                m_initialized = true;
             }
         }
         return entryTypeSet;
@@ -131,7 +144,12 @@ namespace DBUS
 
     const char *DBusDictionary::getContainerSignature() const
     {
-        return m_containedSignature.c_str();
+        const char* retSig = nullptr;
+        if(!m_containedSignature.empty())
+        {
+            retSig = m_containedSignature.c_str();
+        }
+        return retSig;
     }
 
     DBusArgument::ArgType DBusDictionary::getArgType() const
@@ -141,11 +159,23 @@ namespace DBUS
         return static_cast<ArgType>(DBUS_TYPE_ARRAY);
     }
 
+    std::pair<DBusArgument::ArgType, DBusArgument::ArgType> DBusDictionary::getEntryType() const
+    {
+        return m_entryType;
+    }
+
+    bool DBusDictionary::isInitialized() const
+    {
+        return m_initialized;
+    }
+
     template<>
     bool DBusDictionary::addEntry(DBusArgument *key, DBusArgument *value)
     {
         bool entryAdded = false;
-        if(key != nullptr && value != nullptr)
+        if(m_initialized)
+        {
+        if(key && value)
         {
             if(key->getArgType() == m_entryType.first)
             {
@@ -160,10 +190,6 @@ namespace DBUS
                             if(!keyArg->argIsContainerType() && !valArg->argIsContainerType())
                             {                                
                                 std::unique_ptr<DBusArgument> newEntry{new DBusDictEntry{static_cast<DBusBasicArgument*>(keyArg.release()), static_cast<DBusBasicArgument*>(valArg.release())}};
-                                if(m_subArgs.size() == 0)
-                                {
-                                    m_containedSignature = newEntry->getSignature();
-                                }
                                 m_subArgs.push_back(std::move(newEntry));
                                 entryAdded = true;
                             }
@@ -171,6 +197,7 @@ namespace DBUS
                     }
                 }
             }
+        }
         }
         return entryAdded;
     }

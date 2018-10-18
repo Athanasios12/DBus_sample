@@ -96,7 +96,7 @@ namespace DBUS
                 retPtr = &(std::get<double>(m_arg));
                 break;
             case DBusArgument::ArgType::String:
-                retPtr = &(std::get<char*>(m_arg));
+                retPtr = const_cast<char*>(std::get<std::string>(m_arg).c_str());
                 break;
             default:
                 break;

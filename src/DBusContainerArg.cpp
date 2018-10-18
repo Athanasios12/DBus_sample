@@ -107,4 +107,9 @@ namespace DBUS
     {
         return m_subArgs.end();
     }
+
+    std::size_t DBusContainerArg::getSize() const
+    {
+        return m_subArgs.size();
+    }
 }

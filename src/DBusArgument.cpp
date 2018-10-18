@@ -20,7 +20,7 @@ namespace DBUS
     DBusArgument::DBusArgument(DBusArgument::ArgType argType):
         m_argType{argType}
     {
-        setSignature();
+        m_signature = getArgTypeSignature(m_argType);
     }
 
     DBusArgument::DBusArgument(const DBusArgument &other)
@@ -72,7 +72,6 @@ namespace DBUS
     {
         int wrongTypeIndex = -1;
         argValType argTypeVariant;
-        char *cptr = nullptr;
         auto arg = DBusArgumentFactory::getArgument(Byte);
         switch (type)
         {
@@ -104,7 +103,7 @@ namespace DBUS
             argTypeVariant = true;
             break;
         case String:
-            argTypeVariant = cptr;
+            argTypeVariant = std::string{};
             break;
         case Array:
         case Struct:
@@ -128,59 +127,61 @@ namespace DBUS
         return m_signature.c_str();
     }
 
-    void DBusArgument::setSignature()
+    std::string DBusArgument::getArgTypeSignature(ArgType argType)
     {
-        switch (m_argType)
+        std::string signature;
+        switch (argType)
         {
         case Byte:
-            m_signature = DBUS_TYPE_BYTE_AS_STRING;
+            signature = DBUS_TYPE_BYTE_AS_STRING;
             break;
         case UInt16:
-            m_signature = DBUS_TYPE_UINT16_AS_STRING;
+            signature = DBUS_TYPE_UINT16_AS_STRING;
             break;
         case UInt32:
-            m_signature = DBUS_TYPE_UINT32_AS_STRING;
+            signature = DBUS_TYPE_UINT32_AS_STRING;
             break;
         case UInt64:
-            m_signature = DBUS_TYPE_UINT64_AS_STRING;
+            signature = DBUS_TYPE_UINT64_AS_STRING;
             break;
         case Int16:
-            m_signature = DBUS_TYPE_INT16_AS_STRING;
+            signature = DBUS_TYPE_INT16_AS_STRING;
             break;
         case Int32:
-            m_signature = DBUS_TYPE_INT32_AS_STRING;
+            signature = DBUS_TYPE_INT32_AS_STRING;
             break;
         case Int64:
-            m_signature = DBUS_TYPE_INT64_AS_STRING;
+            signature = DBUS_TYPE_INT64_AS_STRING;
             break;
         case Double:
-            m_signature = DBUS_TYPE_DOUBLE_AS_STRING;
+            signature = DBUS_TYPE_DOUBLE_AS_STRING;
             break;
         case Bool:
-            m_signature = DBUS_TYPE_BOOLEAN_AS_STRING;
+            signature = DBUS_TYPE_BOOLEAN_AS_STRING;
             break;
         case String:
-            m_signature = DBUS_TYPE_STRING_AS_STRING;
+            signature = DBUS_TYPE_STRING_AS_STRING;
             break;
         case Array:
         case Dictionary:
-            m_signature = DBUS_TYPE_ARRAY_AS_STRING;
+            signature = DBUS_TYPE_ARRAY_AS_STRING;
             break;
         case Struct:
-            m_signature = DBUS_STRUCT_SIG;
+            signature = DBUS_STRUCT_SIG;
             break;
         case Dictionary_Entry:
-            m_signature = DBUS_DICT_ENTRY_SIG;
+            signature = DBUS_DICT_ENTRY_SIG;
             break;
         default:
             break;
         }
+        return signature;
     }
 
     template <>
-    int DBusArgument::setArgVariant(argValType &var, const char* value) const
+    DBusArgument::argValType DBusArgument::getSetArgVariant(const char* value) const
     {
-        var = const_cast<char*>(value);
-        return var.index();
+        argValType var = std::string{value};
+        return var;
     }
 }
