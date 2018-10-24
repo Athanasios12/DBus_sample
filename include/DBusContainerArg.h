@@ -22,7 +22,8 @@ namespace DBUS
         bool operator==(const DBusContainerArg &other) const;
 
         bool argIsContainerType() const;
-        virtual bool addArgument(DBusArgument* arg) = 0;        
+        virtual bool addArgument(DBusArgument* arg) = 0;
+        virtual void resetArgument();
 
         virtual ArgType getArgType() const;
         virtual const char* getContainerSignature() const;

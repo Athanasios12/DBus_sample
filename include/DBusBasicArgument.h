@@ -29,6 +29,7 @@ namespace DBUS
         bool argIsContainerType() const;
     private:
         argValType m_arg;
+        bool m_argSet{false};
     };
 
     template<typename T>
@@ -36,10 +37,12 @@ namespace DBUS
     {
         bool argSet = false;
         auto index = getArgTypeIndex(m_argType);        
-        auto argVariant = getSetArgVariant(value);
-        if(index == static_cast<decltype(index)>(argVariant.index()))
+        argValType argVariant{};
+        auto varIdx = setArgVariant(argVariant, value);
+        if(index == static_cast<decltype(index)>(varIdx))
         {
             m_arg = value;
+            m_argSet = true;
             argSet = true;
         }
         return argSet;
@@ -52,13 +55,15 @@ namespace DBUS
         auto index = getArgTypeIndex(argType);        
         if(index >= 0)
         {
-            auto argVariant = getSetArgVariant(value);
-            if(index == static_cast<decltype(index)>(argVariant.index()))
+            argValType argVariant{};
+            auto varIdx = setArgVariant(argVariant, value);
+            if(index == static_cast<decltype(index)>(varIdx))
             {
                 m_argType = argType;
                 m_arg = argVariant;
                 m_signature = getArgTypeSignature(argType);
                 argReset = true;
+                m_argSet = true;
             }
         }
         return argReset;

@@ -194,7 +194,7 @@ namespace
                 auto arg = static_cast<DBusBasicArgument*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::Int16));
                 arg->setArgValue<dbus_int16_t>(20);
                 //change argType and value
-                arg->resetArg<const char*>(DBusArgument::ArgType::String, "Hello from Client");
+                arg->resetArg<char*>(DBusArgument::ArgType::String, "Hello from Client");
                 auto arg1 = static_cast<DBusBasicArgument*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::Byte));
                 arg1->setArgValue<uint8_t>(10);
                 //array argument

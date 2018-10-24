@@ -25,10 +25,16 @@ namespace DBUS
         bool addArgument(Arg newElem);
         bool addArgument(DBusArgument *arg);
         bool setElementsType(ArgType argType);
+        void resetArgument() final;
+
         const char* getContainerSignature() const final;
+        ArgType getElemType() const;
+        bool isElementTypeSet() const;
     private:
         bool containedSignatureMatch(DBusArgument *arg);
+
         ArgType m_elemType;
+        bool m_elemTypeSet{false};
     };
 
     template<typename Arg>
@@ -37,18 +43,21 @@ namespace DBUS
         bool addedNewArg = false;
         if(m_elemType != ArgType::Invalid)
         {
-            //check if arg type match
-            argValType argVariant = newElem;
-            if(static_cast<int>(argVariant.index()) == getArgTypeIndex(m_elemType))
+            if(m_elemTypeSet)
             {
-                //check if contained signature match
-                std::unique_ptr<DBusArgument> arg{new DBusBasicArgument{m_elemType}};
-                if(arg)
+                //check if arg type match
+                argValType argVariant = newElem;
+                if(static_cast<int>(argVariant.index()) == getArgTypeIndex(m_elemType))
                 {
-                    if(containedSignatureMatch(arg.get()))
+                    //check if contained signature match
+                    std::unique_ptr<DBusArgument> arg{new DBusBasicArgument{m_elemType}};
+                    if(arg)
                     {
-                        static_cast<DBusBasicArgument*>(arg.get())->setArgValue(newElem);
-                        m_subArgs.push_back(std::move(arg));
+                        if(containedSignatureMatch(arg.get()))
+                        {
+                            static_cast<DBusBasicArgument*>(arg.get())->setArgValue(newElem);
+                            m_subArgs.push_back(std::move(arg));
+                        }
                     }
                 }
             }

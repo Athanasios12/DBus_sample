@@ -14,26 +14,24 @@ namespace DBUS
         DBusContainerArg(ArgType::Array),
         m_elemType(argType)
     {
-
+        m_containedSignature = getArgTypeSignature(m_elemType);
+        m_signature += m_containedSignature;
     }
 
     DBusArray::DBusArray(const DBusArray &other):
         DBusContainerArg(other)
     {
-        if(this != &other)
-        {
-            m_elemType = other.m_elemType;
-        }
+        m_elemType = other.m_elemType;
+        m_elemTypeSet = other.m_elemTypeSet;
     }
 
     DBusArray::DBusArray(DBusArray &&other):
         DBusContainerArg(std::forward<DBusArray>(other))
     {
-        if(this != &other)
-        {
-            m_elemType = other.m_elemType;
-            other.m_elemType = ArgType::Invalid;
-        }
+        m_elemType = other.m_elemType;
+        m_elemTypeSet = other.m_elemTypeSet;
+        other.m_elemTypeSet = false;
+        other.m_elemType = ArgType::Invalid;
     }
 
     DBusArray& DBusArray::operator=(const DBusArray &other)
@@ -41,6 +39,7 @@ namespace DBUS
         if(this != &other)
         {
             m_elemType = other.m_elemType;
+            m_elemTypeSet = other.m_elemTypeSet;
             DBusContainerArg::operator=(other);
         }
         return *this;
@@ -51,7 +50,9 @@ namespace DBUS
         if(this != &other)
         {
             m_elemType = other.m_elemType;
+            m_elemTypeSet = other.m_elemTypeSet;
             other.m_elemType = ArgType::Invalid;
+            other.m_elemTypeSet = false;
             DBusContainerArg::operator=(std::forward<DBusArray>(other));
         }
         return *this;
@@ -78,20 +79,23 @@ namespace DBUS
         bool addedNewArg = false;
         if(arg)
         {
-            if(arg->getArgType() != ArgType::Invalid)
+            if(m_elemTypeSet)
             {
-                if(arg->getArgType() == m_elemType)
+                if(arg->getArgType() != ArgType::Invalid)
                 {
-                    auto newArg = DBusArgumentFactory::getArgCopy(arg);
-                    if(newArg)
+                    if(arg->getArgType() == m_elemType)
                     {
-                        if(containedSignatureMatch(newArg.get()))
+                        auto newArg = DBusArgumentFactory::getArgCopy(arg);
+                        if(newArg)
                         {
-                            m_subArgs.push_back(std::move(newArg));
-                            addedNewArg = true;
+                            if(containedSignatureMatch(newArg.get()))
+                            {
+                                m_subArgs.push_back(std::move(newArg));
+                                addedNewArg = true;
+                            }
                         }
-                    }
 
+                    }
                 }
             }
         }
@@ -101,26 +105,49 @@ namespace DBUS
     bool DBusArray::setElementsType(ArgType argType)
     {
         bool setElemType = false;
-        if(m_elemType == ArgType::Invalid)
+        if(argType != ArgType::Invalid)
         {
-            // elem type has not been set yet
-            setElemType = (getArgTypeIndex(argType) >= 0);
-            if(setElemType)
+            if(!m_elemTypeSet) // otherwise specify explicitly by calling resetContainer and then set type
             {
-                m_elemType = argType;
+                // elem type has not been set yet
+                setElemType = (getArgTypeIndex(argType) >= 0);
+                if(setElemType)
+                {
+                    m_elemType = argType;
+                    m_elemTypeSet = true;
+                    m_containedSignature = getArgTypeSignature(argType);
+                    m_signature = getArgTypeSignature(ArgType::Array) + m_containedSignature;
+                }
             }
         }
         return setElemType;
     }
 
+    void DBusArray::resetArgument()
+    {
+        DBusContainerArg::resetArgument();
+        m_elemType = ArgType::Invalid;
+        m_elemTypeSet = false;
+    }
+
     const char *DBusArray::getContainerSignature() const
     {
         const char *retPtr = nullptr;
-        if(!m_signature.empty())
+        if(!m_containedSignature.empty())
         {
             retPtr = m_containedSignature.c_str();
         }
         return retPtr;
+    }
+
+    DBusArgument::ArgType DBusArray::getElemType() const
+    {
+        return m_elemType;
+    }
+
+    bool DBusArray::isElementTypeSet() const
+    {
+        return m_elemTypeSet;
     }
 
     bool DBusArray::containedSignatureMatch(DBusArgument *arg)

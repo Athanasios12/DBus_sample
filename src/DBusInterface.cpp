@@ -62,6 +62,7 @@ namespace DBUS
             if(!arg->argIsContainerType())
             {
                 auto retValPtr = static_cast<DBusBasicArgument*>(arg)->getArgValuePtr();
+                fprintf(stderr, "\n%s\n", (const char*)retValPtr);
                 if(retValPtr)
                 {
                     dbus_message_iter_append_basic(iterator, static_cast<int>(arg->getArgType()), retValPtr);

@@ -44,12 +44,14 @@ namespace DBUS
         if(m_initialized)
         {
             //check if types match
-            auto keyVariant = getSetArgVariant(key);
-            auto valVariant = getSetArgVariant(value);
+            argValType keyVariant{};
+            auto keyIdx = setArgVariant(keyVariant, key);
+            argValType valVariant{};
+            auto valIdx = setArgVariant(valVariant, value);
             //fprintf(stderr, "\nKey index : %d\nValue index: %d\n", keyVariant.index(), valVariant.index());
-            if(static_cast<int>(keyVariant.index()) == getArgTypeIndex(m_entryType.first))
+            if(static_cast<int>(keyIdx) == getArgTypeIndex(m_entryType.first))
             {
-                if(static_cast<int>(valVariant.index()) == getArgTypeIndex(m_entryType.second))
+                if(static_cast<int>(valIdx) == getArgTypeIndex(m_entryType.second))
                 {
                     std::unique_ptr<DBusArgument> keyArg{new DBusBasicArgument{m_entryType.first}};
                     if(keyArg)

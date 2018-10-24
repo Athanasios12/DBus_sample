@@ -20,7 +20,7 @@ namespace DBUS
                                 bool,
                                 double,
                                 uint8_t,
-                                std::string,
+                                char*,//tried with std::string - sigfaults??
                                 DBusArgument*> argValType;
 
         enum ArgType
@@ -51,16 +51,18 @@ namespace DBUS
         DBusArgument& operator=(DBusArgument &&other);
         virtual ~DBusArgument();
 
-        int getArgTypeIndex(ArgType type) const;
+        virtual void resetArgument();
+
         template <typename Val>
-        argValType getSetArgVariant(Val value) const
+        auto setArgVariant(argValType &var, Val value) const
         {
-            argValType var = value;
-            return var;
+            var = value;
+            return var.index();
         }
 
         virtual ArgType getArgType() const;
         virtual const char* getSignature() const;
+        int getArgTypeIndex(ArgType type) const;
         virtual bool argIsContainerType() const = 0;
     protected:
         static std::string getArgTypeSignature(ArgType argType);

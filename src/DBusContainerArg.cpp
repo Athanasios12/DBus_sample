@@ -17,18 +17,15 @@ namespace DBUS
     DBusContainerArg::DBusContainerArg(const DBusContainerArg &other):
         DBusArgument(other)
     {
-        if(this != &other)
+        for(auto && arg : other.m_subArgs)
         {
-            for(auto && arg : other.m_subArgs)
+            if(arg)
             {
-                if(arg)
-                {
-                    auto argCopy = DBusArgumentFactory::getArgCopy(arg.get());
-                    m_subArgs.push_back(std::move(argCopy));
-                }
+                auto argCopy = DBusArgumentFactory::getArgCopy(arg.get());
+                m_subArgs.push_back(std::move(argCopy));
             }
-            m_containedSignature = other.m_containedSignature;
         }
+        m_containedSignature = other.m_containedSignature;
     }
 
     DBusContainerArg::DBusContainerArg(DBusContainerArg &&other):
@@ -84,6 +81,13 @@ namespace DBUS
     bool DBusContainerArg::argIsContainerType() const
     {
         return true;
+    }
+
+    void DBusContainerArg::resetArgument()
+    {
+        DBusArgument::resetArgument();
+        m_containedSignature.clear();
+        m_subArgs.clear();
     }
 
     DBusArgument::ArgType DBusContainerArg::getArgType() const

@@ -25,21 +25,15 @@ namespace DBUS
 
     DBusArgument::DBusArgument(const DBusArgument &other)
     {
-        if(this != &other)
-        {
-            m_argType = other.m_argType;
-            m_signature = other.m_signature;
-        }
+        m_argType = other.m_argType;
+        m_signature = other.m_signature;
     }
 
     DBusArgument::DBusArgument(DBusArgument &&other)
     {
-        if(this != &other)
-        {
-            m_argType = other.m_argType;
-            m_signature = std::move(other.m_signature);
-            other.m_argType = ArgType::Invalid;
-        }
+        m_argType = other.m_argType;
+        m_signature = std::move(other.m_signature);
+        other.m_argType = ArgType::Invalid;
     }
 
     DBusArgument& DBusArgument::operator=(const DBusArgument &other)
@@ -68,11 +62,18 @@ namespace DBUS
 
     }
 
+    void DBusArgument::resetArgument()
+    {
+        m_argType = ArgType::Invalid;
+        m_signature.clear();
+    }
+
     int DBusArgument::getArgTypeIndex(ArgType type) const
     {
         int wrongTypeIndex = -1;
         argValType argTypeVariant;
         auto arg = DBusArgumentFactory::getArgument(Byte);
+        char* cptr = nullptr;
         switch (type)
         {
         case Byte:
@@ -103,7 +104,7 @@ namespace DBUS
             argTypeVariant = true;
             break;
         case String:
-            argTypeVariant = std::string{};
+            argTypeVariant = cptr;
             break;
         case Array:
         case Struct:
@@ -124,7 +125,12 @@ namespace DBUS
 
     const char *DBusArgument::getSignature() const
     {
-        return m_signature.c_str();
+        const char *retPtr = nullptr;
+        if(!m_signature.empty())
+        {
+            retPtr = m_signature.c_str();
+        }
+        return retPtr;
     }
 
     std::string DBusArgument::getArgTypeSignature(ArgType argType)
@@ -179,9 +185,9 @@ namespace DBUS
     }
 
     template <>
-    DBusArgument::argValType DBusArgument::getSetArgVariant(const char* value) const
+    auto DBusArgument::setArgVariant(DBusArgument::argValType &var, const char* value) const
     {
-        argValType var = std::string{value};
-        return var;
+        var = const_cast<char*>(value);
+        return var.index();
     }
 }

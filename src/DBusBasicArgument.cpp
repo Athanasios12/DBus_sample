@@ -16,19 +16,16 @@ namespace DBUS
     DBusBasicArgument::DBusBasicArgument(const DBusBasicArgument &other):
         DBusArgument(other)
     {
-        if(this != &other)
-        {
-            m_arg = other.m_arg;
-        }
+        m_argSet = other.m_argSet;
+        m_arg = other.m_arg;
     }
 
     DBusBasicArgument::DBusBasicArgument(DBusBasicArgument &&other):
         DBusArgument(std::forward<DBusBasicArgument>(other))
     {
-        if(this != &other)
-        {
-            m_arg = std::move(other.m_arg);
-        }
+        m_argSet = other.m_argSet;
+        other.m_argSet = false;
+        m_arg = std::move(other.m_arg);
     }
 
     DBusBasicArgument& DBusBasicArgument::operator=(const DBusBasicArgument &other)
@@ -36,6 +33,7 @@ namespace DBUS
         if(this != &other)
         {
             DBusArgument::operator=(other);
+            m_argSet = other.m_argSet;
             m_arg = other.m_arg;
         }
         return *this;
@@ -47,6 +45,8 @@ namespace DBUS
         {
             DBusArgument::operator=(std::forward<DBusBasicArgument>(other));
             m_arg = std::move(other.m_arg);
+            m_argSet = other.m_argSet;
+            other.m_argSet = false;
         }
         return *this;
     }
@@ -64,7 +64,7 @@ namespace DBUS
     void* DBusBasicArgument::getArgValuePtr()
     {
         void *retPtr = nullptr;
-        if(m_argType != ArgType::Invalid)
+        if(m_argType != ArgType::Invalid && m_argSet)
         {
             switch(m_argType)
             {
@@ -72,7 +72,7 @@ namespace DBUS
                 retPtr = &(std::get<uint8_t>(m_arg));
                 break;
             case DBusArgument::ArgType::Bool:
-                retPtr = &(std::get<dbus_bool_t>(m_arg));
+                retPtr = &(std::get<bool>(m_arg));
                 break;
             case DBusArgument::ArgType::Int16:
                 retPtr = &(std::get<dbus_int16_t>(m_arg));
@@ -96,7 +96,7 @@ namespace DBUS
                 retPtr = &(std::get<double>(m_arg));
                 break;
             case DBusArgument::ArgType::String:
-                retPtr = const_cast<char*>(std::get<std::string>(m_arg).c_str());
+                retPtr = std::get<char*>(m_arg);
                 break;
             default:
                 break;
