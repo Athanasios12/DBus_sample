@@ -79,11 +79,22 @@ namespace DBUS
         bool addedNewArg = false;
         if(arg)
         {
-            if(m_elemTypeSet)
+            if(arg->getArgType() != ArgType::Invalid)
             {
-                if(arg->getArgType() != ArgType::Invalid)
+                if(arg->isArgInitlized())
                 {
-                    if(arg->getArgType() == m_elemType)
+                    //special case for dictionary - because it type return is different than container type
+                    //dictionary is special array of entries in DBus protocol
+                    bool elemIsMatchingDictionary = false;
+                    if(arg->argIsContainerType())
+                    {
+                        auto cArg = static_cast<DBusContainerArg*>(arg);
+                        if((cArg->getContainerType() == m_elemType) && (cArg->getArgType() != m_elemType))
+                        {
+                            elemIsMatchingDictionary = true;
+                        }
+                    }
+                    if(arg->getArgType() == m_elemType || elemIsMatchingDictionary)
                     {
                         auto newArg = DBusArgumentFactory::getArgCopy(arg);
                         if(newArg)
@@ -92,9 +103,9 @@ namespace DBUS
                             {
                                 m_subArgs.push_back(std::move(newArg));
                                 addedNewArg = true;
+                                m_argIsInitalized = true;
                             }
                         }
-
                     }
                 }
             }
@@ -114,7 +125,6 @@ namespace DBUS
                 if(setElemType)
                 {
                     m_elemType = argType;
-                    m_elemTypeSet = true;
                     m_containedSignature = getArgTypeSignature(argType);
                     m_signature = getArgTypeSignature(ArgType::Array) + m_containedSignature;
                 }
@@ -127,7 +137,7 @@ namespace DBUS
     {
         DBusContainerArg::resetArgument();
         m_elemType = ArgType::Invalid;
-        m_elemTypeSet = false;
+        m_elemTypeSet = false;        
     }
 
     const char *DBusArray::getContainerSignature() const
@@ -152,17 +162,34 @@ namespace DBUS
 
     bool DBusArray::containedSignatureMatch(DBusArgument *arg)
     {
-        bool sigMatch = true;
+        bool sigMatch = false;
         if(arg)
         {
-            if(m_subArgs.size() == 0)
+            if(!arg->argIsContainerType())
             {
-                m_signature += arg->getSignature();
-                m_containedSignature = arg->getSignature();
+                if(arg->getSignature() == m_containedSignature && m_elemType != ArgType::Invalid)
+                {
+                    sigMatch = true;
+                }
             }
-            else if(arg->getSignature() != m_containedSignature)
+            else
             {
-                sigMatch = false;
+                auto containerArg = static_cast<DBusContainerArg*>(arg);
+                if(containerArg->getContainerTypeSignature() == m_containedSignature ||
+                   containerArg->getSignature() == m_containedSignature)
+                {
+                    std::string elemSig{containerArg->getSignature()};
+                    if(!m_elemTypeSet)
+                    {
+                        m_signature = m_containerSignature + elemSig;
+                        m_containedSignature = elemSig;
+                        m_elemTypeSet = true;
+                    }
+                    if(m_signature == m_containerSignature + elemSig)
+                    {
+                        sigMatch = true;
+                    }
+                }
             }
         }
         return sigMatch;

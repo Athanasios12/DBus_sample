@@ -16,15 +16,12 @@ namespace DBUS
     DBusBasicArgument::DBusBasicArgument(const DBusBasicArgument &other):
         DBusArgument(other)
     {
-        m_argSet = other.m_argSet;
         m_arg = other.m_arg;
     }
 
     DBusBasicArgument::DBusBasicArgument(DBusBasicArgument &&other):
         DBusArgument(std::forward<DBusBasicArgument>(other))
     {
-        m_argSet = other.m_argSet;
-        other.m_argSet = false;
         m_arg = std::move(other.m_arg);
     }
 
@@ -33,7 +30,6 @@ namespace DBUS
         if(this != &other)
         {
             DBusArgument::operator=(other);
-            m_argSet = other.m_argSet;
             m_arg = other.m_arg;
         }
         return *this;
@@ -45,8 +41,6 @@ namespace DBUS
         {
             DBusArgument::operator=(std::forward<DBusBasicArgument>(other));
             m_arg = std::move(other.m_arg);
-            m_argSet = other.m_argSet;
-            other.m_argSet = false;
         }
         return *this;
     }
@@ -70,10 +64,7 @@ namespace DBUS
             {
             case DBusArgument::ArgType::Byte:
                 retPtr = &(std::get<uint8_t>(m_arg));
-                break;
-            case DBusArgument::ArgType::Bool:
-                retPtr = &(std::get<bool>(m_arg));
-                break;
+                break;            
             case DBusArgument::ArgType::Int16:
                 retPtr = &(std::get<dbus_int16_t>(m_arg));
                 break;
@@ -83,6 +74,7 @@ namespace DBUS
             case DBusArgument::ArgType::Int32:
                 retPtr = &(std::get<dbus_int32_t>(m_arg));
                 break;
+            case DBusArgument::ArgType::Bool:
             case DBusArgument::ArgType::UInt32:
                 retPtr = &(std::get<dbus_uint32_t>(m_arg));
                 break;
@@ -96,7 +88,7 @@ namespace DBUS
                 retPtr = &(std::get<double>(m_arg));
                 break;
             case DBusArgument::ArgType::String:
-                retPtr = std::get<char*>(m_arg);
+                retPtr = (void*)const_cast<char*>(std::get<const char*>(m_arg));
                 break;
             default:
                 break;

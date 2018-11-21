@@ -46,128 +46,123 @@ namespace
 
     TEST_F(DBusStructTest, defaultCtor)
     {
-//        DBusStruct dbStruct;
-//        EXPECT_EQ(0u, dbStruct.getSize());
-//        EXPECT_EQ(std::make_pair(DBusArgument::ArgType::Invalid, DBusArgument::ArgType::Invalid), dbStruct.getEntryType());
-//        EXPECT_EQ(false, dbStruct.isInitialized());
-//        EXPECT_EQ("a", std::string{dbStruct.getSignature()});
-//        EXPECT_EQ(nullptr, dbStruct.getContainerSignature());
+        DBusStruct dbStruct;
+        EXPECT_EQ(0u, dbStruct.getSize());
+        EXPECT_EQ(DBusArgument::ArgType::Struct, dbStruct.getArgType());
+        EXPECT_EQ(std::string{"()"}, std::string{dbStruct.getSignature()});
+        EXPECT_EQ(true, dbStruct.getContainedSignature().empty());
+        EXPECT_EQ(nullptr, dbStruct.getContainerSignature());
     }
 
-//    TEST_F(DBusStructTest, ctor)
-//    {
-//        DBusStruct dbStruct{DBusArgument::ArgType::String, DBusArgument::ArgType::Int32};
-//        EXPECT_EQ(0u, dbStruct.getSize());
-//        EXPECT_EQ(std::make_pair(DBusArgument::ArgType::String, DBusArgument::ArgType::Int32), dbStruct.getEntryType());
-//        EXPECT_EQ(true, dbStruct.isInitialized());
-//        EXPECT_EQ("a{si}", std::string{dbStruct.getSignature()});
-//        EXPECT_EQ(true, dbStruct.getContainerSignature() != nullptr);
-//        EXPECT_EQ("{si}", std::string{dbStruct.getContainerSignature()});
-//    }
+    TEST_F(DBusStructTest, addField_valid)
+    {
+        DBusStruct dbStruct;
+        EXPECT_EQ(true, dbStruct.addField(DBusArgument::ArgType::String, "String field"));
+        EXPECT_EQ(true, dbStruct.addField(DBusArgument::ArgType::Int32, 90));
+        EXPECT_EQ(2u, dbStruct.getSize());
+        std::string expectedSig = std::string{"("} + std::string{DBUS_TYPE_STRING_AS_STRING} +
+                                   std::string{DBUS_TYPE_INT32_AS_STRING} + std::string{")"};
+        EXPECT_EQ(expectedSig, std::string{dbStruct.getSignature()});
+        EXPECT_EQ(std::string{DBUS_TYPE_STRING_AS_STRING} + std::string{DBUS_TYPE_INT32_AS_STRING},
+                  dbStruct.getContainedSignature());
+        auto firstArgPtr = static_cast<DBusBasicArgument*>(dbStruct.getArgValueAt(0));
+        auto secondArgPtr = static_cast<DBusBasicArgument*>(dbStruct.getArgValueAt(1));
+        //error z rzutem char* na stringa, sprawdzic tworzenie basic arga
+        EXPECT_NE(nullptr, firstArgPtr);
+        EXPECT_NE(nullptr, secondArgPtr);
+        EXPECT_EQ(DBusArgument::ArgType::String, firstArgPtr->getArgType());
+        EXPECT_EQ(DBusArgument::ArgType::Int32, secondArgPtr->getArgType());
+        EXPECT_EQ(std::string{"String field"}, std::string{static_cast<char*>(firstArgPtr->getArgValuePtr())});
+        EXPECT_EQ(90, *(static_cast<dbus_int32_t*>(secondArgPtr->getArgValuePtr())));
+    }
 
-//    TEST_F(DBusStructTest, copyCtor)
-//    {
-//        DBusStruct dbStruct;
-//        DBusBasicArgument key{DBusArgument::ArgType::String};
-//        DBusBasicArgument value{DBusArgument::ArgType::Int32};
-//        dbStruct.setEntryType(key.getArgType(), value.getArgType());
-//        dbStruct.addEntry<const char*, dbus_int32_t>("Key", 10);
-//        dbStruct.addEntry<DBusArgument*, DBusArgument*>(&key, &value);
-//        DBusStruct dbStructCopy{dbStruct};
-//        //original
-//        EXPECT_EQ(2u, dbStructCopy.getSize());
-//        EXPECT_EQ(std::make_pair(DBusArgument::ArgType::String, DBusArgument::ArgType::Int32), dbStructCopy.getEntryType());
-//        EXPECT_EQ(true, dbStructCopy.isInitialized());
-//        EXPECT_EQ("a{si}", std::string{dbStructCopy.getSignature()});
-//        EXPECT_EQ("{si}", std::string{dbStructCopy.getContainerSignature()});
-//        //copy
-//        EXPECT_EQ(dbStructCopy.getSize(), dbStruct.getSize());
-//        EXPECT_EQ(dbStructCopy.getEntryType(), dbStruct.getEntryType());
-//        EXPECT_EQ(dbStructCopy.isInitialized(), dbStruct.isInitialized());
-//        EXPECT_EQ(true, strcmp(dbStruct.getSignature(), dbStructCopy.getSignature()) == 0);
-//        EXPECT_EQ(true, strcmp(dbStruct.getContainerSignature(), dbStructCopy.getContainerSignature()) == 0);
-//    }
+    TEST_F(DBusStructTest, addField_nonMatchingTypeAndValue)
+    {
+        DBusStruct dbStruct;
+        EXPECT_EQ(false, dbStruct.addField(DBusArgument::ArgType::String, 20));
+        EXPECT_EQ(0u, dbStruct.getSize());
+        EXPECT_EQ(std::string{"()"}, std::string{dbStruct.getSignature()});
+        EXPECT_EQ(true, dbStruct.getContainedSignature().empty());
+        EXPECT_EQ(nullptr, dbStruct.getContainerSignature());
+    }
 
-//    TEST_F(DBusStructTest, moveCtor)
-//    {
-//        DBusStruct dbStruct;
-//        DBusBasicArgument key{DBusArgument::ArgType::String};
-//        DBusBasicArgument value{DBusArgument::ArgType::Int32};
-//        dbStruct.setEntryType(key.getArgType(), value.getArgType());
-//        dbStruct.addEntry<const char*, dbus_int32_t>("Key", 10);
-//        dbStruct.addEntry<DBusArgument*, DBusArgument*>(&key, &value);
-//        DBusStruct dbStructMove{std::move(dbStruct)};
-//        //move
-//        EXPECT_EQ(2u, dbStructMove.getSize());
-//        EXPECT_EQ(std::make_pair(DBusArgument::ArgType::String, DBusArgument::ArgType::Int32), dbStructMove.getEntryType());
-//        EXPECT_EQ(true, dbStructMove.isInitialized());
-//        EXPECT_EQ("a{si}", std::string{dbStructMove.getSignature()});
-//        EXPECT_EQ("{si}", std::string{dbStructMove.getContainerSignature()});
-//        //original
-//        EXPECT_EQ(0u, dbStruct.getSize());
-//        EXPECT_EQ(std::make_pair(DBusArgument::ArgType::Invalid, DBusArgument::ArgType::Invalid), dbStruct.getEntryType());
-//        EXPECT_EQ(false, dbStruct.isInitialized());
-//        EXPECT_EQ("a", std::string{dbStruct.getSignature()});
-//        EXPECT_EQ(nullptr, dbStruct.getContainerSignature());
-//    }
+    TEST_F(DBusStructTest, addArgument_valid)
+    {
+        DBusStruct dbStruct;
+        DBusBasicArgument field0{DBusArgument::ArgType::String};
+        EXPECT_EQ(true, field0.setArgValue("String field"));
+        DBusBasicArgument field1{DBusArgument::ArgType::Int32};
+        EXPECT_EQ(true, field1.setArgValue(90));
 
-//    TEST_F(DBusStructTest, addEntry_valid)
-//    {
-//        DBusStruct dbStruct;
-//        DBusBasicArgument key{DBusArgument::ArgType::String};
-//        DBusBasicArgument value{DBusArgument::ArgType::Int32};
-//        dbStruct.setEntryType(key.getArgType(), value.getArgType());
+        EXPECT_EQ(true, dbStruct.addArgument(static_cast<DBusArgument*>(&field0)));
+        EXPECT_EQ(true, dbStruct.addArgument(static_cast<DBusArgument*>(&field1)));
+        EXPECT_EQ(2u, dbStruct.getSize());
+        std::string expectedSig = std::string{"("} + std::string{DBUS_TYPE_STRING_AS_STRING} +
+                                   std::string{DBUS_TYPE_INT32_AS_STRING} + std::string{")"};
+        EXPECT_EQ(expectedSig, std::string{dbStruct.getSignature()});
+        EXPECT_EQ(std::string{DBUS_TYPE_STRING_AS_STRING} + std::string{DBUS_TYPE_INT32_AS_STRING},
+                  dbStruct.getContainedSignature());
+        //check if args added with proper values
+        auto firstArgPtr = static_cast<DBusBasicArgument*>(dbStruct.getArgValueAt(0));
+        auto secondArgPtr = static_cast<DBusBasicArgument*>(dbStruct.getArgValueAt(1));
+        EXPECT_NE(nullptr, firstArgPtr);
+        EXPECT_NE(nullptr, secondArgPtr);
+        EXPECT_EQ(DBusArgument::ArgType::String, firstArgPtr->getArgType());
+        EXPECT_EQ(DBusArgument::ArgType::Int32, secondArgPtr->getArgType());
+        EXPECT_EQ(std::string{"String field"}, std::string{static_cast<char*>(firstArgPtr->getArgValuePtr())});
+        EXPECT_EQ(90, *(static_cast<dbus_int32_t*>(secondArgPtr->getArgValuePtr())));
+    }
 
-//        bool addedEntries = dbStruct.addEntry<const char*, dbus_int32_t>("Key", 10);
-//        addedEntries &= dbStruct.addEntry<DBusArgument*, DBusArgument*>(&key, &value);
+    TEST_F(DBusStructTest, addArgument_invalid)
+    {
+        //trying to add uninitialized arg
+        DBusStruct dbStruct;
+        DBusBasicArgument invalidArg{};
+        EXPECT_EQ(false, dbStruct.addArgument(static_cast<DBusArgument*>(&invalidArg)));
+        EXPECT_EQ(0u, dbStruct.getSize());
+        EXPECT_EQ(std::string{"()"}, std::string{dbStruct.getSignature()});
+        EXPECT_EQ(true, dbStruct.getContainedSignature().empty());
+        EXPECT_EQ(nullptr, dbStruct.getContainerSignature());
+    }
 
-//        EXPECT_EQ(true, addedEntries);
-//        EXPECT_EQ(2u, dbStruct.getSize());
-//        EXPECT_EQ(std::make_pair(DBusArgument::ArgType::String, DBusArgument::ArgType::Int32), dbStruct.getEntryType());
-//        EXPECT_EQ(true, dbStruct.isInitialized());
-//        EXPECT_EQ("a{si}", std::string{dbStruct.getSignature()});
-//        EXPECT_EQ("{si}", std::string{dbStruct.getContainerSignature()});
-//    }
+    TEST_F(DBusStructTest, copyCtor)
+    {
+        DBusStruct dbStruct;
+        dbStruct.addField(DBusArgument::ArgType::String, "String field");
+        dbStruct.addField(DBusArgument::ArgType::Int32, 78);
+        DBusStruct dbStructCopy{dbStruct};
+        //original
+        EXPECT_EQ(2u, dbStruct.getSize());
+        std::string expectedSig = std::string{"("} + std::string{DBUS_TYPE_STRING_AS_STRING} +
+                                   std::string{DBUS_TYPE_INT32_AS_STRING} + std::string{")"};
+        EXPECT_EQ(expectedSig, std::string{dbStruct.getSignature()});
+        EXPECT_EQ(std::string{DBUS_TYPE_STRING_AS_STRING} + std::string{DBUS_TYPE_INT32_AS_STRING},
+                  dbStruct.getContainedSignature());
+        //copy
+        EXPECT_EQ(dbStruct.getSize(), dbStructCopy.getSize());
+        EXPECT_EQ(true, strcmp(dbStruct.getSignature(), dbStructCopy.getSignature()) == 0);
+        EXPECT_EQ(dbStruct.getContainedSignature(), dbStructCopy.getContainedSignature());
+    }
 
-//    TEST_F(DBusStructTest, addEntry_invalid)
-//    {
-//        DBusStruct dbStruct;
-//        DBusBasicArgument key{DBusArgument::ArgType::String};
-//        DBusBasicArgument value{DBusArgument::ArgType::Int32};
-//        dbStruct.setEntryType(key.getArgType(), value.getArgType());
-
-//        bool addedEntries = dbStruct.addEntry<double, bool>(10.9, true);
-//        addedEntries &= dbStruct.addEntry<DBusArgument*, DBusArgument*>(&key, &value);
-//        EXPECT_EQ(false, addedEntries);
-//        EXPECT_EQ(1u, dbStruct.getSize());
-//    }
-
-//    TEST_F(DBusStructTest, addArgument_valid)
-//    {
-//        DBusStruct dbStruct;
-//        DBusBasicArgument key{DBusArgument::ArgType::String};
-//        DBusBasicArgument value{DBusArgument::ArgType::Int32};
-//        DBusdbStructEntry entry{&key, &value};
-//        dbStruct.setEntryType(entry.getKeyType(), entry.getValueType());
-//        bool argAdded = dbStruct.addArgument(&entry);
-//        EXPECT_EQ(true, argAdded);
-//        EXPECT_EQ(1u, dbStruct.getSize());
-//        EXPECT_EQ(true, dbStruct.isInitialized());
-//        EXPECT_EQ("a{si}", std::string{dbStruct.getSignature()});
-//        EXPECT_EQ("{si}", std::string{dbStruct.getContainerSignature()});
-//    }
-
-//    TEST_F(DBusStructTest, addArgument_invalid)
-//    {
-//        DBusStruct dbStruct;
-//        DBusBasicArgument string{DBusArgument::ArgType::String};
-//        dbStruct.setEntryType(DBusArgument::ArgType::String, DBusArgument::ArgType::Int32);
-//        bool argAdded = dbStruct.addArgument(&string);
-//        EXPECT_EQ(false, argAdded);
-//        EXPECT_EQ(0u, dbStruct.getSize());
-//        EXPECT_EQ(true, dbStruct.isInitialized());
-//        EXPECT_EQ("a{si}", std::string{dbStruct.getSignature()});
-//        EXPECT_EQ("{si}", std::string{dbStruct.getContainerSignature()});
-//    }
+    TEST_F(DBusStructTest, moveCtor)
+    {
+        DBusStruct dbStruct;
+        dbStruct.addField(DBusArgument::ArgType::String, "String field");
+        dbStruct.addField(DBusArgument::ArgType::Int32, 78);
+        DBusStruct dbStructMove{std::move(dbStruct)};
+        //move
+        EXPECT_EQ(2u, dbStructMove.getSize());
+        std::string expectedSig = std::string{"("} + std::string{DBUS_TYPE_STRING_AS_STRING} +
+                                   std::string{DBUS_TYPE_INT32_AS_STRING} + std::string{")"};
+        EXPECT_EQ(expectedSig, std::string{dbStructMove.getSignature()});
+        EXPECT_EQ(std::string{DBUS_TYPE_STRING_AS_STRING} + std::string{DBUS_TYPE_INT32_AS_STRING},
+                  dbStructMove.getContainedSignature());
+        //original
+        EXPECT_EQ(0u, dbStruct.getSize());
+        EXPECT_EQ(DBusArgument::ArgType::Struct, dbStruct.getArgType());
+        EXPECT_EQ(std::string{"()"}, std::string{dbStruct.getSignature()});
+        EXPECT_EQ(true, dbStruct.getContainedSignature().empty());
+        EXPECT_EQ(nullptr, dbStruct.getContainerSignature());
+    }
 
 }

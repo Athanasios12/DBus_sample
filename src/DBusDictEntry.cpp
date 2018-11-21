@@ -122,14 +122,21 @@ namespace DBUS
     bool DBusDictEntry::setKey(std::unique_ptr<DBusArgument> &key)
     {
         bool keyValid = false;
-        if(key.get())
+        if(key)
         {
-            m_subArgs[KEY_IDX] = std::move(key);
-            keyValid = true;
-            m_keySet = true;
-            if(m_valSet)
+            //dictionary entry can have only basic types no containers allowed
+            if(key->getArgType() != ArgType::Invalid && !key->argIsContainerType())
             {
-                setEntrySignature();
+                if(key->isArgInitlized())
+                {
+                    m_subArgs[KEY_IDX] = std::move(key);
+                    keyValid = true;
+                    m_keySet = true;
+                    if(m_valSet)
+                    {
+                        setEntrySignature();
+                    }
+                }
             }
         }
         return keyValid;
@@ -138,14 +145,21 @@ namespace DBUS
     bool DBusDictEntry::setValue(std::unique_ptr<DBusArgument> &value)
     {
         bool valueValid = false;
-        if(value.get())
+        if(value)
         {
-            m_subArgs[VALUE_IDX] = std::move(value);
-            valueValid = true;
-            m_valSet = true;
-            if(m_keySet)
+            //dictionary entry can have only basic types no containers allowed
+            if(value->getArgType() != ArgType::Invalid && !value->argIsContainerType())
             {
-                setEntrySignature();
+                if(value->isArgInitlized())
+                {
+                    m_subArgs[VALUE_IDX] = std::move(value);
+                    valueValid = true;
+                    m_valueSet = true;
+                    if(m_keySet)
+                    {
+                        setEntrySignature();
+                    }
+                }
             }
         }
         return valueValid;
@@ -156,14 +170,18 @@ namespace DBUS
         bool keyValid = false;
         if(key)
         {
-            if(!key->argIsContainerType())
+            //dictionary entry can have only basic types no containers allowed
+            if(key->getArgType() != ArgType::Invalid && !key->argIsContainerType())
             {
-                m_subArgs[KEY_IDX] = std::move(DBusArgumentFactory::getArgCopy(key));
-                keyValid = true;
-                m_keySet = true;
-                if(m_valSet)
+                if(key->isArgInitlized())
                 {
-                    setEntrySignature();
+                    m_subArgs[KEY_IDX] = std::move(DBusArgumentFactory::getArgCopy(key));
+                    keyValid = true;
+                    m_keySet = true;
+                    if(m_valSet)
+                    {
+                        setEntrySignature();
+                    }
                 }
             }
         }
@@ -175,14 +193,18 @@ namespace DBUS
         bool valueValid = false;
         if(value)
         {
-            if(!value->argIsContainerType())
+            //dictionary entry can have only basic types no containers allowed
+            if(value->getArgType() != ArgType::Invalid && !value->argIsContainerType())
             {
-                m_subArgs[VALUE_IDX] = std::move(DBusArgumentFactory::getArgCopy(value));
-                valueValid = true;
-                m_valSet = true;
-                if(m_keySet)
+                if(value->isArgInitlized())
                 {
-                    setEntrySignature();
+                    m_subArgs[VALUE_IDX] = std::move(DBusArgumentFactory::getArgCopy(value));
+                    valueValid = true;
+                    m_valSet = true;
+                    if(m_keySet)
+                    {
+                        setEntrySignature();
+                    }
                 }
             }
         }
@@ -231,6 +253,7 @@ namespace DBUS
                     m_signature.insert(entryEnd, m_subArgs[KEY_IDX]->getSignature());
                     entryEnd = m_signature.find_last_of(DICT_ENTRY_END_CHAR);
                     m_signature.insert(entryEnd, m_subArgs[VALUE_IDX]->getSignature());
+                    m_argIsInitalized = true;
                 }
             }
         }

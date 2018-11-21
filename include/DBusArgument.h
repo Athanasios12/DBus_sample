@@ -17,10 +17,9 @@ namespace DBUS
                                 dbus_int32_t,
                                 dbus_uint64_t,
                                 dbus_int64_t,
-                                bool,
                                 double,
                                 uint8_t,
-                                char*,//tried with std::string - sigfaults??
+                                const char*,//tried with std::string - sigfaults??
                                 DBusArgument*> argValType;
 
         enum ArgType
@@ -51,22 +50,16 @@ namespace DBUS
         DBusArgument& operator=(DBusArgument &&other);
         virtual ~DBusArgument();
 
-        virtual void resetArgument();
-
-        template <typename Val>
-        auto setArgVariant(argValType &var, Val value) const
-        {
-            var = value;
-            return var.index();
-        }
-
+        virtual void resetArgument();        
         virtual ArgType getArgType() const;
         virtual const char* getSignature() const;
         int getArgTypeIndex(ArgType type) const;
         virtual bool argIsContainerType() const = 0;
-    protected:
         static std::string getArgTypeSignature(ArgType argType);
+        bool isArgInitlized() const;
+    protected:
         ArgType m_argType;
+        bool m_argIsInitalized{false};
         std::string m_signature;
     };
 }

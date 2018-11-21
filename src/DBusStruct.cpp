@@ -3,8 +3,8 @@
 
 namespace DBUS
 {
-    const char STRUCT_START_CHAR = '(';
-    const char STRUCT_END_CHAR = ')';
+    const std::string STRUCT_START_CHAR{"("};
+    const std::string  STRUCT_END_CHAR{")"};
 
     DBusStruct::DBusStruct():
         DBusContainerArg(ArgType::Struct)
@@ -21,21 +21,25 @@ namespace DBUS
     DBusStruct::DBusStruct(DBusStruct &&other):
         DBusContainerArg(std::forward<DBusStruct>(other))
     {
-        if(this != &other)
-        {
-            m_subArgs = std::move(other.m_subArgs);
-        }
+        other.m_signature = STRUCT_START_CHAR + STRUCT_END_CHAR;
     }
 
     DBusStruct& DBusStruct::operator=(const DBusStruct &other)
     {
-        DBusContainerArg::operator=(other);
+        if(this != &other)
+        {
+            DBusContainerArg::operator=(other);
+        }
         return *this;
     }
 
     DBusStruct& DBusStruct::operator=(DBusStruct &&other)
     {
-        DBusContainerArg::operator=(std::forward<DBusStruct>(other));
+        if(this != &other)
+        {
+            DBusContainerArg::operator=(std::forward<DBusStruct>(other));
+            other.m_signature = STRUCT_START_CHAR + STRUCT_END_CHAR;
+        }
         return *this;
     }
 
@@ -71,12 +75,16 @@ namespace DBUS
         {
             if(arg->getArgType() != ArgType::Invalid)
             {
-                auto newArg = DBusArgumentFactory::getArgCopy(arg);
-                if(newArg)
+                if(arg->isArgInitlized())
                 {
-                    appendStructSignature(newArg.get());
-                    m_subArgs.push_back(std::move(newArg));
-                    addedNewArg = true;
+                    auto newArg = DBusArgumentFactory::getArgCopy(arg);
+                    if(newArg)
+                    {
+                        appendStructSignature(newArg.get());
+                        m_subArgs.push_back(std::move(newArg));
+                        addedNewArg = true;
+                        m_argIsInitalized = true;
+                    }
                 }
             }
         }
@@ -87,11 +95,8 @@ namespace DBUS
     {
         if(arg)
         {
-            auto structEnd = m_signature.find_last_of(STRUCT_END_CHAR);
-            if(structEnd != std::string::npos)
-            {
-                m_signature.insert(structEnd, arg->getSignature());
-            }
+            m_containedSignature += arg->getSignature();
+            m_signature = STRUCT_START_CHAR + m_containedSignature + STRUCT_END_CHAR;
         }
     }
 }

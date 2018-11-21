@@ -11,12 +11,14 @@ namespace DBUS
     DBusContainerArg::DBusContainerArg(ArgType argType):
         DBusArgument(argType)
     {
-
+        m_containerSignature = m_signature;
     }
 
     DBusContainerArg::DBusContainerArg(const DBusContainerArg &other):
         DBusArgument(other)
     {
+        m_containerSignature = other.m_containerSignature;
+        m_containedSignature = other.m_containedSignature;
         for(auto && arg : other.m_subArgs)
         {
             if(arg)
@@ -25,7 +27,6 @@ namespace DBUS
                 m_subArgs.push_back(std::move(argCopy));
             }
         }
-        m_containedSignature = other.m_containedSignature;
     }
 
     DBusContainerArg::DBusContainerArg(DBusContainerArg &&other):
@@ -34,6 +35,7 @@ namespace DBUS
         if(this != &other)
         {
             m_subArgs = std::move(other.m_subArgs);
+            m_containerSignature = std::move(other.m_containerSignature);
             m_containedSignature = std::move(other.m_containedSignature);
         }
     }
@@ -42,6 +44,8 @@ namespace DBUS
     {
         if(this != &other)
         {
+            m_containerSignature = other.m_containerSignature;
+            m_containedSignature = other.m_containedSignature;
             DBusArgument::operator=(other);
             for(auto && arg : other.m_subArgs)
             {
@@ -50,8 +54,7 @@ namespace DBUS
                     auto argCopy = DBusArgumentFactory::getArgCopy(arg.get());
                     m_subArgs.push_back(std::move(argCopy));
                 }
-            }
-            m_containedSignature = other.m_containedSignature;
+            }            
         }
         return *this;
     }
@@ -63,6 +66,7 @@ namespace DBUS
             DBusArgument::operator=(std::forward<DBusContainerArg>(other));
             m_subArgs = std::move(other.m_subArgs);
             m_containedSignature = std::move(other.m_containedSignature);
+            m_containerSignature = std::move(other.m_containerSignature);
         }
         return *this;
     }
@@ -90,6 +94,20 @@ namespace DBUS
         m_subArgs.clear();
     }
 
+    bool DBusContainerArg::resetContainedArgument(std::size_t pos, DBusArgument *newArg)
+    {
+        bool resetArg = false;
+        if(newArg)
+        {
+            if(pos < m_subArgs.size())
+            {
+                m_subArgs[pos].reset(newArg);
+                resetArg = true;
+            }
+        }
+        return resetArg;
+    }
+
     DBusArgument::ArgType DBusContainerArg::getArgType() const
     {
         return m_argType;
@@ -112,8 +130,36 @@ namespace DBUS
         return m_subArgs.end();
     }
 
+    DBusArgument *DBusContainerArg::getArgValueAt(std::size_t pos) const
+    {
+        DBusArgument *retVal = nullptr;
+        if(pos < m_subArgs.size())
+        {
+            if(m_subArgs[pos])
+            {
+                retVal = m_subArgs[pos].get();
+            }
+        }
+        return retVal;
+    }
+
     std::size_t DBusContainerArg::getSize() const
     {
         return m_subArgs.size();
+    }
+
+    std::string DBusContainerArg::getContainerTypeSignature() const
+    {
+        return m_containerSignature;
+    }
+
+    std::string DBusContainerArg::getContainedSignature() const
+    {
+        return m_containedSignature;
+    }
+
+    DBusArgument::ArgType DBusContainerArg::getContainerType() const
+    {
+        return m_argType;
     }
 }

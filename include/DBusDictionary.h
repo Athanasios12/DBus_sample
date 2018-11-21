@@ -27,13 +27,14 @@ namespace DBUS
         bool addEntry(Key key, Value value);
         bool addArgument(DBusArgument* arg);
         bool setEntryType(ArgType keyType, ArgType valType);
-        const char* getContainerSignature() const final;
 
+        const char* getContainerSignature() const final;
         ArgType getArgType() const;
         std::pair<ArgType, ArgType> getEntryType() const;
+        ArgType getContainerType() const final;
         bool isInitialized() const;
     private:
-        bool  m_initialized;
+        bool m_initialized{false};
         std::pair<ArgType, ArgType> m_entryType;
     };
 
@@ -44,14 +45,12 @@ namespace DBUS
         if(m_initialized)
         {
             //check if types match
-            argValType keyVariant{};
-            auto keyIdx = setArgVariant(keyVariant, key);
-            argValType valVariant{};
-            auto valIdx = setArgVariant(valVariant, value);
+            argValType keyVariant = key;
+            argValType valVariant = value;
             //fprintf(stderr, "\nKey index : %d\nValue index: %d\n", keyVariant.index(), valVariant.index());
-            if(static_cast<int>(keyIdx) == getArgTypeIndex(m_entryType.first))
+            if(static_cast<int>(keyVariant.index()) == getArgTypeIndex(m_entryType.first))
             {
-                if(static_cast<int>(valIdx) == getArgTypeIndex(m_entryType.second))
+                if(static_cast<int>(valVariant.index()) == getArgTypeIndex(m_entryType.second))
                 {
                     std::unique_ptr<DBusArgument> keyArg{new DBusBasicArgument{m_entryType.first}};
                     if(keyArg)
@@ -68,6 +67,7 @@ namespace DBUS
                                     std::unique_ptr<DBusArgument> newEntry{new DBusDictEntry{keyArg, valArg}};
                                     m_subArgs.push_back(std::move(newEntry));
                                     entryAdded = true;
+                                    m_argIsInitalized = true;
                                 }
                             }
                         }

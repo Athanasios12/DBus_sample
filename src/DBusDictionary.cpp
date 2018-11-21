@@ -94,28 +94,28 @@ namespace DBUS
 
     bool DBusDictionary::addArgument(DBusArgument *arg)
     {
-        bool addedNewArg = false;        
-        if(arg)
+        bool addedNewArg = false;
+        if(m_initialized)
         {
-            if(arg->getArgType() == ArgType::Dictionary_Entry)
+            if(arg)
             {
-                auto entry = static_cast<DBusDictEntry*>(arg);
-                if(entry->getKeySet() && entry->getValueSet())
+                if(arg->getArgType() == ArgType::Dictionary_Entry)
                 {
-                    if(!m_initialized)
+                    if(arg->isArgInitlized())
                     {
-                        m_entryType = std::make_pair(entry->getKeyType(), entry->getValueType());
-                        m_containedSignature = entry->getSignature();
-                        m_signature += m_containedSignature;
-                        m_initialized = true;
-                    }
-                    if((entry->getKeyType() == m_entryType.first) && (entry->getValueType() == m_entryType.second))
-                    {
-                        auto newArg = DBusArgumentFactory::getArgCopy(arg);
-                        if(newArg)
+                        auto entry = static_cast<DBusDictEntry*>(arg);
+                        if(entry->getKeySet() && entry->getValueSet())
                         {
-                            m_subArgs.push_back(std::move(newArg));
-                            addedNewArg = true;
+                            if((entry->getKeyType() == m_entryType.first) && (entry->getValueType() == m_entryType.second))
+                            {
+                                auto newArg = DBusArgumentFactory::getArgCopy(arg);
+                                if(newArg)
+                                {
+                                    m_subArgs.push_back(std::move(newArg));
+                                    m_argIsInitalized = true;
+                                    addedNewArg = true;
+                                }
+                            }
                         }
                     }
                 }
@@ -162,6 +162,11 @@ namespace DBUS
     std::pair<DBusArgument::ArgType, DBusArgument::ArgType> DBusDictionary::getEntryType() const
     {
         return m_entryType;
+    }
+
+    DBusArgument::ArgType DBusDictionary::getContainerType() const
+    {
+        return ArgType::Dictionary;
     }
 
     bool DBusDictionary::isInitialized() const

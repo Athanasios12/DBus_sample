@@ -43,21 +43,21 @@ namespace DBUS
         bool addedNewArg = false;
         if(m_elemType != ArgType::Invalid)
         {
-            if(m_elemTypeSet)
+            //check if arg type match
+            argValType argVariant = newElem;
+            if(static_cast<int>(argVariant.index()) == getArgTypeIndex(m_elemType))
             {
-                //check if arg type match
-                argValType argVariant = newElem;
-                if(static_cast<int>(argVariant.index()) == getArgTypeIndex(m_elemType))
+                //check if contained signature match
+                std::unique_ptr<DBusArgument> arg{new DBusBasicArgument{m_elemType}};
+                if(arg)
                 {
-                    //check if contained signature match
-                    std::unique_ptr<DBusArgument> arg{new DBusBasicArgument{m_elemType}};
-                    if(arg)
+                    if(containedSignatureMatch(arg.get()))
                     {
-                        if(containedSignatureMatch(arg.get()))
-                        {
-                            static_cast<DBusBasicArgument*>(arg.get())->setArgValue(newElem);
-                            m_subArgs.push_back(std::move(arg));
-                        }
+                        static_cast<DBusBasicArgument*>(arg.get())->setArgValue(newElem);
+                        m_subArgs.push_back(std::move(arg));
+                        addedNewArg = true;
+                        //by default array of 0 size is not initialized - no sense is sending it
+                        m_argIsInitalized = true;
                     }
                 }
             }

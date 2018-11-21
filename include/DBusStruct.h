@@ -43,6 +43,8 @@ namespace DBUS
                     appendStructSignature(arg.get());
                     static_cast<DBusBasicArgument*>(arg.get())->setArgValue(value);
                     m_subArgs.push_back(std::move(arg));
+                    addedNewArg = true;
+                    m_argIsInitalized = true;
                 }
             }
         }

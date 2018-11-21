@@ -50,7 +50,7 @@ namespace
         EXPECT_EQ(0u, dict.getSize());
         EXPECT_EQ(std::make_pair(DBusArgument::ArgType::Invalid, DBusArgument::ArgType::Invalid), dict.getEntryType());
         EXPECT_EQ(false, dict.isInitialized());
-        EXPECT_EQ("a", std::string{dict.getSignature()});
+        EXPECT_EQ(DBUS_TYPE_ARRAY_AS_STRING, std::string{dict.getSignature()});
         EXPECT_EQ(nullptr, dict.getContainerSignature());
     }
 
@@ -60,9 +60,97 @@ namespace
         EXPECT_EQ(0u, dict.getSize());
         EXPECT_EQ(std::make_pair(DBusArgument::ArgType::String, DBusArgument::ArgType::Int32), dict.getEntryType());
         EXPECT_EQ(true, dict.isInitialized());
-        EXPECT_EQ("a{si}", std::string{dict.getSignature()});
+        auto expectedSig = std::string{DBUS_TYPE_ARRAY_AS_STRING} +
+                std::string{"{"} + std::string{DBUS_TYPE_STRING_AS_STRING} +
+                std::string{DBUS_TYPE_INT32_AS_STRING} + std::string{"}"};
+        EXPECT_EQ(expectedSig, std::string{dict.getSignature()});
         EXPECT_EQ(true, dict.getContainerSignature() != nullptr);
-        EXPECT_EQ("{si}", std::string{dict.getContainerSignature()});
+        EXPECT_EQ(std::string{"{"} + std::string{DBUS_TYPE_STRING_AS_STRING} + std::string{DBUS_TYPE_INT32_AS_STRING} + std::string{"}"},
+                  std::string{dict.getContainerSignature()});
+    }    
+
+    TEST_F(DBusDictionaryTest, addEntry_valid)
+    {
+        DBusDictionary dict;
+        DBusBasicArgument key{DBusArgument::ArgType::String};
+        DBusBasicArgument value{DBusArgument::ArgType::Int32};
+        dict.setEntryType(key.getArgType(), value.getArgType());
+
+        bool addedEntries = dict.addEntry<const char*, dbus_int32_t>("Key", 10);
+        addedEntries &= dict.addEntry<DBusArgument*, DBusArgument*>(&key, &value);
+
+        EXPECT_EQ(true, addedEntries);
+        EXPECT_EQ(2u, dict.getSize());
+        EXPECT_EQ(std::make_pair(DBusArgument::ArgType::String, DBusArgument::ArgType::Int32), dict.getEntryType());
+        EXPECT_EQ(true, dict.isInitialized());
+        auto expectedSig = std::string{DBUS_TYPE_ARRAY_AS_STRING} +
+                std::string{"{"} + std::string{DBUS_TYPE_STRING_AS_STRING} +
+                std::string{DBUS_TYPE_INT32_AS_STRING} + std::string{"}"};
+        EXPECT_EQ(expectedSig, std::string{dict.getSignature()});
+        EXPECT_EQ(std::string{"{"} + std::string{DBUS_TYPE_STRING_AS_STRING} + std::string{DBUS_TYPE_INT32_AS_STRING} + std::string{"}"},
+                  std::string{dict.getContainerSignature()});
+    }
+
+    TEST_F(DBusDictionaryTest, addEntry_invalid_EntryArgsValuesNotSet)
+    {
+        DBusDictionary dict;
+        DBusBasicArgument key{DBusArgument::ArgType::String};
+        DBusBasicArgument value{DBusArgument::ArgType::Int32};
+        dict.setEntryType(key.getArgType(), value.getArgType());
+
+        bool addedEntry = dict.addEntry(static_cast<DBusArgument*>(&key), static_cast<DBusArgument*>(&value));
+        EXPECT_EQ(false, addedEntry);
+        EXPECT_EQ(0u, dict.getSize());
+    }
+
+    TEST_F(DBusDictionaryTest, addEntry_invalid_DifferentEntryType)
+    {
+        DBusDictionary dict;
+        DBusBasicArgument key{DBusArgument::ArgType::String};
+        DBusBasicArgument value{DBusArgument::ArgType::Byte};
+        EXPECT_EQ(true, key.setArgValue("String"));
+        EXPECT_EQ(true, value.setArgValue(10));
+        dict.setEntryType(DBusArgument::ArgType::Double, DBusArgument::ArgType::Double);
+
+        bool addedEntry = dict.addEntry(static_cast<DBusArgument*>(&key), static_cast<DBusArgument*>(&value));
+        EXPECT_EQ(false, addedEntry);
+        EXPECT_EQ(0u, dict.getSize());
+    }
+
+    TEST_F(DBusDictionaryTest, addArgument_valid)
+    {
+        DBusDictionary dict;
+        DBusBasicArgument key{DBusArgument::ArgType::String};
+        DBusBasicArgument value{DBusArgument::ArgType::Int32};
+        DBusDictEntry entry{&key, &value};
+        dict.setEntryType(entry.getKeyType(), entry.getValueType());
+        bool argAdded = dict.addArgument(&entry);
+        EXPECT_EQ(true, argAdded);
+        EXPECT_EQ(1u, dict.getSize());
+        EXPECT_EQ(true, dict.isInitialized());
+        auto expectedSig = std::string{DBUS_TYPE_ARRAY_AS_STRING} +
+                std::string{"{"} + std::string{DBUS_TYPE_STRING_AS_STRING} +
+                std::string{DBUS_TYPE_INT32_AS_STRING} + std::string{"}"};
+        EXPECT_EQ(expectedSig, std::string{dict.getSignature()});
+        EXPECT_EQ(std::string{"{"} + std::string{DBUS_TYPE_STRING_AS_STRING} + std::string{DBUS_TYPE_INT32_AS_STRING} + std::string{"}"},
+                  std::string{dict.getContainerSignature()});
+    }
+
+    TEST_F(DBusDictionaryTest, addArgument_invalid)
+    {
+        DBusDictionary dict;
+        DBusBasicArgument string{DBusArgument::ArgType::String};
+        dict.setEntryType(DBusArgument::ArgType::String, DBusArgument::ArgType::Int32);
+        bool argAdded = dict.addArgument(&string);
+        EXPECT_EQ(false, argAdded);
+        EXPECT_EQ(0u, dict.getSize());
+        EXPECT_EQ(true, dict.isInitialized());
+        auto expectedSig = std::string{DBUS_TYPE_ARRAY_AS_STRING} +
+                std::string{"{"} + std::string{DBUS_TYPE_STRING_AS_STRING} +
+                std::string{DBUS_TYPE_INT32_AS_STRING} + std::string{"}"};
+        EXPECT_EQ(expectedSig, std::string{dict.getSignature()});
+        EXPECT_EQ(std::string{"{"} + std::string{DBUS_TYPE_STRING_AS_STRING} + std::string{DBUS_TYPE_INT32_AS_STRING} + std::string{"}"},
+                  std::string{dict.getContainerSignature()});
     }
 
     TEST_F(DBusDictionaryTest, copyCtor)
@@ -78,8 +166,12 @@ namespace
         EXPECT_EQ(2u, dictCopy.getSize());
         EXPECT_EQ(std::make_pair(DBusArgument::ArgType::String, DBusArgument::ArgType::Int32), dictCopy.getEntryType());
         EXPECT_EQ(true, dictCopy.isInitialized());
-        EXPECT_EQ("a{si}", std::string{dictCopy.getSignature()});
-        EXPECT_EQ("{si}", std::string{dictCopy.getContainerSignature()});
+        auto expectedSig = std::string{DBUS_TYPE_ARRAY_AS_STRING} +
+                std::string{"{"} + std::string{DBUS_TYPE_STRING_AS_STRING} +
+                std::string{DBUS_TYPE_INT32_AS_STRING} + std::string{"}"};
+        EXPECT_EQ(expectedSig, std::string{dict.getSignature()});
+        EXPECT_EQ(std::string{"{"} + std::string{DBUS_TYPE_STRING_AS_STRING} + std::string{DBUS_TYPE_INT32_AS_STRING} + std::string{"}"},
+                  std::string{dictCopy.getContainerSignature()});
         //copy
         EXPECT_EQ(dictCopy.getSize(), dict.getSize());
         EXPECT_EQ(dictCopy.getEntryType(), dict.getEntryType());
@@ -101,73 +193,18 @@ namespace
         EXPECT_EQ(2u, dictMove.getSize());
         EXPECT_EQ(std::make_pair(DBusArgument::ArgType::String, DBusArgument::ArgType::Int32), dictMove.getEntryType());
         EXPECT_EQ(true, dictMove.isInitialized());
-        EXPECT_EQ("a{si}", std::string{dictMove.getSignature()});
-        EXPECT_EQ("{si}", std::string{dictMove.getContainerSignature()});
+        auto expectedSig = std::string{DBUS_TYPE_ARRAY_AS_STRING} +
+                std::string{"{"} + std::string{DBUS_TYPE_STRING_AS_STRING} +
+                std::string{DBUS_TYPE_INT32_AS_STRING} + std::string{"}"};
+        EXPECT_EQ(expectedSig, std::string{dict.getSignature()});
+        EXPECT_EQ(std::string{"{"} + std::string{DBUS_TYPE_STRING_AS_STRING} + std::string{DBUS_TYPE_INT32_AS_STRING} + std::string{"}"},
+                  std::string{dictMove.getContainerSignature()});
         //original
         EXPECT_EQ(0u, dict.getSize());
         EXPECT_EQ(std::make_pair(DBusArgument::ArgType::Invalid, DBusArgument::ArgType::Invalid), dict.getEntryType());
         EXPECT_EQ(false, dict.isInitialized());
-        EXPECT_EQ("a", std::string{dict.getSignature()});
+        EXPECT_EQ(DBUS_TYPE_ARRAY_AS_STRING, std::string{dict.getSignature()});
         EXPECT_EQ(nullptr, dict.getContainerSignature());
-    }
-
-    TEST_F(DBusDictionaryTest, addEntry_valid)
-    {
-        DBusDictionary dict;
-        DBusBasicArgument key{DBusArgument::ArgType::String};
-        DBusBasicArgument value{DBusArgument::ArgType::Int32};
-        dict.setEntryType(key.getArgType(), value.getArgType());
-
-        bool addedEntries = dict.addEntry<const char*, dbus_int32_t>("Key", 10);
-        addedEntries &= dict.addEntry<DBusArgument*, DBusArgument*>(&key, &value);
-
-        EXPECT_EQ(true, addedEntries);
-        EXPECT_EQ(2u, dict.getSize());
-        EXPECT_EQ(std::make_pair(DBusArgument::ArgType::String, DBusArgument::ArgType::Int32), dict.getEntryType());
-        EXPECT_EQ(true, dict.isInitialized());
-        EXPECT_EQ("a{si}", std::string{dict.getSignature()});
-        EXPECT_EQ("{si}", std::string{dict.getContainerSignature()});
-    }
-
-    TEST_F(DBusDictionaryTest, addEntry_invalid)
-    {
-        DBusDictionary dict;
-        DBusBasicArgument key{DBusArgument::ArgType::String};
-        DBusBasicArgument value{DBusArgument::ArgType::Int32};
-        dict.setEntryType(key.getArgType(), value.getArgType());
-
-        bool addedEntries = dict.addEntry<double, bool>(10.9, true);
-        addedEntries &= dict.addEntry<DBusArgument*, DBusArgument*>(&key, &value);
-        EXPECT_EQ(false, addedEntries);
-        EXPECT_EQ(1u, dict.getSize());
-    }
-
-    TEST_F(DBusDictionaryTest, addArgument_valid)
-    {
-        DBusDictionary dict;
-        DBusBasicArgument key{DBusArgument::ArgType::String};
-        DBusBasicArgument value{DBusArgument::ArgType::Int32};
-        DBusDictEntry entry{&key, &value};
-        dict.setEntryType(entry.getKeyType(), entry.getValueType());
-        bool argAdded = dict.addArgument(&entry);
-        EXPECT_EQ(true, argAdded);
-        EXPECT_EQ(1u, dict.getSize());
-        EXPECT_EQ(true, dict.isInitialized());
-        EXPECT_EQ("a{si}", std::string{dict.getSignature()});
-        EXPECT_EQ("{si}", std::string{dict.getContainerSignature()});
-    }
-
-    TEST_F(DBusDictionaryTest, addArgument_invalid)
-    {
-        DBusDictionary dict;
-        DBusBasicArgument string{DBusArgument::ArgType::String};
-        dict.setEntryType(DBusArgument::ArgType::String, DBusArgument::ArgType::Int32);
-        bool argAdded = dict.addArgument(&string);
-        EXPECT_EQ(false, argAdded);
-        EXPECT_EQ(0u, dict.getSize());
-        EXPECT_EQ(true, dict.isInitialized());
-        EXPECT_EQ("a{si}", std::string{dict.getSignature()});
-        EXPECT_EQ("{si}", std::string{dict.getContainerSignature()});
     }
 
 }
