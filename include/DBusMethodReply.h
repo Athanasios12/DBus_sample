@@ -21,13 +21,12 @@ namespace DBUS
         bool operator==(const DBusMethodReply& other) const;
 
         bool processDBusMsgReply(DBusMessageIter *msgItr);
-        //sink - takes dynamicly allocated pointer and takes over it ownership
-        //both for smart and raw pointer argument
         bool setRetArg(std::unique_ptr<DBusArgument> &retArg);
         bool setRetArg(DBusArgument *retArg);
 
         bool isValid() const;
         DBusArgument* getReturn() const;
+        DBusArgument::ArgType getReturnType() const;
     private:
         bool m_valid;
         DBusArgument::ArgType m_returnType;
@@ -36,5 +35,3 @@ namespace DBUS
 }
 #endif // DBUSMETHODREPLY_H
 
-//Zdefiniuj move i copy contructory dla Container i Arg jako klas
-// bazowych i korzystac z nich w klasach pochodnych

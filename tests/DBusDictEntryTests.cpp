@@ -57,8 +57,10 @@ namespace
 
     TEST_F(DBusDictEntryTest, ctor_rawPtrArgs)
     {
-        DBusBasicArgument key{DBusArgument::ArgType::String};
+        DBusBasicArgument key{DBusArgument::ArgType::String};        
         DBusBasicArgument value{DBusArgument::ArgType::Int32};
+        key.setArgValue("String Key");
+        value.setArgValue(100);
         DBusDictEntry entry{&key, &value};
         EXPECT_EQ(2u, entry.getSize());
         EXPECT_EQ(true, entry.getKeySet());
@@ -73,6 +75,8 @@ namespace
     {
         std::unique_ptr<DBusArgument> key{new DBusBasicArgument{DBusArgument::ArgType::String}};
         std::unique_ptr<DBusArgument> value{new DBusBasicArgument{DBusArgument::ArgType::Int32}};
+        static_cast<DBusBasicArgument*>(key.get())->setArgValue("String Key");
+        static_cast<DBusBasicArgument*>(value.get())->setArgValue(100);
         DBusDictEntry entry{key, value};
         EXPECT_EQ(2u, entry.getSize());
         EXPECT_EQ(true, entry.getKeySet());
@@ -89,6 +93,8 @@ namespace
     {
         std::unique_ptr<DBusArgument> key{new DBusBasicArgument{DBusArgument::ArgType::String}};
         std::unique_ptr<DBusArgument> value{new DBusBasicArgument{DBusArgument::ArgType::Int32}};
+        static_cast<DBusBasicArgument*>(key.get())->setArgValue("String Key");
+        static_cast<DBusBasicArgument*>(value.get())->setArgValue(100);
         DBusDictEntry entry{key, value};
         DBusDictEntry entryCopy{entry};
         EXPECT_EQ(2u, entry.getSize());
@@ -111,6 +117,8 @@ namespace
     {
         std::unique_ptr<DBusArgument> key{new DBusBasicArgument{DBusArgument::ArgType::String}};
         std::unique_ptr<DBusArgument> value{new DBusBasicArgument{DBusArgument::ArgType::Int32}};
+        static_cast<DBusBasicArgument*>(key.get())->setArgValue("String Key");
+        static_cast<DBusBasicArgument*>(value.get())->setArgValue(100);
         DBusDictEntry entry{key, value};
         DBusDictEntry entryMove{std::move(entry)};
         EXPECT_EQ(2u, entryMove.getSize());
@@ -126,13 +134,14 @@ namespace
         EXPECT_EQ(false, entry.getValueSet());
         EXPECT_EQ(DBusArgument::ArgType::Invalid, entry.getKeyType());
         EXPECT_EQ(DBusArgument::ArgType::Invalid, entry.getValueType());
-        EXPECT_EQ("", std::string{entry.getSignature()});
+        EXPECT_EQ(nullptr, entry.getSignature());
         EXPECT_EQ(nullptr, entry.getContainerSignature());
     }
 
     TEST_F(DBusDictEntryTest, setKey_rawPtrArg)
     {
         DBusBasicArgument key{DBusArgument::ArgType::String};
+        key.setArgValue("String Key");
         DBusDictEntry entry;
         entry.setKey(&key);
         EXPECT_EQ(true, entry.getKeySet());
@@ -143,6 +152,7 @@ namespace
     TEST_F(DBusDictEntryTest, setValue_rawPtrArg)
     {
         DBusBasicArgument value{DBusArgument::ArgType::Int32};
+        value.setArgValue(100);
         DBusDictEntry entry;
         entry.setValue(&value);
         EXPECT_EQ(true, entry.getValueSet());
@@ -153,6 +163,7 @@ namespace
     TEST_F(DBusDictEntryTest, setKey_smartPtrArg)
     {
         std::unique_ptr<DBusArgument> key{new DBusBasicArgument{DBusArgument::ArgType::String}};
+        static_cast<DBusBasicArgument*>(key.get())->setArgValue("String Key");
         DBusDictEntry entry;
         entry.setKey(key);
         EXPECT_EQ(false, entry.getValueSet());
@@ -164,6 +175,7 @@ namespace
     TEST_F(DBusDictEntryTest, setValue_smartPtrArg)
     {
         std::unique_ptr<DBusArgument> value{new DBusBasicArgument{DBusArgument::ArgType::Int32}};
+        static_cast<DBusBasicArgument*>(value.get())->setArgValue(100);
         DBusDictEntry entry;
         entry.setValue(value);
         EXPECT_EQ(true, entry.getValueSet());
@@ -176,6 +188,8 @@ namespace
     {
         DBusBasicArgument key{DBusArgument::ArgType::String};
         DBusBasicArgument value{DBusArgument::ArgType::Int32};
+        key.setArgValue("String Key");
+        value.setArgValue(100);
         DBusDictEntry entry;
         entry.setKey(&key);
         entry.setValue(&value);
@@ -190,6 +204,8 @@ namespace
     {
         DBusBasicArgument key{DBusArgument::ArgType::String};
         DBusArray value{DBusArgument::ArgType::Int32};
+        key.setArgValue("String Key");
+        value.addArgument(100);
         DBusDictEntry entry;
         entry.setKey(&key);
         entry.setValue(&value);
@@ -203,6 +219,7 @@ namespace
     TEST_F(DBusDictEntryTest, addArgument)
     {
         DBusBasicArgument key{DBusArgument::ArgType::String};
+        key.setArgValue("String Key");
         DBusDictEntry entry;
         EXPECT_EQ(true, entry.addArgument(&key));
         EXPECT_EQ(true, entry.getKeySet());

@@ -149,4 +149,9 @@ namespace DBUS
     {
         return m_return.get();
     }
+
+    DBusArgument::ArgType DBusMethodReply::getReturnType() const
+    {
+        return m_returnType;
+    }
 }

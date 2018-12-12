@@ -41,23 +41,17 @@ namespace DBUS
     DBusDictEntry::DBusDictEntry(const DBusDictEntry &other):
         DBusContainerArg{other}
     {
-        if(this != &other)
-        {
-            m_keySet = other.m_keySet;
-            m_valSet = other.m_valSet;
-        }
+        m_keySet = other.m_keySet;
+        m_valSet = other.m_valSet;
     }
 
     DBusDictEntry::DBusDictEntry(DBusDictEntry &&other):
         DBusContainerArg(std::forward<DBusDictEntry>(other))
     {
-        if(this != &other)
-        {
-            m_keySet = other.m_keySet;
-            m_valSet = other.m_valSet;
-            other.m_keySet = false;
-            other.m_valSet = false;
-        }
+        m_keySet = other.m_keySet;
+        m_valSet = other.m_valSet;
+        other.m_keySet = false;
+        other.m_valSet = false;
     }
 
     DBusDictEntry& DBusDictEntry::operator=(const DBusDictEntry &other)
@@ -154,7 +148,7 @@ namespace DBUS
                 {
                     m_subArgs[VALUE_IDX] = std::move(value);
                     valueValid = true;
-                    m_valueSet = true;
+                    m_valSet = true;
                     if(m_keySet)
                     {
                         setEntrySignature();

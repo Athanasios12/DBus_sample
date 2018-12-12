@@ -14,9 +14,12 @@ namespace DBUS
         }
     }
 
-    DBusMethod::DBusMethod():
-        m_bindingSet(false),
-        m_returnType{DBusArgument::ArgType::Invalid}
+    DBusMethod::DBusMethod(const std::string& name):
+        m_bindingSet{false},
+        m_numOfArgs{0},
+        m_returnType{DBusArgument::ArgType::Invalid},
+        m_bindingArgTypesSet{false},
+        m_name{name}
     {
 
     }
@@ -29,6 +32,7 @@ namespace DBUS
         m_returnType(returnType)
 
     {
+        m_bindingArgTypesSet = !(numOfArgs > 0);
         resizeAndInitArgs(numOfArgs);
     }
 
@@ -137,20 +141,32 @@ namespace DBUS
         return valid;
     }
 
-    bool DBusMethod::setArg(std::unique_ptr<DBusArgument> &arg, uint8_t argNum)
+    bool DBusMethod::setArg(std::unique_ptr<DBusArgument> &arg, std::size_t argNum)
+    {
+        return setArg(arg.get(), argNum);
+    }
+
+    bool DBusMethod::setArg(DBusArgument *arg, std::size_t argNum)
     {
         bool argSet = false;
-        if(m_bindingSet)
+        if(m_bindingSet && m_bindingArgTypesSet)
         {
             if(argNum < m_numOfArgs)
             {
                 //check argument type before assigning it to it
-                if(arg.get())
+                if(arg)
                 {
-                    if(arg->getArgType() == m_argTypes[argNum])
+                    if(arg->isArgInitlized())
                     {
-                        m_args[argNum] = std::move(arg);
-                        argSet = true;
+                        if(arg->getArgType() == m_argTypes[argNum])
+                        {
+                            auto argCopy = DBusArgumentFactory::getArgCopy(arg);
+                            if(argCopy)
+                            {
+                                m_args[argNum] = std::move(argCopy);
+                                argSet = true;
+                            }
+                        }
                     }
                 }
             }
@@ -161,12 +177,13 @@ namespace DBUS
     bool DBusMethod::setBindingArgTypes(const std::vector<DBusArgument::ArgType> &bindingArgTypes)
     {
         bool argTypesSet = false;
-        if(m_args.size() > 0)
+        if(m_bindingSet)
         {
             if(m_args.size() == bindingArgTypes.size())
             {
                 m_argTypes = bindingArgTypes;
                 argTypesSet = true;
+                m_bindingArgTypesSet = true;
             }
         }
         return argTypesSet;
@@ -184,15 +201,20 @@ namespace DBUS
         return reply;
     }
 
-    uint8_t DBusMethod::getNumOfArgs() const
+    std::size_t DBusMethod::getNumOfArgs() const
     {
         return m_numOfArgs;
     }
 
-    void DBusMethod::setBinding(dBusMethodBinding &binding, uint8_t numOfArgs)
+    void DBusMethod::setBinding(dBusMethodBinding &binding, std::size_t numOfArgs, DBusArgument::ArgType returnType)
     {
         m_binding = binding;
-        m_numOfArgs = numOfArgs;
+        m_numOfArgs = numOfArgs;        
+        m_bindingSet = true;
+        m_returnType = returnType;
+        resizeAndInitArgs(numOfArgs);
+        m_bindingArgTypesSet = !(numOfArgs > 0);
+
     }
 
     std::string DBusMethod::getName() const
@@ -215,6 +237,16 @@ namespace DBUS
         return m_returnType;
     }
 
+    bool DBusMethod::bindingIsSet() const
+    {
+        return m_bindingSet;
+    }
+
+    bool DBusMethod::methodArgTypesSet() const
+    {
+        return m_bindingArgTypesSet;
+    }
+
     void DBusMethod::setName(const std::string &name)
     {
         m_name = name;
@@ -232,18 +264,23 @@ namespace DBUS
 
     bool DBusMethod::extractMsgInputArguments(DBusMessageIter *msgItr)
     {
-        uint16_t numOfMatchedArgs = 0;
-        for(auto && arg : m_args)
+        bool extractedArgs = false;
+        if(m_bindingSet && m_bindingArgTypesSet && m_returnType != DBusArgument::ArgType::Invalid)
         {
-            if(arg->getArgType() == dbus_message_iter_get_arg_type(msgItr))
+            uint16_t numOfMatchedArgs = 0;
+            for(auto && arg : m_args)
             {
-                if(DBusInterface::extractDBusMessageArgData(arg.get(), msgItr))
+                if(arg->getArgType() == dbus_message_iter_get_arg_type(msgItr))
                 {
-                    ++numOfMatchedArgs;
+                    if(DBusInterface::extractDBusMessageArgData(arg.get(), msgItr))
+                    {
+                        ++numOfMatchedArgs;
+                    }
                 }
+                dbus_message_iter_next(msgItr);
             }
-            dbus_message_iter_next(msgItr);
+            extractedArgs = (numOfMatchedArgs == m_args.size());
         }
-        return (numOfMatchedArgs == m_args.size());
+        return extractedArgs;
     }
 }

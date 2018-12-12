@@ -176,7 +176,7 @@ namespace
         EXPECT_EQ(std::string{subDict.getSignature()}, std::string{array.getContainerSignature()});
     }
 
-    TEST_F(DBusArrayTest, addArgument_dictionaryArg_2DifferentDictionaries)
+    TEST_F(DBusArrayTest, addArgument_dictionaryArg_2DifferentDictionariesError)
     {
         //first dictionary
         DBusDictionary subDict{DBusArgument::ArgType::String, DBusArgument::ArgType::Int32};
@@ -212,14 +212,19 @@ namespace
         EXPECT_NE(nullptr, secondArgPtr);
         EXPECT_EQ(DBusArgument::ArgType::Int32, firstArgPtr->getArgType());
         EXPECT_EQ(DBusArgument::ArgType::Int32, secondArgPtr->getArgType());
-        EXPECT_EQ(-100, *(static_cast<dbus_int32_t*>(firstArgPtr->getArgValuePtr())));
-        EXPECT_EQ(52, *(static_cast<dbus_int32_t*>(secondArgPtr->getArgValuePtr())));
+        auto firstArgValue = static_cast<dbus_int32_t*>(firstArgPtr->getArgValuePtr());
+        auto secondArgValue = static_cast<dbus_int32_t*>(secondArgPtr->getArgValuePtr());
+        EXPECT_NE(nullptr, firstArgValue);
+        EXPECT_NE(nullptr, secondArgValue);
+        EXPECT_EQ(-100, *firstArgValue);
+        EXPECT_EQ(52, *secondArgValue);
     }
 
     TEST_F(DBusArrayTest, copyCtor)
     {
         DBusArray array{DBusArgument::ArgType::String};
         DBusBasicArgument strArg{DBusArgument::ArgType::String};
+        strArg.setArgValue("String");
         EXPECT_EQ(true, array.addArgument(static_cast<DBusArgument*>(&strArg)));
         DBusArray arrayCopy{array};
         //original
@@ -241,6 +246,7 @@ namespace
     {
         DBusArray array{DBusArgument::ArgType::String};
         DBusBasicArgument strArg{DBusArgument::ArgType::String};
+        strArg.setArgValue("String");
         array.addArgument(static_cast<DBusArgument*>(&strArg));
         DBusArray arrayMove{std::move(array)};
         //move

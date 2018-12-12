@@ -19,7 +19,7 @@ namespace DBUS
         DBusContainerArg& operator=(DBusContainerArg &&other);
         virtual ~DBusContainerArg();
 
-        bool operator==(const DBusContainerArg &other) const;
+        bool operator==(const DBusContainerArg &other) const;        
 
         bool argIsContainerType() const;
         virtual bool addArgument(DBusArgument* arg) = 0;        
@@ -39,6 +39,8 @@ namespace DBUS
         std::string getContainedSignature() const;
         virtual ArgType getContainerType() const;
     protected:
+        //virtual bool checkIfArgPtrEqual(DBusArgument *arg) const = 0;
+
         SubArgs m_subArgs;
         std::string m_containerSignature;
         std::string m_containedSignature;

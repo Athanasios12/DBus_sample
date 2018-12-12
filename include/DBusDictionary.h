@@ -22,6 +22,7 @@ namespace DBUS
         virtual ~DBusDictionary();
 
         bool operator==(const DBusDictionary &other) const;
+        bool operator!=(const DBusDictionary &other) const;
 
         template<typename Key, typename Value>
         bool addEntry(Key key, Value value);
@@ -34,7 +35,7 @@ namespace DBUS
         ArgType getContainerType() const final;
         bool isInitialized() const;
     private:
-        bool m_initialized{false};
+        bool m_entryTypeSet{false};
         std::pair<ArgType, ArgType> m_entryType;
     };
 
@@ -42,34 +43,24 @@ namespace DBUS
     bool DBusDictionary::addEntry(Key key, Value value)
     {
         bool entryAdded = false;
-        if(m_initialized)
+        if(m_entryTypeSet)
         {
-            //check if types match
-            argValType keyVariant = key;
-            argValType valVariant = value;
-            //fprintf(stderr, "\nKey index : %d\nValue index: %d\n", keyVariant.index(), valVariant.index());
-            if(static_cast<int>(keyVariant.index()) == getArgTypeIndex(m_entryType.first))
+            std::unique_ptr<DBusArgument> keyArg{new DBusBasicArgument{m_entryType.first}};
+            if(keyArg)
             {
-                if(static_cast<int>(valVariant.index()) == getArgTypeIndex(m_entryType.second))
+                if(static_cast<DBusBasicArgument*>(keyArg.get())->setArgValue(key))
                 {
-                    std::unique_ptr<DBusArgument> keyArg{new DBusBasicArgument{m_entryType.first}};
-                    if(keyArg)
+                    //key matches the entry type
+                    std::unique_ptr<DBusArgument> valArg{new DBusBasicArgument{m_entryType.second}};
+                    if(valArg)
                     {
-                        if(static_cast<DBusBasicArgument*>(keyArg.get())->setArgValue(key))
+                        //check if value matches entry type
+                        if(static_cast<DBusBasicArgument*>(valArg.get())->setArgValue(value))
                         {
-                            //key matches the entry type
-                            std::unique_ptr<DBusArgument> valArg{new DBusBasicArgument{m_entryType.second}};
-                            if(valArg)
-                            {
-                                //check if value matches entry type
-                                if(static_cast<DBusBasicArgument*>(valArg.get())->setArgValue<decltype(value)>(value))
-                                {
-                                    std::unique_ptr<DBusArgument> newEntry{new DBusDictEntry{keyArg, valArg}};
-                                    m_subArgs.push_back(std::move(newEntry));
-                                    entryAdded = true;
-                                    m_argIsInitalized = true;
-                                }
-                            }
+                            std::unique_ptr<DBusArgument> newEntry{new DBusDictEntry{keyArg, valArg}};
+                            m_subArgs.push_back(std::move(newEntry));
+                            entryAdded = true;
+                            m_argIsInitalized = true;
                         }
                     }
                 }

@@ -9,6 +9,7 @@
 #include "DBusArgument.h"
 #include "DBusBasicArgument.h"
 #include "DBusContainerArg.h"
+#include <optional>
 
 namespace DBUS
 {
@@ -78,7 +79,7 @@ namespace DBUS
         bool addObject(DBusObject &object);
         //getters
         std::string getName() const;
-        DBusObject getObject(const std::string &name) const;
+        std::optional<DBusObject> getObject(const std::string &name) const;
 
         //static methods
         static bool processDBusContainerArg(DBusContainerArg *containerArg, DBusMessageIter *iterator);

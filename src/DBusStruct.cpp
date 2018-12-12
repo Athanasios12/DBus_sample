@@ -22,6 +22,8 @@ namespace DBUS
         DBusContainerArg(std::forward<DBusStruct>(other))
     {
         other.m_signature = STRUCT_START_CHAR + STRUCT_END_CHAR;
+        m_parentContainer = other.m_parentContainer;
+        other.m_parentContainer = nullptr;
     }
 
     DBusStruct& DBusStruct::operator=(const DBusStruct &other)
@@ -50,45 +52,52 @@ namespace DBUS
 
     bool DBusStruct::operator==(const DBusStruct &other) const
     {
-        bool equal = false;
-        if(m_subArgs.size() == other.m_subArgs.size())
-        {
-            bool allEqual = true;
-            for(size_t i = 0; i < m_subArgs.size(); i++)
-            {
-                if(m_subArgs[i] != other.m_subArgs[i])
-                {
-                    allEqual = false;
-                    break;
-                }
-            }
-            equal = allEqual;
-        }
-        return equal;
+        return DBusContainerArg::operator ==(other);
+    }
+
+    bool DBusStruct::operator!=(const DBusStruct &other) const
+    {
+        return !operator==(other);
     }
 
     bool DBusStruct::addArgument(DBusArgument *arg)
     {
         //container of containers other than dictionary may cause problems, test that
         bool addedNewArg = false;
-        if(arg)
+        if(m_parentContainer == nullptr)
         {
-            if(arg->getArgType() != ArgType::Invalid)
+            if(arg)
             {
-                if(arg->isArgInitlized())
+                if(arg->getArgType() != ArgType::Invalid)
                 {
-                    auto newArg = DBusArgumentFactory::getArgCopy(arg);
-                    if(newArg)
+                    if(arg->isArgInitlized())
                     {
-                        appendStructSignature(newArg.get());
-                        m_subArgs.push_back(std::move(newArg));
-                        addedNewArg = true;
-                        m_argIsInitalized = true;
+                        auto newArg = DBusArgumentFactory::getArgCopy(arg);
+                        if(newArg)
+                        {
+                            if(newArg->getArgType() == ArgType::Struct)
+                            {
+                                auto structArg = static_cast<DBusStruct*>(newArg.get());
+                                structArg->setParentStruct(this);
+                            }
+                            appendStructSignature(newArg.get());
+                            m_subArgs.push_back(std::move(newArg));
+                            addedNewArg = true;
+                            m_argIsInitalized = true;
+                        }
                     }
                 }
             }
         }
         return addedNewArg;
+    }
+
+    void DBusStruct::setParentStruct(DBusStruct *parentStruct)
+    {
+        if(parentStruct)
+        {
+            m_parentContainer = parentStruct;
+        }
     }
 
     void DBusStruct::appendStructSignature(DBusArgument *arg)

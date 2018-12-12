@@ -19,32 +19,38 @@ namespace DBUS
         virtual ~DBusStruct();
 
         bool operator==(const DBusStruct &other) const;
+        bool operator!=(const DBusStruct &other) const;
 
         template<typename Val>
         bool addField(ArgType type, Val value);
         bool addArgument(DBusArgument *arg);
+        void setParentStruct(DBusStruct *parentStruct);
     private:
         void appendStructSignature(DBusArgument *arg);
+        DBusStruct *m_parentContainer{nullptr};
     };
 
     template<typename Val>
     bool DBusStruct::addField(ArgType type, Val value)
     {
         bool addedNewArg = false;
-        if(type != ArgType::Invalid)
+        //if struct has a parent container, forbidd adding new fields, because
+        //that would need dynamic update of parent container signature
+        if(m_parentContainer == nullptr)
         {
-            //check if arg type matches value type
-            argValType argVariant = value;
-            if(static_cast<int>(argVariant.index()) == getArgTypeIndex(type))
+            if(type != ArgType::Invalid)
             {
+                //check if arg type matches value type
                 std::unique_ptr<DBusArgument> arg{new DBusBasicArgument{type}};
                 if(arg)
                 {
-                    appendStructSignature(arg.get());
-                    static_cast<DBusBasicArgument*>(arg.get())->setArgValue(value);
-                    m_subArgs.push_back(std::move(arg));
-                    addedNewArg = true;
-                    m_argIsInitalized = true;
+                    if(static_cast<DBusBasicArgument*>(arg.get())->setArgValue(value))
+                    {
+                        appendStructSignature(arg.get());
+                        m_subArgs.push_back(std::move(arg));
+                        addedNewArg = true;
+                        m_argIsInitalized = true;
+                    }
                 }
             }
         }

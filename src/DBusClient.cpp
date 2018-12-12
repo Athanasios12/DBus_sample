@@ -61,7 +61,9 @@ namespace DBUS
                 //append client bus name at the end of the message
                 auto clientBusName = DBusArgumentFactory::getArgument(DBusArgument::ArgType::String);
                 static_cast<DBusBasicArgument*>(clientBusName.get())->setArgValue(m_busName.c_str());
-                DBusInterface::appendArg(clientBusName.get(), &iter);
+                DBusBasicArgument clientNameArg{DBusArgument::ArgType::String};
+                clientNameArg.setArgValue(m_busName.c_str());
+                DBusInterface::appendArg(&clientNameArg, &iter);
                 //send with reply request
                 DBusPendingCall *pending_return = nullptr;
                 if(dbus_connection_send_with_reply(m_connection, request, &pending_return, -1))

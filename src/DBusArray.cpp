@@ -73,6 +73,11 @@ namespace DBUS
         return equal;
     }
 
+    bool DBusArray::operator!=(const DBusArray &other) const
+    {
+        return !operator ==(other);
+    }
+
     bool DBusArray::addArgument(DBusArgument *arg)
     {
         //container of containers other than dictionary may cause problems, test that

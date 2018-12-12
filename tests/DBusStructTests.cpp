@@ -125,6 +125,11 @@ namespace
         EXPECT_EQ(nullptr, dbStruct.getContainerSignature());
     }
 
+    TEST_F(DBusStructTest, addArgument_nestedStructAsField)
+    {
+        //finish that test case - important is the signature
+    }
+
     TEST_F(DBusStructTest, copyCtor)
     {
         DBusStruct dbStruct;

@@ -21,6 +21,9 @@ namespace DBUS
 
         template<typename T>
         bool setArgValue(T value);
+        bool setArgValue(const char* value);
+        bool setArgValue(char* value);
+        bool setArgValue(DBusBasicValue value);
 
         template<typename T>
         bool resetArg(ArgType argType, T value);
@@ -28,6 +31,7 @@ namespace DBUS
         void* getArgValuePtr();
         bool argIsContainerType() const;
     private:
+        void initializeArgValue(const DBusBasicArgument &arg);
         argValType m_arg;
     };
 
@@ -35,7 +39,7 @@ namespace DBUS
     bool DBusBasicArgument::setArgValue(T value)
     {
         bool argSet = false;
-        if(m_arg != ArgType::Invalid)
+        if(m_argType != ArgType::Invalid)
         {
             int index = getArgTypeIndex(m_argType);
             argValType argVariant = value;

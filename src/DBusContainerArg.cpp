@@ -1,5 +1,6 @@
 #include "DBusContainerArg.h"
 #include "DBusArgumentFactory.h"
+#include "DBusBasicArgument.h"
 
 namespace DBUS
 {
@@ -32,12 +33,9 @@ namespace DBUS
     DBusContainerArg::DBusContainerArg(DBusContainerArg &&other):
         DBusArgument(std::forward<DBusContainerArg>(other))
     {
-        if(this != &other)
-        {
-            m_subArgs = std::move(other.m_subArgs);
-            m_containerSignature = std::move(other.m_containerSignature);
-            m_containedSignature = std::move(other.m_containedSignature);
-        }
+        m_subArgs = std::move(other.m_subArgs);
+        m_containerSignature = std::move(other.m_containerSignature);
+        m_containedSignature = std::move(other.m_containedSignature);
     }
 
     DBusContainerArg& DBusContainerArg::operator=(const DBusContainerArg &other)
@@ -78,8 +76,41 @@ namespace DBUS
 
     bool DBusContainerArg::operator==(const DBusContainerArg &other) const
     {
-        //just checks if each shared pointer has the same address as other
-        return m_subArgs == other.m_subArgs;
+        bool equal = false;
+        if(DBusArgument::operator ==(other))
+        {
+            if(m_subArgs.size() == other.m_subArgs.size())
+            {
+                bool argEqual = true;
+                for(size_t i = 0; i < m_subArgs.size(); i++)
+                {
+                    if(m_subArgs[i] && other.m_subArgs[i])
+                    {
+                        //solve casting problem, maybe add overload with DBusArgument* as fun parameter for all args
+                        if(other.m_subArgs[i].get()->argIsContainerType())
+                        {
+                            DBusContainerArg *cArg = static_cast<DBusContainerArg*>(other.m_subArgs[i].get());
+                            if(!static_cast< DBusContainerArg*>(m_subArgs[i].get())->operator==(*cArg))
+                            {
+                                argEqual = false;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            DBusBasicArgument *bArg = static_cast<DBusBasicArgument*>(other.m_subArgs[i].get());
+                            if(!static_cast< DBusBasicArgument*>(m_subArgs[i].get())->operator==(*bArg))
+                            {
+                                argEqual = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                equal = argEqual;
+            }
+        }
+        return equal;
     }
 
     bool DBusContainerArg::argIsContainerType() const

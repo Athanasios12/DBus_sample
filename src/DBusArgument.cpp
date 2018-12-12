@@ -27,12 +27,16 @@ namespace DBUS
     {
         m_argType = other.m_argType;
         m_signature = other.m_signature;
+        m_argIsInitalized = other.m_argIsInitalized;
     }
 
     DBusArgument::DBusArgument(DBusArgument &&other)
     {
         m_argType = other.m_argType;
-        m_signature = std::move(other.m_signature);        
+        m_signature = std::move(other.m_signature);
+
+        m_argIsInitalized = other.m_argIsInitalized;
+        other.m_argIsInitalized = false;
     }
 
     DBusArgument& DBusArgument::operator=(const DBusArgument &other)
@@ -41,6 +45,7 @@ namespace DBUS
         {
             m_argType = other.m_argType;
             m_signature = other.m_signature;
+            m_argIsInitalized = other.m_argIsInitalized;
         }
         return *this;
     }
@@ -51,7 +56,8 @@ namespace DBUS
         {
             m_argType = other.m_argType;
             m_signature = std::move(other.m_signature);
-            other.m_argType = ArgType::Invalid;
+            m_argIsInitalized = other.m_argIsInitalized;
+            other.m_argIsInitalized = false;
         }
         return *this;
     }
@@ -59,6 +65,11 @@ namespace DBUS
     DBusArgument::~DBusArgument()
     {
 
+    }
+
+    bool DBusArgument::operator==(const DBusArgument &other) const
+    {
+        return ((m_argType == other.m_argType) && (m_signature == other.m_signature));
     }
 
     void DBusArgument::resetArgument()
@@ -73,7 +84,7 @@ namespace DBUS
         int wrongTypeIndex = -1;
         argValType argTypeVariant;
         auto arg = DBusArgumentFactory::getArgument(Byte);
-        const char* cptr = nullptr;
+        std::unique_ptr<char[]> cptr = nullptr;
         switch (type)
         {
         case Byte:
@@ -102,7 +113,7 @@ namespace DBUS
             argTypeVariant = static_cast<double>(0);
             break;
         case String:
-            argTypeVariant = cptr;
+            argTypeVariant = std::move(cptr);
             break;
         case Array:
         case Struct:

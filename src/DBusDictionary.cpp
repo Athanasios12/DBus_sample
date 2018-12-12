@@ -6,14 +6,14 @@ namespace DBUS
 
     DBusDictionary::DBusDictionary():
         DBusContainerArg(ArgType::Dictionary),
-        m_initialized{false}
+        m_entryTypeSet{false}
     {
         m_entryType = std::make_pair(ArgType::Invalid, ArgType::Invalid);
     }
 
     DBusDictionary::DBusDictionary(ArgType keyType, ArgType valType):
         DBusContainerArg(ArgType::Dictionary),
-        m_initialized{true}
+        m_entryTypeSet{true}
     {
         m_entryType = std::make_pair(keyType, valType);
         m_containedSignature = DBusDictEntry::createEntrySignature(keyType, valType);
@@ -25,7 +25,7 @@ namespace DBUS
     {
         if(this != &other)
         {
-            m_initialized = other.m_initialized;
+            m_entryTypeSet = other.m_entryTypeSet;
             m_entryType = other.m_entryType;            
         }
     }
@@ -35,9 +35,9 @@ namespace DBUS
     {
         if(this != &other)
         {
-            m_initialized = other.m_initialized;
+            m_entryTypeSet = other.m_entryTypeSet;
             m_entryType = other.m_entryType;
-            other.m_initialized = false;
+            other.m_entryTypeSet = false;
             other.m_entryType = std::make_pair(ArgType::Invalid, ArgType::Invalid);
             other.m_signature = getArgTypeSignature(ArgType::Dictionary);
         }
@@ -47,7 +47,7 @@ namespace DBUS
     {        
         if(this != &other)
         {
-            m_initialized = other.m_initialized;
+            m_entryTypeSet = other.m_entryTypeSet;
             m_entryType = other.m_entryType;
             DBusContainerArg::operator=(other);
         }
@@ -58,9 +58,9 @@ namespace DBUS
     {        
         if(this != &other)
         {
-            m_initialized = other.m_initialized;
+            m_entryTypeSet = other.m_entryTypeSet;
             m_entryType = other.m_entryType;
-            other.m_initialized = false;
+            other.m_entryTypeSet = false;
             other.m_entryType = std::make_pair(ArgType::Invalid, ArgType::Invalid);
             DBusContainerArg::operator=(std::forward<DBusDictionary>(other));
         }
@@ -76,26 +76,22 @@ namespace DBUS
     {
         //move this to parent class and call its operator
         bool equal = false;
-        if(m_subArgs.size() == other.m_subArgs.size())
+        if(DBusContainerArg::operator==(other))
         {
-            bool allEqual = true;
-            for(size_t i = 0; i < m_subArgs.size(); i++)
-            {
-                if(m_subArgs[i] != other.m_subArgs[i])
-                {
-                    allEqual = false;
-                    break;
-                }
-            }
-            equal = allEqual;
+            equal = other.m_entryType == m_entryType;
         }
         return equal;
+    }
+
+    bool DBusDictionary::operator!=(const DBusDictionary &other) const
+    {
+        return !operator==(other);
     }
 
     bool DBusDictionary::addArgument(DBusArgument *arg)
     {
         bool addedNewArg = false;
-        if(m_initialized)
+        if(m_entryTypeSet)
         {
             if(arg)
             {
@@ -127,7 +123,7 @@ namespace DBUS
     bool DBusDictionary::setEntryType(ArgType keyType, ArgType valType)
     {
         bool entryTypeSet = false;
-        if(!m_initialized)
+        if(!m_entryTypeSet)
         {
             //type has not been set yet
             entryTypeSet = (getArgTypeIndex(keyType) >= 0) && (getArgTypeIndex(valType) >= 0);
@@ -136,13 +132,13 @@ namespace DBUS
                 m_entryType = std::make_pair(keyType, valType);
                 m_containedSignature = DBusDictEntry::createEntrySignature(keyType, valType);
                 m_signature += m_containedSignature;
-                m_initialized = true;
+                m_entryTypeSet = true;
             }
         }
         return entryTypeSet;
     }
 
-    const char *DBusDictionary::getContainerSignature() const
+    const char* DBusDictionary::getContainerSignature() const
     {
         const char* retSig = nullptr;
         if(!m_containedSignature.empty())
@@ -171,20 +167,20 @@ namespace DBUS
 
     bool DBusDictionary::isInitialized() const
     {
-        return m_initialized;
+        return m_entryTypeSet;
     }
 
     template<>
     bool DBusDictionary::addEntry(DBusArgument *key, DBusArgument *value)
     {
         bool entryAdded = false;
-        if(m_initialized)
+        if(m_entryTypeSet)
         {
         if(key && value)
         {
-            if(key->getArgType() == m_entryType.first)
+            if(key->getArgType() == m_entryType.first && key->isArgInitlized())
             {
-                if(value->getArgType() == m_entryType.second)
+                if(value->getArgType() == m_entryType.second && value->isArgInitlized())
                 {
                     auto keyArg = DBusArgumentFactory::getArgCopy(key);
                     if(keyArg)

@@ -14,7 +14,7 @@ namespace DBUS
     public:
         typedef std::function<DBusMethodReply(const std::vector<std::unique_ptr<DBusArgument>>&)> dBusMethodBinding;
 
-        DBusMethod();
+        DBusMethod(const std::string& name);
         DBusMethod(const std::string& name, dBusMethodBinding &binding,std::size_t numOfArgs, DBusArgument::ArgType returnType);
         DBusMethod(const DBusMethod &other);
         DBusMethod(DBusMethod &&other);
@@ -26,25 +26,28 @@ namespace DBUS
         bool checkIfAllArgsSet() const;
         DBusMethodReply callBinding() const;
 
-        bool setArg(std::unique_ptr<DBusArgument> &arg, uint8_t argNum);
+        bool setArg(std::unique_ptr<DBusArgument> &arg, std::size_t argNum);
+        bool setArg(DBusArgument* arg, std::size_t argNum);
         bool setBindingArgTypes(const std::vector<DBusArgument::ArgType> &bindingArgTypes);
-        void setBinding(dBusMethodBinding &binding, uint8_t numOfArgs);
+        void setBinding(dBusMethodBinding &binding, std::size_t numOfArgs, DBusArgument::ArgType returnType);
         void setName(const std::string &name);
         void setObjectName(const std::string &name);
         void setInterfaceName(const std::string &name);
         
         bool extractMsgInputArguments(DBusMessageIter *msgItr);
 
-        uint8_t getNumOfArgs() const;
+        std::size_t getNumOfArgs() const;
         std::string getName() const;
         std::string getObjectName() const;
         std::string getInterfaceName() const;
-        DBusArgument::ArgType getReturnType() const;
-
+        DBusArgument::ArgType getReturnType() const;        
+        bool bindingIsSet() const;
+        bool methodArgTypesSet() const;
     private:
         void resizeAndInitArgs(std::size_t newSize);
 
-        bool m_bindingSet;
+        bool m_bindingSet{false};
+        bool m_bindingArgTypesSet{false};
         std::size_t m_numOfArgs;
         dBusMethodBinding m_binding;
         std::string m_name;

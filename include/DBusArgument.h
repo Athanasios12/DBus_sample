@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <string>
 #include <optional>
+#include <memory>
 
 namespace DBUS
 {
@@ -19,7 +20,7 @@ namespace DBUS
                                 dbus_int64_t,
                                 double,
                                 uint8_t,
-                                const char*,//tried with std::string - sigfaults??
+                                std::unique_ptr<char[]>,
                                 DBusArgument*> argValType;
 
         enum ArgType
@@ -49,6 +50,8 @@ namespace DBUS
         DBusArgument& operator=(const DBusArgument &other);
         DBusArgument& operator=(DBusArgument &&other);
         virtual ~DBusArgument();
+
+        bool operator==(const DBusArgument &other) const;
 
         virtual void resetArgument();        
         virtual ArgType getArgType() const;

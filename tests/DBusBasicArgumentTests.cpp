@@ -58,46 +58,14 @@ namespace
         EXPECT_EQ(DBusArgument::ArgType::String, bArg.getArgType());
         EXPECT_EQ(nullptr, bArg.getArgValuePtr());
         EXPECT_EQ(DBUS_TYPE_STRING_AS_STRING, std::string{bArg.getSignature()});
-    }
-
-    TEST_F(DBusBasicArgumentTest, copyCtor)
-    {
-        DBusBasicArgument bArg{DBusArgument::ArgType::String};
-        const char *cstr = "Hello";
-        bArg.setArgValue<char*>(const_cast<char*>(cstr));
-        DBusBasicArgument bArgCopy{bArg};
-        //original
-        EXPECT_EQ(DBusArgument::ArgType::String, bArg.getArgType());
-        EXPECT_EQ(true, strcmp(cstr, static_cast<const char*>(bArg.getArgValuePtr())) == 0);
-        EXPECT_EQ(DBUS_TYPE_STRING_AS_STRING, std::string{bArg.getSignature()});
-        //copy
-        EXPECT_EQ(bArgCopy.getArgType(), bArg.getArgType());
-        EXPECT_EQ(true, strcmp(static_cast<const char*>(bArg.getArgValuePtr()),
-                  static_cast<const char*>(bArgCopy.getArgValuePtr())) == 0);
-        EXPECT_EQ(std::string{bArg.getSignature()}, std::string{bArgCopy.getSignature()});
-    }
-
-    TEST_F(DBusBasicArgumentTest, moveCtor)
-    {
-        DBusBasicArgument bArg{DBusArgument::ArgType::String};
-        const char *cstr = "Hello";
-        bArg.setArgValue<char*>(const_cast<char*>(cstr));
-        DBusBasicArgument bArgMove{std::move(bArg)};
-        //original
-        EXPECT_EQ(DBusArgument::ArgType::Invalid, bArg.getArgType());
-        EXPECT_EQ(nullptr, bArg.getArgValuePtr());
-        EXPECT_EQ(nullptr, bArg.getSignature());
-        //move
-        EXPECT_EQ(DBusArgument::ArgType::String, bArgMove.getArgType());
-        EXPECT_EQ(true, strcmp(cstr, static_cast<const char*>(bArgMove.getArgValuePtr())) == 0);
-        EXPECT_EQ(DBUS_TYPE_STRING_AS_STRING, std::string{bArgMove.getSignature()});
-    }
+    }    
 
     TEST_F(DBusBasicArgumentTest, setArgValue_UInt16)
     {
         DBusBasicArgument bArg{DBusArgument::ArgType::UInt16};
         dbus_uint16_t uint16_val = 100;
-        bArg.setArgValue<dbus_uint16_t>(uint16_val);
+
+        EXPECT_EQ(true, bArg.setArgValue<dbus_uint16_t>(uint16_val));
 
         void* retVal = bArg.getArgValuePtr();
         EXPECT_EQ(true, bArg.getArgValuePtr() != nullptr);
@@ -108,7 +76,8 @@ namespace
     {
         DBusBasicArgument bArg{DBusArgument::ArgType::UInt32};
         dbus_uint32_t uint32_val = 100;
-        bArg.setArgValue<dbus_uint32_t>(uint32_val);
+
+        EXPECT_EQ(true, bArg.setArgValue<dbus_uint32_t>(uint32_val));
 
         void* retVal = bArg.getArgValuePtr();
         EXPECT_EQ(true, bArg.getArgValuePtr() != nullptr);
@@ -119,7 +88,8 @@ namespace
     {
         DBusBasicArgument bArg{DBusArgument::ArgType::UInt64};
         dbus_uint64_t uint64_val = 100;
-        bArg.setArgValue<dbus_uint64_t>(uint64_val);
+
+        EXPECT_EQ(true, bArg.setArgValue<dbus_uint64_t>(uint64_val));
 
         void* retVal = bArg.getArgValuePtr();
         EXPECT_EQ(true, bArg.getArgValuePtr() != nullptr);
@@ -130,7 +100,8 @@ namespace
     {
         DBusBasicArgument bArg{DBusArgument::ArgType::Int16};
         dbus_int16_t int16_val = -100;
-        bArg.setArgValue<dbus_int16_t>(int16_val);
+
+        EXPECT_EQ(true, bArg.setArgValue<dbus_int16_t>(int16_val));
 
         void* retVal = bArg.getArgValuePtr();
         EXPECT_EQ(true, bArg.getArgValuePtr() != nullptr);
@@ -141,7 +112,8 @@ namespace
     {
         DBusBasicArgument bArg{DBusArgument::ArgType::Int32};
         dbus_int32_t int32_val = -100;
-        bArg.setArgValue<dbus_int32_t>(int32_val);
+
+        EXPECT_EQ(true, bArg.setArgValue<dbus_int32_t>(int32_val));
 
         void* retVal = bArg.getArgValuePtr();
         EXPECT_EQ(true, bArg.getArgValuePtr() != nullptr);
@@ -152,7 +124,8 @@ namespace
     {
         DBusBasicArgument bArg{DBusArgument::ArgType::Int64};
         dbus_int64_t int64_val = -100;
-        bArg.setArgValue<dbus_int64_t>(int64_val);
+
+        EXPECT_EQ(true, bArg.setArgValue<dbus_int64_t>(int64_val));
 
         void* retVal = bArg.getArgValuePtr();
         EXPECT_EQ(true, bArg.getArgValuePtr() != nullptr);
@@ -164,7 +137,7 @@ namespace
         DBusBasicArgument bArg{DBusArgument::ArgType::Double};
         double double_val = -100.1;
 
-        bArg.setArgValue<double>(double_val);
+        EXPECT_EQ(true, bArg.setArgValue<double>(double_val));
 
         void* retVal = bArg.getArgValuePtr();
         EXPECT_EQ(true, bArg.getArgValuePtr() != nullptr);
@@ -174,13 +147,13 @@ namespace
     TEST_F(DBusBasicArgumentTest, setArgValue_Bool)
     {
         DBusBasicArgument bArg{DBusArgument::ArgType::Bool};
-        bool bool_val = true;
+        dbus_bool_t bool_val = true;
 
-        bArg.setArgValue<bool>(bool_val);
+        EXPECT_EQ(true, bArg.setArgValue(bool_val));
 
         void* retVal = bArg.getArgValuePtr();
         EXPECT_EQ(true, bArg.getArgValuePtr() != nullptr);
-        EXPECT_EQ(bool_val, *(static_cast<bool*>(retVal)));
+        EXPECT_EQ(bool_val, *(static_cast<dbus_bool_t*>(retVal)));
     }
 
     TEST_F(DBusBasicArgumentTest, setArgValue_Byte)
@@ -188,7 +161,7 @@ namespace
         DBusBasicArgument bArg{DBusArgument::ArgType::Byte};
         uint8_t byte_val = true;
 
-        bArg.setArgValue<uint8_t>(byte_val);
+        EXPECT_EQ(true, bArg.setArgValue<uint8_t>(byte_val));
 
         void* retVal = bArg.getArgValuePtr();
         EXPECT_EQ(true, bArg.getArgValuePtr() != nullptr);
@@ -199,9 +172,44 @@ namespace
     {
         DBusBasicArgument bArg{DBusArgument::ArgType::String};
         const char *cstr = "Hello";
-        bArg.setArgValue<char*>(const_cast<char*>(cstr));
+
+        EXPECT_EQ(true, bArg.setArgValue(cstr));
+
         void* retVal = bArg.getArgValuePtr();
         EXPECT_EQ(true, bArg.getArgValuePtr() != nullptr);
-        EXPECT_EQ(true, strcmp(cstr, static_cast<const char*>(retVal)) == 0);
+        EXPECT_EQ(true, strcmp(cstr, static_cast<char*>(retVal)) == 0);
+    }
+
+    TEST_F(DBusBasicArgumentTest, copyCtor)
+    {
+        DBusBasicArgument bArg{DBusArgument::ArgType::String};
+        const char *cstr = "Hello";
+        EXPECT_EQ(true, bArg.setArgValue(cstr));
+        DBusBasicArgument bArgCopy{bArg};
+        //original
+        EXPECT_EQ(DBusArgument::ArgType::String, bArg.getArgType());
+        EXPECT_EQ(true, strcmp(cstr, static_cast<char*>(bArg.getArgValuePtr())) == 0);
+        EXPECT_EQ(DBUS_TYPE_STRING_AS_STRING, std::string{bArg.getSignature()});
+        //copy
+        EXPECT_EQ(bArgCopy.getArgType(), bArg.getArgType());
+        EXPECT_EQ(true, strcmp(static_cast<char*>(bArg.getArgValuePtr()),
+                  static_cast<char*>(bArgCopy.getArgValuePtr())) == 0);
+        EXPECT_EQ(std::string{bArg.getSignature()}, std::string{bArgCopy.getSignature()});
+    }
+
+    TEST_F(DBusBasicArgumentTest, moveCtor)
+    {
+        DBusBasicArgument bArg{DBusArgument::ArgType::String};
+        const char *cstr = "Hello";
+        EXPECT_EQ(true, bArg.setArgValue(cstr));
+        DBusBasicArgument bArgMove{std::move(bArg)};
+        //original
+        EXPECT_EQ(DBusArgument::ArgType::Invalid, bArg.getArgType());
+        EXPECT_EQ(nullptr, bArg.getArgValuePtr());
+        EXPECT_EQ(nullptr, bArg.getSignature());
+        //move
+        EXPECT_EQ(DBusArgument::ArgType::String, bArgMove.getArgType());
+        EXPECT_EQ(true, strcmp(cstr, static_cast<char*>(bArgMove.getArgValuePtr())) == 0);
+        EXPECT_EQ(DBUS_TYPE_STRING_AS_STRING, std::string{bArgMove.getSignature()});
     }
 }

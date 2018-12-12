@@ -140,9 +140,7 @@ namespace DBUS
     {
         bool processed = true;
         for(auto && arg : m_args)
-        {
-            //wypierdala sie na ktoryms, ale juz bledu ze zlym castem nie ma hurraa
-            fprintf(stderr, "\nType : %d\n", arg->getArgType());
+        {            
             if(!DBusInterface::appendArg(arg.get(), msgItr))
             {
                 processed = false;

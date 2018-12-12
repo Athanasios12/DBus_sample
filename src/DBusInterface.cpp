@@ -1,10 +1,10 @@
 #include "DBusInterface.h"
-
 #include "DBusMethod.h"
 #include "DBusArray.h"
 #include <variant>
 #include <algorithm>
 #include "DBusArgumentFactory.h"
+#include <cstring>
 
 namespace DBUS
 {
@@ -46,11 +46,15 @@ namespace DBUS
         return m_name;
     }
 
-    DBusInterface::DBusObject DBusInterface::getObject(const std::string &name) const
+    std::optional<DBusInterface::DBusObject> DBusInterface::getObject(const std::string &name) const
     {
         DBusObject object(name);
         auto interObject = std::find(m_objects.begin(), m_objects.end(), object);
-        return *interObject;
+        if(interObject != std::end(m_objects))
+        {
+            return *interObject;
+        }
+        return {};
     }
 
     bool DBusInterface::appendArg(DBusArgument *arg, DBusMessageIter *iterator)
@@ -61,11 +65,18 @@ namespace DBUS
         {
             if(!arg->argIsContainerType())
             {
-                auto retValPtr = static_cast<DBusBasicArgument*>(arg)->getArgValuePtr();
-                fprintf(stderr, "\n%s\n", (const char*)retValPtr);
+                void* retValPtr = static_cast<DBusBasicArgument*>(arg)->getArgValuePtr();
                 if(retValPtr)
                 {
-                    dbus_message_iter_append_basic(iterator, static_cast<int>(arg->getArgType()), retValPtr);
+                    if(arg->getArgType() != DBusArgument::ArgType::String)
+                    {
+                        dbus_message_iter_append_basic(iterator, static_cast<int>(arg->getArgType()), retValPtr);
+                    }
+                    else
+                    {
+                        char *string = static_cast<char*>(retValPtr);
+                        dbus_message_iter_append_basic(iterator, static_cast<int>(arg->getArgType()), &string);
+                    }
                     argAdded = true;
                 }
             }
@@ -74,7 +85,7 @@ namespace DBUS
                 if(arg->getArgType() != DBusArgument::ArgType::Invalid)
                 {
                     DBusMessageIter subIter;
-                    DBusContainerArg *cArg = static_cast<DBusContainerArg*>(arg); // wrong cast of dict entry - not child of dbuscontainer arg
+                    DBusContainerArg *cArg = static_cast<DBusContainerArg*>(arg);
                     dbus_message_iter_open_container(iterator, cArg->getArgType(), cArg->getContainerSignature(), &subIter);
                     bool allSubArgsAppended = true;
                     for(auto subArgItr = cArg->getFirstArgItr(); subArgItr != cArg->getLastArgItr(); subArgItr++)
@@ -98,8 +109,15 @@ namespace DBUS
         bool argMatched = false;
         if(bArg.getArgType() != DBusArgument::ArgType::Invalid)
         {
-            dbus_message_iter_get_basic(argIter, bArg.getArgValuePtr());
-            argMatched = true;
+            if(bArg.getArgType() == dbus_message_iter_get_arg_type(argIter))
+            {
+                DBusBasicValue value;
+                dbus_message_iter_get_basic(argIter, &value);
+                if(bArg.setArgValue(value))
+                {
+                    argMatched = true;
+                }
+            }
         }
         return argMatched;
     }
@@ -109,39 +127,42 @@ namespace DBUS
         bool containerProcessed = true;
         if(cArg && iterator)
         {
-            size_t numOfElements = dbus_message_iter_get_element_count(iterator);
-            if(numOfElements > 0)
+            //get element type
+            DBusMessageIter elementIterator;
+            dbus_message_iter_recurse(iterator, &elementIterator);
+            auto type = dbus_message_iter_get_arg_type(&elementIterator);
+            while(type != DBusArgument::ArgType::Invalid)
             {
-                size_t elemNum = 0;
-                auto type = dbus_message_iter_get_arg_type(iterator);
-                while(type != DBusArgument::ArgType::Invalid)
+                bool argExtracted = false;
+                auto subArg = DBusArgumentFactory::getArgument(static_cast<DBusArgument::ArgType>(type));
+                if(subArg)
                 {
-                    auto subArg = DBusArgumentFactory::getArgument(static_cast<DBusArgument::ArgType>(type));
-                    if(subArg.get())
+                    if(!subArg->argIsContainerType())
                     {
-                        if(!subArg->argIsContainerType())
-                        {
-                            DBusBasicArgument *bPtr = static_cast<DBusBasicArgument*>(subArg.get());
-                            if(extractDBusBasicArg(*bPtr, iterator))
-                            {
-                                cArg->addArgument(subArg.release());
-                            }
-                        }
-                        else
-                        {
-                            DBusMessageIter subIterator;
-                            dbus_message_iter_recurse(iterator, &subIterator);
-                            processDBusContainerArg(static_cast<DBusContainerArg*>(subArg.get()), &subIterator);
-                        }
-                        ++elemNum;
+                        DBusBasicArgument *bPtr = static_cast<DBusBasicArgument*>(subArg.get());
+                        argExtracted = extractDBusBasicArg(*bPtr, &elementIterator);
                     }
-                    dbus_message_iter_next(iterator);
-                    type = dbus_message_iter_get_arg_type(iterator);
+                    else
+                    {
+                        argExtracted = processDBusContainerArg(static_cast<DBusContainerArg*>(subArg.get()), &elementIterator);
+                    }
+
+                    if(argExtracted)
+                    {
+                        if(!cArg->addArgument(subArg.get()))
+                        {
+                            argExtracted = false;
+                        }
+
+                    }
                 }
-                if(elemNum != numOfElements)
+                if(!argExtracted)
                 {
                     containerProcessed = false;
+                    break;
                 }
+                dbus_message_iter_next(&elementIterator);
+                type = dbus_message_iter_get_arg_type(&elementIterator);
             }
         }
         return containerProcessed;
@@ -150,22 +171,23 @@ namespace DBUS
     bool DBusInterface::extractDBusMessageArgData(DBusArgument *arg, DBusMessageIter *argIter)
     {
         bool argExtracted = false;
-        auto argType = arg->getArgType();
-        if(argType != DBusArgument::ArgType::Invalid)
+        if(arg && argIter)
         {
-            if(argType == dbus_message_iter_get_arg_type(argIter))
+            auto argType = arg->getArgType();
+            if(argType != DBusArgument::ArgType::Invalid)
             {
-                if(!arg->argIsContainerType())
+                if(argType == dbus_message_iter_get_arg_type(argIter))
                 {
-                    argExtracted = extractDBusBasicArg(*(static_cast<DBusBasicArgument*>(arg)), argIter);
+                    if(!arg->argIsContainerType())
+                    {
+                        argExtracted = extractDBusBasicArg(*(static_cast<DBusBasicArgument*>(arg)), argIter);
+                    }
+                    else
+                    {
+                        //container types handled separately - recursive calls
+                        argExtracted = processDBusContainerArg(static_cast<DBusContainerArg*>(arg), argIter);
+                    }
                 }
-                else
-                {
-                    //container types handled separately - recursive calls
-                    DBusMessageIter subIter;
-                    dbus_message_iter_recurse(argIter, &subIter);
-                    argExtracted = processDBusContainerArg(static_cast<DBusContainerArg*>(arg), &subIter);
-                }                
             }
         }
         return argExtracted;
