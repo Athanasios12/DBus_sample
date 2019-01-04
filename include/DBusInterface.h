@@ -27,46 +27,25 @@ namespace DBUS
 
             }
 
-            bool addMethod(DBusMethod& method)
+            bool addMethod(DBusMethod&& method)
             {
                 bool methodAdded = false;
-                if(std::find(m_methods.begin(), m_methods.end(), method) == std::end(m_methods))
+                if(method.bindingIsSet() && method.checkIfAllArgsSet())
                 {
-                    method.setObjectName(m_name);
-                    method.setInterfaceName(m_interfaceName);
-                    m_methods.push_back(method);
-                    methodAdded = true;
+                    if(std::find(m_methods.begin(), m_methods.end(), method) == std::end(m_methods))
+                    {
+                        method.setObjectName(m_name);
+                        method.setInterfaceName(m_interfaceName);
+                        m_methods.push_back(std::move(method));
+                        methodAdded = true;
+                    }
                 }
                 return methodAdded;
             }
 
-            bool setMethodArg(const std::string &methodName, std::vector<std::unique_ptr<DBusArgument>> &args)
-            {
-                bool argSet = false;
-                auto method = std::find_if(m_methods.begin(), m_methods.end(),
-                             [&methodName](const DBusMethod &method)
-                            {
-                                return (method.getName() == methodName);
-                            });
-                if(method != std::end(m_methods))
-                {
-                    bool allArgsSet = true;
-                    for(size_t i = 0; i < args.size(); i++)
-                    {
-                        if(!method->setArg(args[i], i))
-                        {
-                            allArgsSet = false;
-                            break;
-                        }
-                    }
-                    argSet = allArgsSet;
-                }
-                return argSet;
-            }
-
             bool operator==(const DBusObject& other) const
             {
-                return ((other.m_name == m_name) && (other.m_interfaceName == m_interfaceName));
+                return ((other.m_name == m_name) && (m_methods == other.m_methods));
             }
         };
 

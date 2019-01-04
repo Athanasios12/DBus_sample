@@ -34,9 +34,13 @@ namespace DBUS
         bool addedObject = false;
         if(std::find(m_objects.begin(), m_objects.end(), object) == std::end(m_objects))
         {
-            object.m_interfaceName = m_name;
-            m_objects.push_back(object);
-            addedObject = true;
+            //check if object has at least one method otherwise don't add it
+            if(!object.m_methods.empty())
+            {
+                object.m_interfaceName = m_name;
+                m_objects.push_back(object);
+                addedObject = true;
+            }
         }
         return addedObject;
     }

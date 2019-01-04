@@ -138,16 +138,27 @@ namespace DBUS
 
     bool DBusArgumentPack::appendArgsToDBusMsg(DBusMessageIter *msgItr) const
     {
-        bool processed = true;
-        for(auto && arg : m_args)
-        {            
-            if(!DBusInterface::appendArg(arg.get(), msgItr))
+        bool argsAppended = false;
+        if(m_args.size() > 0)
+        {
+            size_t numOfAppendedArgs = 0;
+            for(auto && arg : m_args)
             {
-                processed = false;
-                break;
+                if(arg && arg->isArgInitlized())
+                {
+                    if(DBusInterface::appendArg(arg.get(), msgItr))
+                    {
+                        ++numOfAppendedArgs;
+                    }
+                }
+                else
+                {
+                    break;
+                }
             }
+            argsAppended = (numOfAppendedArgs == m_args.size());
         }
-        return processed;
+        return argsAppended;
     }
 
     bool DBusArgumentPack::checkIfAllArgsValid() const

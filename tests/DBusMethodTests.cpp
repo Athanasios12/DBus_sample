@@ -26,7 +26,7 @@ namespace
     const std::string objectName{"/in/Radoslaw/adder"};
     const std::string interfaceName{"in.Radoslaw.Interface"};
 
-    std::function<DBusMethodReply(const std::vector<std::unique_ptr<DBusArgument>>&)> printBinding =
+    const std::function<DBusMethodReply(const std::vector<std::unique_ptr<DBusArgument>>&)> printBinding =
             [](const std::vector<std::unique_ptr<DBusArgument>> &args)
     {
         //check
@@ -44,22 +44,25 @@ namespace
         return retVal;
     };
 
-    std::function<DBusMethodReply(const std::vector<std::unique_ptr<DBusArgument>>&)> stringEchoBinding =
+    const std::function<DBusMethodReply(const std::vector<std::unique_ptr<DBusArgument>>&)> stringEchoBinding =
             [](const std::vector<std::unique_ptr<DBusArgument>> &args)
     {
         DBusMethodReply retVal{DBusArgument::ArgType::String};
         //chck if only one arg put and if type is string
         if(args.size() == 1)
         {
-            if(args[0]->getArgType() == retVal.getReturnType())
+            if(args[0])
             {
-                //check if arg is initalized
-                if(args[0]->isArgInitlized())
+                if(args[0]->getArgType() == retVal.getReturnType())
                 {
-                    auto strArg = static_cast<DBusBasicArgument*>(args[0].get());
-                    std::unique_ptr<DBusArgument> retArg{new DBusBasicArgument{DBusArgument::ArgType::String}};
-                    static_cast<DBusBasicArgument*>(retArg.get())->setArgValue(static_cast<char*>(strArg->getArgValuePtr()));
-                    retVal.setRetArg(retArg);
+                    //check if arg is initalized
+                    if(args[0]->isArgInitlized())
+                    {
+                        auto strArg = static_cast<DBusBasicArgument*>(args[0].get());
+                        std::unique_ptr<DBusArgument> retArg{new DBusBasicArgument{DBusArgument::ArgType::String}};
+                        static_cast<DBusBasicArgument*>(retArg.get())->setArgValue(static_cast<char*>(strArg->getArgValuePtr()));
+                        retVal.setRetArg(retArg);
+                    }
                 }
             }
         }
@@ -218,13 +221,54 @@ namespace
         EXPECT_EQ(true, dbusMethod.methodArgTypesSet());
     }
 
-    TEST_F(DBusMethodTest, extractMsgInputArguments_allArgNotExtracted)
+    TEST_F(DBusMethodTest, extractMsgInputArguments_allArgsNotExtracted)
     {
-
+        DBusArgumentPack methodInputArgs{methodName, objectName, interfaceName};
+        //add method call input arguments
+        //added not initialized argument, will not be extracted
+        auto arg = static_cast<DBusBasicArgument*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::String));
+        //create method call dbus msg
+        DBusMessage *request = dbus_message_new_method_call(serverBusName.c_str(),
+                                                            methodInputArgs.getObjectName().c_str(),
+                                                            methodInputArgs.getInterfaceName().c_str(),
+                                                            methodInputArgs.getMethodName().c_str());
+        DBusMessageIter txIter;
+        dbus_message_iter_init_append(request, &txIter);
+        methodInputArgs.appendArgsToDBusMsg(&txIter);
+        //method call has been created, now simulate receiving it on server side and extracting input arguments
+        std::vector<DBusArgument::ArgType> bindingArgTypes = {DBusArgument::ArgType::String};
+        DBusArgument::ArgType methodReturnType = DBusArgument::ArgType::String;
+        DBusMethod method{methodName, stringEchoBinding, bindingArgTypes.size(), methodReturnType};
+        method.setBindingArgTypes(bindingArgTypes);
+        DBusMessageIter rxIter;
+        dbus_message_iter_init(request, &rxIter);
+        EXPECT_EQ(false, method.extractMsgInputArguments(&rxIter));
+        EXPECT_EQ(false, method.checkIfAllArgsSet());
     }
 
     TEST_F(DBusMethodTest, extractMsgInputArguments_Success)
     {
+        //add method call input arguments
+        DBusArgumentPack methodInputArgs{methodName, objectName, interfaceName};
+        auto arg = static_cast<DBusBasicArgument*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::String));
+        arg->setArgValue("String");
+        //create method call dbus msg
+        DBusMessage *request = dbus_message_new_method_call(serverBusName.c_str(),
+                                                            methodInputArgs.getObjectName().c_str(),
+                                                            methodInputArgs.getInterfaceName().c_str(),
+                                                            methodInputArgs.getMethodName().c_str());
+        DBusMessageIter txIter;
+        dbus_message_iter_init_append(request, &txIter);
+        methodInputArgs.appendArgsToDBusMsg(&txIter);
+        //method call has been created, now simulate receiving it on server side and extracting input arguments
+        std::vector<DBusArgument::ArgType> bindingArgTypes = {DBusArgument::ArgType::String};
+        DBusArgument::ArgType methodReturnType = DBusArgument::ArgType::String;
+        DBusMethod method{methodName, stringEchoBinding, bindingArgTypes.size(), methodReturnType};
+        method.setBindingArgTypes(bindingArgTypes);
+        DBusMessageIter rxIter;
+        dbus_message_iter_init(request, &rxIter);
+        EXPECT_EQ(true, method.extractMsgInputArguments(&rxIter));
+        EXPECT_EQ(true, method.checkIfAllArgsSet());
 
     }
 
@@ -240,7 +284,33 @@ namespace
 
     TEST_F(DBusMethodTest, callBinding_validReply)
     {
+        //add method call input arguments
+        DBusArgumentPack methodInputArgs{methodName, objectName, interfaceName};
 
+        auto arg = static_cast<DBusBasicArgument*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::String));
+        arg->setArgValue("String");
+        //create method call dbus msg
+        DBusMessage *request = dbus_message_new_method_call(serverBusName.c_str(),
+                                                            methodInputArgs.getObjectName().c_str(),
+                                                            methodInputArgs.getInterfaceName().c_str(),
+                                                            methodInputArgs.getMethodName().c_str());
+        DBusMessageIter txIter;
+        dbus_message_iter_init_append(request, &txIter);
+        methodInputArgs.appendArgsToDBusMsg(&txIter);
+        //method call has been created, now simulate receiving it on server side and extracting input arguments
+        std::vector<DBusArgument::ArgType> bindingArgTypes = {DBusArgument::ArgType::String};
+        DBusArgument::ArgType methodReturnType = DBusArgument::ArgType::String;
+        DBusMethod method{methodName, stringEchoBinding, bindingArgTypes.size(), methodReturnType};
+        method.setBindingArgTypes(bindingArgTypes);
+        DBusMessageIter rxIter;
+        dbus_message_iter_init(request, &rxIter);
+        method.extractMsgInputArguments(&rxIter);
+        method.checkIfAllArgsSet();
+        DBusMethodReply reply = method.callBinding();
+        EXPECT_EQ(true, reply.isValid());
+        DBusBasicArgument* retArg = static_cast<DBusBasicArgument*>(reply.getReturn());
+        EXPECT_EQ(true, retArg != nullptr);
+        EXPECT_EQ(true, *retArg == *arg);
     }
 
     TEST_F(DBusMethodTest, copyCtor)

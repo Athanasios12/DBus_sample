@@ -15,7 +15,7 @@ namespace DBUS
         typedef std::function<DBusMethodReply(const std::vector<std::unique_ptr<DBusArgument>>&)> dBusMethodBinding;
 
         DBusMethod(const std::string& name);
-        DBusMethod(const std::string& name, dBusMethodBinding &binding,std::size_t numOfArgs, DBusArgument::ArgType returnType);
+        DBusMethod(const std::string& name, const dBusMethodBinding &binding,std::size_t numOfArgs, DBusArgument::ArgType returnType);
         DBusMethod(const DBusMethod &other);
         DBusMethod(DBusMethod &&other);
         DBusMethod& operator=(const DBusMethod &other);
@@ -29,7 +29,7 @@ namespace DBUS
         bool setArg(std::unique_ptr<DBusArgument> &arg, std::size_t argNum);
         bool setArg(DBusArgument* arg, std::size_t argNum);
         bool setBindingArgTypes(const std::vector<DBusArgument::ArgType> &bindingArgTypes);
-        void setBinding(dBusMethodBinding &binding, std::size_t numOfArgs, DBusArgument::ArgType returnType);
+        void setBinding(const dBusMethodBinding &binding, std::size_t numOfArgs, DBusArgument::ArgType returnType);
         void setName(const std::string &name);
         void setObjectName(const std::string &name);
         void setInterfaceName(const std::string &name);

@@ -14,6 +14,24 @@ namespace
     const std::string objectName{"/in/Radoslaw/adder"};
     const std::string interfaceName{"in.Radoslaw.Interface"};
 
+    const std::function<DBusMethodReply(const std::vector<std::unique_ptr<DBusArgument>>&)> printBinding =
+            [](const std::vector<std::unique_ptr<DBusArgument>> &args)
+    {
+        //check
+        std::cout << "\nAdd numbers called!" << std::endl;
+        std::cout << "Number of method input args : " << args.size() << std::endl;
+        for(auto && arg : args)
+        {
+            std::cout << "Arg Type: " << arg->getArgType() << std::endl;
+
+        }
+        DBusMethodReply retVal{DBusArgument::ArgType::String};
+        std::unique_ptr<DBusArgument> retArg{new DBusBasicArgument{DBusArgument::ArgType::String}};
+        static_cast<DBusBasicArgument*>(retArg.get())->setArgValue("Method return");
+        retVal.setRetArg(retArg);
+        return retVal;
+    };
+
     // The fixture for testing class Foo.
     class DBusInterfaceTest : public ::testing::Test
     {
@@ -300,14 +318,81 @@ namespace
         EXPECT_EQ(true, stringOutArg == stringArg);
     }
 
-    TEST_F(DBusInterfaceTest, copyCtor)
+    // Start of DBusObject Tests
+    //addMethod
+    TEST_F(DBusInterfaceTest, DbusObject_addMethod_error_MethodIsNotInitialized)
     {
-
+        DBusInterface::DBusObject object{objectName};
+        DBusMethod method{methodName};
+        EXPECT_EQ(false, object.addMethod(std::move(method)));
     }
 
-    TEST_F(DBusInterfaceTest, moveCtor)
+    TEST_F(DBusInterfaceTest, DbusObject_addMethod_success)
     {
-
+        DBusInterface::DBusObject object{objectName};
+        std::vector<DBusArgument::ArgType> bindingArgTypes = {DBusArgument::ArgType::String};
+        DBusArgument::ArgType methodReturnType = DBusArgument::ArgType::String;
+        DBusMethod method{methodName, printBinding, bindingArgTypes.size(), methodReturnType};
+        method.setBindingArgTypes(bindingArgTypes);
+        DBusBasicArgument arg{DBusArgument::ArgType::String};
+        arg.setArgValue("String");
+        method.setArg(&arg, 0);
+        EXPECT_EQ(true, object.addMethod(std::move(method)));
     }
 
+    TEST_F(DBusInterfaceTest, DbusObject_addMethod_error_MethodIsDuplicate)
+    {
+        DBusInterface::DBusObject object{objectName};
+        std::vector<DBusArgument::ArgType> bindingArgTypes = {DBusArgument::ArgType::String};
+        DBusArgument::ArgType methodReturnType = DBusArgument::ArgType::String;
+        DBusMethod method{methodName, printBinding, bindingArgTypes.size(), methodReturnType};
+        method.setBindingArgTypes(bindingArgTypes);
+        DBusBasicArgument arg{DBusArgument::ArgType::String};
+        arg.setArgValue("String");
+        method.setArg(&arg, 0);
+        DBusMethod methodCopy{method};
+        EXPECT_EQ(true, object.addMethod(std::move(method)));
+        EXPECT_EQ(false, object.addMethod(std::move(methodCopy)));
+    }
+    // End of DBusObject Tests
+
+    //addObject
+    TEST_F(DBusInterfaceTest, addObject_error_ObjectHasNoMethods)
+    {
+        DBusInterface interface{interfaceName};
+        DBusInterface::DBusObject object{objectName};
+        EXPECT_EQ(false, interface.addObject(object));
+    }
+
+    TEST_F(DBusInterfaceTest, addObject_success)
+    {
+        DBusInterface::DBusObject object{objectName};
+        std::vector<DBusArgument::ArgType> bindingArgTypes = {DBusArgument::ArgType::String};
+        DBusArgument::ArgType methodReturnType = DBusArgument::ArgType::String;
+        DBusMethod method{methodName, printBinding, bindingArgTypes.size(), methodReturnType};
+        method.setBindingArgTypes(bindingArgTypes);
+        DBusBasicArgument arg{DBusArgument::ArgType::String};
+        arg.setArgValue("String");
+        method.setArg(&arg, 0);
+        object.addMethod(std::move(method));
+        DBusInterface interface{interfaceName};
+        EXPECT_EQ(true, interface.addObject(object));
+    }
+
+    TEST_F(DBusInterfaceTest, addObject_error_ObjectIsDuplicate)
+    {
+        DBusInterface::DBusObject object{objectName};
+        std::vector<DBusArgument::ArgType> bindingArgTypes = {DBusArgument::ArgType::String};
+        DBusArgument::ArgType methodReturnType = DBusArgument::ArgType::String;
+        DBusMethod method{methodName, printBinding, bindingArgTypes.size(), methodReturnType};
+        method.setBindingArgTypes(bindingArgTypes);
+        DBusBasicArgument arg{DBusArgument::ArgType::String};
+        arg.setArgValue("String");
+        method.setArg(&arg, 0);
+        EXPECT_EQ(true, object.addMethod(std::move(method)));
+        DBusInterface::DBusObject objectCopy{object};
+        DBusInterface interface{interfaceName};
+        EXPECT_EQ(true, interface.addObject(object));
+        EXPECT_EQ(false, interface.addObject(objectCopy));
+    }
 }
