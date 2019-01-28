@@ -128,6 +128,25 @@ namespace
     TEST_F(DBusStructTest, addArgument_nestedStructAsField)
     {
         //finish that test case - important is the signature
+        DBusStruct dbNestedStruct;
+        DBusBasicArgument field0{DBusArgument::ArgType::String};
+        field0.setArgValue("String field");
+        DBusBasicArgument field1{DBusArgument::ArgType::Int32};
+        field1.setArgValue(90);
+
+        dbNestedStruct.addArgument(static_cast<DBusArgument*>(&field0));
+        dbNestedStruct.addArgument(static_cast<DBusArgument*>(&field1));
+        std::string expectedSig = std::string{"("} + std::string{DBUS_TYPE_STRING_AS_STRING} +
+                                   std::string{DBUS_TYPE_INT32_AS_STRING} + std::string{")"};
+        EXPECT_EQ(expectedSig, std::string{dbNestedStruct.getSignature()});
+        EXPECT_EQ(std::string{DBUS_TYPE_STRING_AS_STRING} + std::string{DBUS_TYPE_INT32_AS_STRING},
+                  dbNestedStruct.getContainedSignature());
+        //check if args added with proper values
+        DBusStruct dbStruct;
+        EXPECT_EQ(true, dbStruct.addArgument(&dbNestedStruct));
+        expectedSig = std::string{"("} + std::string{dbNestedStruct.getSignature()} + std::string{")"};
+        EXPECT_EQ(std::string{dbStruct.getSignature()}, expectedSig);
+        EXPECT_EQ(dbStruct.getContainedSignature(), std::string{dbNestedStruct.getSignature()});
     }
 
     TEST_F(DBusStructTest, copyCtor)

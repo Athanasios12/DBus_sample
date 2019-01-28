@@ -70,7 +70,7 @@ namespace DBUS
             {
                 if(arg->getArgType() != ArgType::Invalid)
                 {
-                    if(arg->isArgInitlized())
+                    if(arg->isArgInitalized())
                     {
                         auto newArg = DBusArgumentFactory::getArgCopy(arg);
                         if(newArg)

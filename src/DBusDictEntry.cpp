@@ -121,7 +121,7 @@ namespace DBUS
             //dictionary entry can have only basic types no containers allowed
             if(key->getArgType() != ArgType::Invalid && !key->argIsContainerType())
             {
-                if(key->isArgInitlized())
+                if(key->isArgInitalized())
                 {
                     m_subArgs[KEY_IDX] = std::move(key);
                     keyValid = true;
@@ -144,7 +144,7 @@ namespace DBUS
             //dictionary entry can have only basic types no containers allowed
             if(value->getArgType() != ArgType::Invalid && !value->argIsContainerType())
             {
-                if(value->isArgInitlized())
+                if(value->isArgInitalized())
                 {
                     m_subArgs[VALUE_IDX] = std::move(value);
                     valueValid = true;
@@ -167,7 +167,7 @@ namespace DBUS
             //dictionary entry can have only basic types no containers allowed
             if(key->getArgType() != ArgType::Invalid && !key->argIsContainerType())
             {
-                if(key->isArgInitlized())
+                if(key->isArgInitalized())
                 {
                     m_subArgs[KEY_IDX] = std::move(DBusArgumentFactory::getArgCopy(key));
                     keyValid = true;
@@ -190,7 +190,7 @@ namespace DBUS
             //dictionary entry can have only basic types no containers allowed
             if(value->getArgType() != ArgType::Invalid && !value->argIsContainerType())
             {
-                if(value->isArgInitlized())
+                if(value->isArgInitalized())
                 {
                     m_subArgs[VALUE_IDX] = std::move(DBusArgumentFactory::getArgCopy(value));
                     valueValid = true;

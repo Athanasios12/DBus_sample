@@ -77,5 +77,43 @@ namespace DBUS
         return argCopy;
     }
 
+    bool DBusArgumentFactory::checkIfArgsEqual(DBusArgument *arg1, DBusArgument *arg2)
+    {
+        bool equal = arg1->getArgType() == arg2->getArgType();
+        if(equal)
+        {
+            switch(arg1->getArgType())
+            {
+            case DBusArgument::ArgType::Byte:
+            case DBusArgument::ArgType::Bool:
+            case DBusArgument::ArgType::Int16:
+            case DBusArgument::ArgType::UInt16:
+            case DBusArgument::ArgType::Int32:
+            case DBusArgument::ArgType::UInt32:
+            case DBusArgument::ArgType::Int64:
+            case DBusArgument::ArgType::UInt64:
+            case DBusArgument::ArgType::Double:
+            case DBusArgument::ArgType::String:
+                equal = *static_cast<DBusBasicArgument*>(arg1) == *static_cast<DBusBasicArgument*>(arg2);
+                break;
+            case DBusArgument::ArgType::Array:
+                equal = *static_cast<DBusArray*>(arg1) == *static_cast<DBusArray*>(arg2);
+                break;
+            case DBusArgument::ArgType::Struct:
+                equal = *static_cast<DBusStruct*>(arg1) == *static_cast<DBusStruct*>(arg2);
+                break;
+            case DBusArgument::ArgType::Dictionary:
+                equal = *static_cast<DBusDictionary*>(arg1) == *static_cast<DBusDictionary*>(arg2);
+                break;
+            case DBusArgument::ArgType::Dictionary_Entry:
+                equal = *static_cast<DBusDictEntry*>(arg1) == *static_cast<DBusDictEntry*>(arg2);
+                break;
+            default:
+                equal = false;
+            }
+        }
+        return equal;
+    }
+
 
 }

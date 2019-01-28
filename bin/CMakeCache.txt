@@ -240,6 +240,9 @@ DBus_sample_BINARY_DIR:STATIC=/home/belisarius/DBus_sample/bin
 //Value Computed by CMake
 DBus_sample_SOURCE_DIR:STATIC=/home/belisarius/DBus_sample
 
+//CMake exported targets
+INSTALL_CMAKE_DIR:PATH=lib/cmake/gtest
+
 //Enable installation of googlemock. (Projects embedding googlemock
 // may want to turn this OFF.)
 INSTALL_GMOCK:BOOL=ON
@@ -258,7 +261,7 @@ PYTHON_EXECUTABLE:FILEPATH=/usr/bin/python
 gmock_BINARY_DIR:STATIC=/home/belisarius/DBus_sample/bin/googletest-build/googlemock
 
 //Dependencies for the target
-gmock_LIB_DEPENDS:STATIC=general;-pthread;general;gtest;
+gmock_LIB_DEPENDS:STATIC=general;gtest;
 
 //Value Computed by CMake
 gmock_SOURCE_DIR:STATIC=/home/belisarius/DBus_sample/bin/googletest-src/googlemock
@@ -267,7 +270,7 @@ gmock_SOURCE_DIR:STATIC=/home/belisarius/DBus_sample/bin/googletest-src/googlemo
 gmock_build_tests:BOOL=OFF
 
 //Dependencies for the target
-gmock_main_LIB_DEPENDS:STATIC=general;-pthread;general;gmock;
+gmock_main_LIB_DEPENDS:STATIC=general;gmock;
 
 //Value Computed by CMake
 googletest-distribution_BINARY_DIR:STATIC=/home/belisarius/DBus_sample/bin/googletest-build
@@ -278,8 +281,8 @@ googletest-distribution_SOURCE_DIR:STATIC=/home/belisarius/DBus_sample/bin/googl
 //Value Computed by CMake
 gtest_BINARY_DIR:STATIC=/home/belisarius/DBus_sample/bin/googletest-build/googlemock/gtest
 
-//Dependencies for the target
-gtest_LIB_DEPENDS:STATIC=general;-pthread;
+//Dependencies for target
+gtest_LIB_DEPENDS:STATIC=
 
 //Value Computed by CMake
 gtest_SOURCE_DIR:STATIC=/home/belisarius/DBus_sample/bin/googletest-src/googletest
@@ -301,7 +304,7 @@ gtest_force_shared_crt:BOOL=ON
 gtest_hide_internal_symbols:BOOL=OFF
 
 //Dependencies for the target
-gtest_main_LIB_DEPENDS:STATIC=general;-pthread;general;gtest;
+gtest_main_LIB_DEPENDS:STATIC=general;gtest;
 
 
 ########################
@@ -563,5 +566,19 @@ THREADS_PTHREAD_ARG:INTERNAL=2
 _GNUInstallDirs_LAST_CMAKE_INSTALL_PREFIX:INTERNAL=/usr/local
 __pkg_config_checked_GLIB:INTERNAL=1
 __pkg_config_checked_PC_DBUS:INTERNAL=1
+generated_dir:INTERNAL=/home/belisarius/DBus_sample/bin/googletest-build/googlemock/gtest/generated
+//ADVANCED property for variable: gmock_build_tests
+gmock_build_tests-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: gtest_build_samples
+gtest_build_samples-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: gtest_build_tests
+gtest_build_tests-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: gtest_disable_pthreads
+gtest_disable_pthreads-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: gtest_force_shared_crt
+gtest_force_shared_crt-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: gtest_hide_internal_symbols
+gtest_hide_internal_symbols-ADVANCED:INTERNAL=1
 prefix_result:INTERNAL=/usr/lib/x86_64-linux-gnu
+targets_export_name:INTERNAL=GTestTargets
 

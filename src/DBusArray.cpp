@@ -86,7 +86,7 @@ namespace DBUS
         {
             if(arg->getArgType() != ArgType::Invalid)
             {
-                if(arg->isArgInitlized())
+                if(arg->isArgInitalized())
                 {
                     //special case for dictionary - because it type return is different than container type
                     //dictionary is special array of entries in DBus protocol

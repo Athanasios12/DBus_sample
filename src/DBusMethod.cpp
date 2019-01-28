@@ -134,7 +134,7 @@ namespace DBUS
         {
             if(arg)
             {
-                if(DBusArgument::ArgType::Invalid == arg->getArgType())
+                if((DBusArgument::ArgType::Invalid == arg->getArgType()) || !arg->isArgInitalized())
                 {
                     valid = false;
                     break;
@@ -164,7 +164,7 @@ namespace DBUS
                 //check argument type before assigning it to it
                 if(arg)
                 {
-                    if(arg->isArgInitlized())
+                    if(arg->isArgInitalized())
                     {
                         if(arg->getArgType() == m_argTypes[argNum])
                         {

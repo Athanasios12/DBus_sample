@@ -193,7 +193,7 @@ namespace DBUS
         return signature;
     }
 
-    bool DBusArgument::isArgInitlized() const
+    bool DBusArgument::isArgInitalized() const
     {
         return m_argIsInitalized;
     }

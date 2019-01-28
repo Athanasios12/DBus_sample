@@ -48,7 +48,6 @@ bool aquireDBusService(DBusConnection* &connection, DBusError *error, const char
 bool broadcastToDBus(DBusConnection* connection, const char* msgObject, const char* msgInterface, const char* sigName)
 {
     bool signalSent = false;
-    dbus_uint32_t serial = 0; // unique number to associate replies with requests
     DBusMessage* msg;
     DBusMessageIter args;
 

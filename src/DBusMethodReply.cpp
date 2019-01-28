@@ -21,35 +21,32 @@ namespace DBUS
 
     DBusMethodReply::DBusMethodReply(const DBusMethodReply &other)
     {
-        if(this != &other)
+        m_valid = other.m_valid;
+        m_returnType = other.m_returnType;
+        if(other.m_return)
         {
-            m_valid = other.m_valid;
-            if(other.m_return)
-            {
-                m_return.reset(DBusArgumentFactory::getArgCopy(other.m_return.get()).release());
-            }
-            else
-            {
-                m_return.reset(nullptr);
-            }
+            m_return.reset(DBusArgumentFactory::getArgCopy(other.m_return.get()).release());
+        }
+        else
+        {
+            m_return.reset(nullptr);
         }
     }
 
     DBusMethodReply::DBusMethodReply(DBusMethodReply &&other)
     {
-        if(this != &other)
+        m_valid = other.m_valid;
+        m_returnType = other.m_returnType;
+        other.m_returnType = DBusArgument::ArgType::Invalid;
+        other.m_valid = false;
+        if(other.m_return)
         {
-            m_valid = other.m_valid;
-            other.m_valid = false;
-            if(other.m_return)
-            {
-                m_return = std::move(other.m_return);
-                other.m_return.reset(nullptr);
-            }
-            else
-            {
-                m_return.reset(nullptr);
-            }
+            m_return = std::move(other.m_return);
+            other.m_return.reset(nullptr);
+        }
+        else
+        {
+            m_return.reset(nullptr);
         }
     }
 
@@ -58,9 +55,10 @@ namespace DBUS
         if(this != &other)
         {
             m_valid = other.m_valid;
+            m_returnType = other.m_returnType;
             if(other.m_return)
             {
-                m_return.reset(DBusArgumentFactory::getArgCopy(other.m_return.get()).release());
+                m_return = std::move(DBusArgumentFactory::getArgCopy(other.m_return.get()));
             }
             else
             {
@@ -76,6 +74,8 @@ namespace DBUS
         {
             m_valid = other.m_valid;
             other.m_valid = false;
+            m_returnType = other.m_returnType;
+            other.m_returnType = DBusArgument::ArgType::Invalid;
             if(other.m_return)
             {
                 m_return = std::move(other.m_return);
@@ -96,7 +96,15 @@ namespace DBUS
 
     bool DBusMethodReply::operator==(const DBusMethodReply& other) const
     {
-        return (other.m_return.get() == m_return.get());
+        bool equal = true;
+        equal &= other.m_returnType == m_returnType;
+        equal &= other.m_valid == m_valid;
+        if(equal && m_return && other.m_return)
+        {
+            //if both not null and other memebers the same
+            equal = DBusArgumentFactory::checkIfArgsEqual(m_return.get(), other.m_return.get());
+        }
+        return equal;
     }
 
     bool DBusMethodReply::processDBusMsgReply(DBusMessageIter *msgItr)
@@ -131,10 +139,9 @@ namespace DBUS
         {
             if(retArg->getArgType() == m_returnType)
             {
-                m_return.reset(retArg);
+                m_return = std::move(DBusArgumentFactory::getArgCopy(retArg));
                 m_valid = true;
                 argSet = true;
-                retArg = nullptr;
             }
         }
         return argSet;

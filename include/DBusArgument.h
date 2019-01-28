@@ -59,7 +59,7 @@ namespace DBUS
         int getArgTypeIndex(ArgType type) const;
         virtual bool argIsContainerType() const = 0;
         static std::string getArgTypeSignature(ArgType argType);
-        bool isArgInitlized() const;
+        bool isArgInitalized() const;
     protected:
         ArgType m_argType;
         bool m_argIsInitalized{false};

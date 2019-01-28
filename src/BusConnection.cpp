@@ -25,24 +25,33 @@ namespace DBUS
         disconnect();
     }
 
+    BusConnection::BusConnection(BusConnection&& other)
+    {
+        m_interfaceList = std::move(other.m_interfaceList);
+        m_busName = other.m_busName;
+        m_busType = other.m_busType;
+        m_connection = other.m_connection;
+        m_connected = other.m_connected;
+        other.m_busName.clear();
+        other.m_busType = DBUS_BUS_SYSTEM;
+        other.m_connection = nullptr;
+        other.m_connected = false;
+    }
+
     BusConnection& BusConnection::operator=(BusConnection&& other)
     {
         if(this != &other)
         {
             disconnect();
-            other.disconnect();
-            m_interfaceList.clear();
-            if(!other.m_interfaceList.empty())
-            {
-                m_interfaceList = other.m_interfaceList;
-                other.m_interfaceList.clear();
-            }
+            m_interfaceList = std::move(other.m_interfaceList);
             m_busName = other.m_busName;
             m_busType = other.m_busType;
             m_connection = other.m_connection;
+            m_connected = other.m_connected;
             other.m_busName.clear();
             other.m_busType = DBUS_BUS_SYSTEM;
             other.m_connection = nullptr;
+            other.m_connected = false;
         }
         return *this;
     }
@@ -65,29 +74,9 @@ namespace DBUS
         return m_connected;
     }
 
-    BusConnection::BusConnection(BusConnection&& other)
-    {
-        if(this != &other)
-        {
-            other.disconnect();
-            m_interfaceList.clear();
-            if(!other.m_interfaceList.empty())
-            {
-                m_interfaceList = other.m_interfaceList;
-                other.m_interfaceList.clear();
-            }
-            m_busName = other.m_busName;
-            m_busType = other.m_busType;
-            m_connection = nullptr;
-            other.m_busName.clear();
-            other.m_busType = DBUS_BUS_SYSTEM;
-            other.m_connection = nullptr;
-        }
-    }
-
     bool BusConnection::disconnect()
     {
-        if(m_connected)
+        if(m_connected && m_connection)
         {
             dbus_connection_unref(m_connection);
             dbus_bus_release_name(m_connection, m_busName.c_str(), NULL);

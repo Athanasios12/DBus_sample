@@ -12,6 +12,7 @@ namespace DBUS
     public:
         static std::unique_ptr<DBusArgument> getArgument(DBusArgument::ArgType argType);
         static std::unique_ptr<DBusArgument> getArgCopy(DBusArgument *arg);
+        static bool checkIfArgsEqual(DBusArgument *arg1, DBusArgument *arg2);
     private:
         DBusArgumentFactory()=delete;
         DBusArgumentFactory(const DBusArgumentFactory &other)=delete;

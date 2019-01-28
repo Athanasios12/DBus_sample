@@ -3,8 +3,138 @@
 
 CMakeFiles/DBus_sample_Tests.dir/src/BusConnection.cpp.o
  ../include/BusConnection.h
+ ../include/DBusArgument.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
  ../include/DBusInterface.h
+ ../include/DBusMethod.h
+ ../include/DBusMethodReply.h
  /home/belisarius/DBus_sample/src/BusConnection.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+CMakeFiles/DBus_sample_Tests.dir/src/DBusArgument.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ /home/belisarius/DBus_sample/src/DBusArgument.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+CMakeFiles/DBus_sample_Tests.dir/src/DBusArgumentFactory.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusArray.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
+ ../include/DBusDictEntry.h
+ ../include/DBusDictionary.h
+ ../include/DBusStruct.h
+ /home/belisarius/DBus_sample/src/DBusArgumentFactory.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+CMakeFiles/DBus_sample_Tests.dir/src/DBusArgumentPack.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusArgumentPack.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
+ ../include/DBusInterface.h
+ ../include/DBusMethod.h
+ ../include/DBusMethodReply.h
+ /home/belisarius/DBus_sample/src/DBusArgumentPack.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+CMakeFiles/DBus_sample_Tests.dir/src/DBusArray.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusArray.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
+ /home/belisarius/DBus_sample/src/DBusArray.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+CMakeFiles/DBus_sample_Tests.dir/src/DBusBasicArgument.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusBasicArgument.h
+ /home/belisarius/DBus_sample/src/DBusBasicArgument.cpp
  /usr/include/dbus-1.0/dbus/dbus-address.h
  /usr/include/dbus-1.0/dbus/dbus-bus.h
  /usr/include/dbus-1.0/dbus/dbus-connection.h
@@ -25,8 +155,15 @@ CMakeFiles/DBus_sample_Tests.dir/src/BusConnection.cpp.o
  /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
 CMakeFiles/DBus_sample_Tests.dir/src/DBusClient.cpp.o
  ../include/BusConnection.h
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusArgumentPack.h
+ ../include/DBusBasicArgument.h
  ../include/DBusClient.h
+ ../include/DBusContainerArg.h
  ../include/DBusInterface.h
+ ../include/DBusMethod.h
+ ../include/DBusMethodReply.h
  /home/belisarius/DBus_sample/src/DBusClient.cpp
  /usr/include/dbus-1.0/dbus/dbus-address.h
  /usr/include/dbus-1.0/dbus/dbus-bus.h
@@ -46,12 +183,171 @@ CMakeFiles/DBus_sample_Tests.dir/src/DBusClient.cpp.o
  /usr/include/dbus-1.0/dbus/dbus-types.h
  /usr/include/dbus-1.0/dbus/dbus.h
  /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+CMakeFiles/DBus_sample_Tests.dir/src/DBusContainerArg.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
+ /home/belisarius/DBus_sample/src/DBusContainerArg.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+CMakeFiles/DBus_sample_Tests.dir/src/DBusDictEntry.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusContainerArg.h
+ ../include/DBusDictEntry.h
+ /home/belisarius/DBus_sample/src/DBusDictEntry.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+CMakeFiles/DBus_sample_Tests.dir/src/DBusDictionary.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
+ ../include/DBusDictEntry.h
+ ../include/DBusDictionary.h
+ /home/belisarius/DBus_sample/src/DBusDictionary.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
 CMakeFiles/DBus_sample_Tests.dir/src/DBusInterface.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusArray.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
  ../include/DBusInterface.h
+ ../include/DBusMethod.h
+ ../include/DBusMethodReply.h
  /home/belisarius/DBus_sample/src/DBusInterface.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+CMakeFiles/DBus_sample_Tests.dir/src/DBusMethod.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
+ ../include/DBusInterface.h
+ ../include/DBusMethod.h
+ ../include/DBusMethodReply.h
+ /home/belisarius/DBus_sample/src/DBusMethod.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+CMakeFiles/DBus_sample_Tests.dir/src/DBusMethodReply.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
+ ../include/DBusInterface.h
+ ../include/DBusMethod.h
+ ../include/DBusMethodReply.h
+ /home/belisarius/DBus_sample/src/DBusMethodReply.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
 CMakeFiles/DBus_sample_Tests.dir/src/DBusServer.cpp.o
  ../include/BusConnection.h
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
  ../include/DBusInterface.h
+ ../include/DBusMethod.h
+ ../include/DBusMethodReply.h
  ../include/DBusServer.h
  /home/belisarius/DBus_sample/src/DBusServer.cpp
  /usr/include/dbus-1.0/dbus/dbus-address.h
@@ -72,11 +368,133 @@ CMakeFiles/DBus_sample_Tests.dir/src/DBusServer.cpp.o
  /usr/include/dbus-1.0/dbus/dbus-types.h
  /usr/include/dbus-1.0/dbus/dbus.h
  /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+CMakeFiles/DBus_sample_Tests.dir/src/DBusStruct.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
+ ../include/DBusStruct.h
+ /home/belisarius/DBus_sample/src/DBusStruct.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+CMakeFiles/DBus_sample_Tests.dir/tests/DBusArrayTests.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusArray.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
+ ../include/DBusDictEntry.h
+ ../include/DBusDictionary.h
+ ../include/DBusStruct.h
+ /home/belisarius/DBus_sample/tests/DBusArrayTests.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+ googletest-src/googletest/include/gtest/gtest-death-test.h
+ googletest-src/googletest/include/gtest/gtest-matchers.h
+ googletest-src/googletest/include/gtest/gtest-message.h
+ googletest-src/googletest/include/gtest/gtest-param-test.h
+ googletest-src/googletest/include/gtest/gtest-printers.h
+ googletest-src/googletest/include/gtest/gtest-test-part.h
+ googletest-src/googletest/include/gtest/gtest-typed-test.h
+ googletest-src/googletest/include/gtest/gtest.h
+ googletest-src/googletest/include/gtest/gtest_pred_impl.h
+ googletest-src/googletest/include/gtest/gtest_prod.h
+ googletest-src/googletest/include/gtest/internal/custom/gtest-port.h
+ googletest-src/googletest/include/gtest/internal/custom/gtest-printers.h
+ googletest-src/googletest/include/gtest/internal/gtest-death-test-internal.h
+ googletest-src/googletest/include/gtest/internal/gtest-filepath.h
+ googletest-src/googletest/include/gtest/internal/gtest-internal.h
+ googletest-src/googletest/include/gtest/internal/gtest-param-util-generated.h
+ googletest-src/googletest/include/gtest/internal/gtest-param-util.h
+ googletest-src/googletest/include/gtest/internal/gtest-port-arch.h
+ googletest-src/googletest/include/gtest/internal/gtest-port.h
+ googletest-src/googletest/include/gtest/internal/gtest-string.h
+ googletest-src/googletest/include/gtest/internal/gtest-type-util.h
+CMakeFiles/DBus_sample_Tests.dir/tests/DBusBasicArgumentTests.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusBasicArgument.h
+ /home/belisarius/DBus_sample/tests/DBusBasicArgumentTests.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+ googletest-src/googletest/include/gtest/gtest-death-test.h
+ googletest-src/googletest/include/gtest/gtest-matchers.h
+ googletest-src/googletest/include/gtest/gtest-message.h
+ googletest-src/googletest/include/gtest/gtest-param-test.h
+ googletest-src/googletest/include/gtest/gtest-printers.h
+ googletest-src/googletest/include/gtest/gtest-test-part.h
+ googletest-src/googletest/include/gtest/gtest-typed-test.h
+ googletest-src/googletest/include/gtest/gtest.h
+ googletest-src/googletest/include/gtest/gtest_pred_impl.h
+ googletest-src/googletest/include/gtest/gtest_prod.h
+ googletest-src/googletest/include/gtest/internal/custom/gtest-port.h
+ googletest-src/googletest/include/gtest/internal/custom/gtest-printers.h
+ googletest-src/googletest/include/gtest/internal/gtest-death-test-internal.h
+ googletest-src/googletest/include/gtest/internal/gtest-filepath.h
+ googletest-src/googletest/include/gtest/internal/gtest-internal.h
+ googletest-src/googletest/include/gtest/internal/gtest-param-util-generated.h
+ googletest-src/googletest/include/gtest/internal/gtest-param-util.h
+ googletest-src/googletest/include/gtest/internal/gtest-port-arch.h
+ googletest-src/googletest/include/gtest/internal/gtest-port.h
+ googletest-src/googletest/include/gtest/internal/gtest-string.h
+ googletest-src/googletest/include/gtest/internal/gtest-type-util.h
 CMakeFiles/DBus_sample_Tests.dir/tests/DBusClientTests.cpp.o
  /home/belisarius/DBus_sample/tests/DBusClientTests.cpp
 CMakeFiles/DBus_sample_Tests.dir/tests/DBusConnectionTests.cpp.o
  ../include/BusConnection.h
+ ../include/DBusArgument.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
  ../include/DBusInterface.h
+ ../include/DBusMethod.h
+ ../include/DBusMethodReply.h
  /home/belisarius/DBus_sample/tests/DBusConnectionTests.cpp
  /usr/include/dbus-1.0/dbus/dbus-address.h
  /usr/include/dbus-1.0/dbus/dbus-bus.h
@@ -97,6 +515,7 @@ CMakeFiles/DBus_sample_Tests.dir/tests/DBusConnectionTests.cpp.o
  /usr/include/dbus-1.0/dbus/dbus.h
  /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
  googletest-src/googletest/include/gtest/gtest-death-test.h
+ googletest-src/googletest/include/gtest/gtest-matchers.h
  googletest-src/googletest/include/gtest/gtest-message.h
  googletest-src/googletest/include/gtest/gtest-param-test.h
  googletest-src/googletest/include/gtest/gtest-printers.h
@@ -110,19 +529,276 @@ CMakeFiles/DBus_sample_Tests.dir/tests/DBusConnectionTests.cpp.o
  googletest-src/googletest/include/gtest/internal/gtest-death-test-internal.h
  googletest-src/googletest/include/gtest/internal/gtest-filepath.h
  googletest-src/googletest/include/gtest/internal/gtest-internal.h
- googletest-src/googletest/include/gtest/internal/gtest-linked_ptr.h
  googletest-src/googletest/include/gtest/internal/gtest-param-util-generated.h
  googletest-src/googletest/include/gtest/internal/gtest-param-util.h
  googletest-src/googletest/include/gtest/internal/gtest-port-arch.h
  googletest-src/googletest/include/gtest/internal/gtest-port.h
  googletest-src/googletest/include/gtest/internal/gtest-string.h
- googletest-src/googletest/include/gtest/internal/gtest-tuple.h
+ googletest-src/googletest/include/gtest/internal/gtest-type-util.h
+CMakeFiles/DBus_sample_Tests.dir/tests/DBusDictEntryTests.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusArray.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
+ ../include/DBusDictEntry.h
+ ../include/DBusDictionary.h
+ /home/belisarius/DBus_sample/tests/DBusDictEntryTests.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+ googletest-src/googletest/include/gtest/gtest-death-test.h
+ googletest-src/googletest/include/gtest/gtest-matchers.h
+ googletest-src/googletest/include/gtest/gtest-message.h
+ googletest-src/googletest/include/gtest/gtest-param-test.h
+ googletest-src/googletest/include/gtest/gtest-printers.h
+ googletest-src/googletest/include/gtest/gtest-test-part.h
+ googletest-src/googletest/include/gtest/gtest-typed-test.h
+ googletest-src/googletest/include/gtest/gtest.h
+ googletest-src/googletest/include/gtest/gtest_pred_impl.h
+ googletest-src/googletest/include/gtest/gtest_prod.h
+ googletest-src/googletest/include/gtest/internal/custom/gtest-port.h
+ googletest-src/googletest/include/gtest/internal/custom/gtest-printers.h
+ googletest-src/googletest/include/gtest/internal/gtest-death-test-internal.h
+ googletest-src/googletest/include/gtest/internal/gtest-filepath.h
+ googletest-src/googletest/include/gtest/internal/gtest-internal.h
+ googletest-src/googletest/include/gtest/internal/gtest-param-util-generated.h
+ googletest-src/googletest/include/gtest/internal/gtest-param-util.h
+ googletest-src/googletest/include/gtest/internal/gtest-port-arch.h
+ googletest-src/googletest/include/gtest/internal/gtest-port.h
+ googletest-src/googletest/include/gtest/internal/gtest-string.h
+ googletest-src/googletest/include/gtest/internal/gtest-type-util.h
+CMakeFiles/DBus_sample_Tests.dir/tests/DBusDictionaryTests.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
+ ../include/DBusDictEntry.h
+ ../include/DBusDictionary.h
+ /home/belisarius/DBus_sample/tests/DBusDictionaryTests.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+ googletest-src/googletest/include/gtest/gtest-death-test.h
+ googletest-src/googletest/include/gtest/gtest-matchers.h
+ googletest-src/googletest/include/gtest/gtest-message.h
+ googletest-src/googletest/include/gtest/gtest-param-test.h
+ googletest-src/googletest/include/gtest/gtest-printers.h
+ googletest-src/googletest/include/gtest/gtest-test-part.h
+ googletest-src/googletest/include/gtest/gtest-typed-test.h
+ googletest-src/googletest/include/gtest/gtest.h
+ googletest-src/googletest/include/gtest/gtest_pred_impl.h
+ googletest-src/googletest/include/gtest/gtest_prod.h
+ googletest-src/googletest/include/gtest/internal/custom/gtest-port.h
+ googletest-src/googletest/include/gtest/internal/custom/gtest-printers.h
+ googletest-src/googletest/include/gtest/internal/gtest-death-test-internal.h
+ googletest-src/googletest/include/gtest/internal/gtest-filepath.h
+ googletest-src/googletest/include/gtest/internal/gtest-internal.h
+ googletest-src/googletest/include/gtest/internal/gtest-param-util-generated.h
+ googletest-src/googletest/include/gtest/internal/gtest-param-util.h
+ googletest-src/googletest/include/gtest/internal/gtest-port-arch.h
+ googletest-src/googletest/include/gtest/internal/gtest-port.h
+ googletest-src/googletest/include/gtest/internal/gtest-string.h
+ googletest-src/googletest/include/gtest/internal/gtest-type-util.h
+CMakeFiles/DBus_sample_Tests.dir/tests/DBusInterfaceTests.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusArray.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
+ ../include/DBusDictEntry.h
+ ../include/DBusDictionary.h
+ ../include/DBusInterface.h
+ ../include/DBusMethod.h
+ ../include/DBusMethodReply.h
+ ../include/DBusStruct.h
+ /home/belisarius/DBus_sample/tests/DBusInterfaceTests.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+ googletest-src/googletest/include/gtest/gtest-death-test.h
+ googletest-src/googletest/include/gtest/gtest-matchers.h
+ googletest-src/googletest/include/gtest/gtest-message.h
+ googletest-src/googletest/include/gtest/gtest-param-test.h
+ googletest-src/googletest/include/gtest/gtest-printers.h
+ googletest-src/googletest/include/gtest/gtest-test-part.h
+ googletest-src/googletest/include/gtest/gtest-typed-test.h
+ googletest-src/googletest/include/gtest/gtest.h
+ googletest-src/googletest/include/gtest/gtest_pred_impl.h
+ googletest-src/googletest/include/gtest/gtest_prod.h
+ googletest-src/googletest/include/gtest/internal/custom/gtest-port.h
+ googletest-src/googletest/include/gtest/internal/custom/gtest-printers.h
+ googletest-src/googletest/include/gtest/internal/gtest-death-test-internal.h
+ googletest-src/googletest/include/gtest/internal/gtest-filepath.h
+ googletest-src/googletest/include/gtest/internal/gtest-internal.h
+ googletest-src/googletest/include/gtest/internal/gtest-param-util-generated.h
+ googletest-src/googletest/include/gtest/internal/gtest-param-util.h
+ googletest-src/googletest/include/gtest/internal/gtest-port-arch.h
+ googletest-src/googletest/include/gtest/internal/gtest-port.h
+ googletest-src/googletest/include/gtest/internal/gtest-string.h
+ googletest-src/googletest/include/gtest/internal/gtest-type-util.h
+CMakeFiles/DBus_sample_Tests.dir/tests/DBusMethodReplyTests.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentPack.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusMethodReply.h
+ /home/belisarius/DBus_sample/tests/DBusMethodReplyTests.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+ googletest-src/googletest/include/gtest/gtest-death-test.h
+ googletest-src/googletest/include/gtest/gtest-matchers.h
+ googletest-src/googletest/include/gtest/gtest-message.h
+ googletest-src/googletest/include/gtest/gtest-param-test.h
+ googletest-src/googletest/include/gtest/gtest-printers.h
+ googletest-src/googletest/include/gtest/gtest-test-part.h
+ googletest-src/googletest/include/gtest/gtest-typed-test.h
+ googletest-src/googletest/include/gtest/gtest.h
+ googletest-src/googletest/include/gtest/gtest_pred_impl.h
+ googletest-src/googletest/include/gtest/gtest_prod.h
+ googletest-src/googletest/include/gtest/internal/custom/gtest-port.h
+ googletest-src/googletest/include/gtest/internal/custom/gtest-printers.h
+ googletest-src/googletest/include/gtest/internal/gtest-death-test-internal.h
+ googletest-src/googletest/include/gtest/internal/gtest-filepath.h
+ googletest-src/googletest/include/gtest/internal/gtest-internal.h
+ googletest-src/googletest/include/gtest/internal/gtest-param-util-generated.h
+ googletest-src/googletest/include/gtest/internal/gtest-param-util.h
+ googletest-src/googletest/include/gtest/internal/gtest-port-arch.h
+ googletest-src/googletest/include/gtest/internal/gtest-port.h
+ googletest-src/googletest/include/gtest/internal/gtest-string.h
+ googletest-src/googletest/include/gtest/internal/gtest-type-util.h
+CMakeFiles/DBus_sample_Tests.dir/tests/DBusMethodTests.cpp.o
+ ../include/BusConnection.h
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusArgumentPack.h
+ ../include/DBusArray.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusClient.h
+ ../include/DBusContainerArg.h
+ ../include/DBusDictEntry.h
+ ../include/DBusDictionary.h
+ ../include/DBusInterface.h
+ ../include/DBusMethod.h
+ ../include/DBusMethodReply.h
+ ../include/DBusServer.h
+ ../include/DBusStruct.h
+ /home/belisarius/DBus_sample/tests/DBusMethodTests.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+ googletest-src/googletest/include/gtest/gtest-death-test.h
+ googletest-src/googletest/include/gtest/gtest-matchers.h
+ googletest-src/googletest/include/gtest/gtest-message.h
+ googletest-src/googletest/include/gtest/gtest-param-test.h
+ googletest-src/googletest/include/gtest/gtest-printers.h
+ googletest-src/googletest/include/gtest/gtest-test-part.h
+ googletest-src/googletest/include/gtest/gtest-typed-test.h
+ googletest-src/googletest/include/gtest/gtest.h
+ googletest-src/googletest/include/gtest/gtest_pred_impl.h
+ googletest-src/googletest/include/gtest/gtest_prod.h
+ googletest-src/googletest/include/gtest/internal/custom/gtest-port.h
+ googletest-src/googletest/include/gtest/internal/custom/gtest-printers.h
+ googletest-src/googletest/include/gtest/internal/gtest-death-test-internal.h
+ googletest-src/googletest/include/gtest/internal/gtest-filepath.h
+ googletest-src/googletest/include/gtest/internal/gtest-internal.h
+ googletest-src/googletest/include/gtest/internal/gtest-param-util-generated.h
+ googletest-src/googletest/include/gtest/internal/gtest-param-util.h
+ googletest-src/googletest/include/gtest/internal/gtest-port-arch.h
+ googletest-src/googletest/include/gtest/internal/gtest-port.h
+ googletest-src/googletest/include/gtest/internal/gtest-string.h
  googletest-src/googletest/include/gtest/internal/gtest-type-util.h
 CMakeFiles/DBus_sample_Tests.dir/tests/DBusServerTests.cpp.o
  ../include/BusConnection.h
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusArgumentPack.h
+ ../include/DBusArray.h
+ ../include/DBusBasicArgument.h
  ../include/DBusClient.h
+ ../include/DBusContainerArg.h
+ ../include/DBusDictEntry.h
+ ../include/DBusDictionary.h
  ../include/DBusInterface.h
+ ../include/DBusMethod.h
+ ../include/DBusMethodReply.h
  ../include/DBusServer.h
+ ../include/DBusStruct.h
  /home/belisarius/DBus_sample/tests/DBusServerTests.cpp
  /usr/include/dbus-1.0/dbus/dbus-address.h
  /usr/include/dbus-1.0/dbus/dbus-bus.h
@@ -143,6 +819,7 @@ CMakeFiles/DBus_sample_Tests.dir/tests/DBusServerTests.cpp.o
  /usr/include/dbus-1.0/dbus/dbus.h
  /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
  googletest-src/googletest/include/gtest/gtest-death-test.h
+ googletest-src/googletest/include/gtest/gtest-matchers.h
  googletest-src/googletest/include/gtest/gtest-message.h
  googletest-src/googletest/include/gtest/gtest-param-test.h
  googletest-src/googletest/include/gtest/gtest-printers.h
@@ -156,11 +833,56 @@ CMakeFiles/DBus_sample_Tests.dir/tests/DBusServerTests.cpp.o
  googletest-src/googletest/include/gtest/internal/gtest-death-test-internal.h
  googletest-src/googletest/include/gtest/internal/gtest-filepath.h
  googletest-src/googletest/include/gtest/internal/gtest-internal.h
- googletest-src/googletest/include/gtest/internal/gtest-linked_ptr.h
  googletest-src/googletest/include/gtest/internal/gtest-param-util-generated.h
  googletest-src/googletest/include/gtest/internal/gtest-param-util.h
  googletest-src/googletest/include/gtest/internal/gtest-port-arch.h
  googletest-src/googletest/include/gtest/internal/gtest-port.h
  googletest-src/googletest/include/gtest/internal/gtest-string.h
- googletest-src/googletest/include/gtest/internal/gtest-tuple.h
+ googletest-src/googletest/include/gtest/internal/gtest-type-util.h
+CMakeFiles/DBus_sample_Tests.dir/tests/DBusStructTests.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusArray.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
+ ../include/DBusStruct.h
+ /home/belisarius/DBus_sample/tests/DBusStructTests.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+ googletest-src/googletest/include/gtest/gtest-death-test.h
+ googletest-src/googletest/include/gtest/gtest-matchers.h
+ googletest-src/googletest/include/gtest/gtest-message.h
+ googletest-src/googletest/include/gtest/gtest-param-test.h
+ googletest-src/googletest/include/gtest/gtest-printers.h
+ googletest-src/googletest/include/gtest/gtest-test-part.h
+ googletest-src/googletest/include/gtest/gtest-typed-test.h
+ googletest-src/googletest/include/gtest/gtest.h
+ googletest-src/googletest/include/gtest/gtest_pred_impl.h
+ googletest-src/googletest/include/gtest/gtest_prod.h
+ googletest-src/googletest/include/gtest/internal/custom/gtest-port.h
+ googletest-src/googletest/include/gtest/internal/custom/gtest-printers.h
+ googletest-src/googletest/include/gtest/internal/gtest-death-test-internal.h
+ googletest-src/googletest/include/gtest/internal/gtest-filepath.h
+ googletest-src/googletest/include/gtest/internal/gtest-internal.h
+ googletest-src/googletest/include/gtest/internal/gtest-param-util-generated.h
+ googletest-src/googletest/include/gtest/internal/gtest-param-util.h
+ googletest-src/googletest/include/gtest/internal/gtest-port-arch.h
+ googletest-src/googletest/include/gtest/internal/gtest-port.h
+ googletest-src/googletest/include/gtest/internal/gtest-string.h
  googletest-src/googletest/include/gtest/internal/gtest-type-util.h

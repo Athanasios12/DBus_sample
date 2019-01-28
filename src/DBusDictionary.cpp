@@ -97,7 +97,7 @@ namespace DBUS
             {
                 if(arg->getArgType() == ArgType::Dictionary_Entry)
                 {
-                    if(arg->isArgInitlized())
+                    if(arg->isArgInitalized())
                     {
                         auto entry = static_cast<DBusDictEntry*>(arg);
                         if(entry->getKeySet() && entry->getValueSet())
@@ -178,9 +178,9 @@ namespace DBUS
         {
         if(key && value)
         {
-            if(key->getArgType() == m_entryType.first && key->isArgInitlized())
+            if(key->getArgType() == m_entryType.first && key->isArgInitalized())
             {
-                if(value->getArgType() == m_entryType.second && value->isArgInitlized())
+                if(value->getArgType() == m_entryType.second && value->isArgInitalized())
                 {
                     auto keyArg = DBusArgumentFactory::getArgCopy(key);
                     if(keyArg)

@@ -30,7 +30,7 @@ namespace DBUS
             bool addMethod(DBusMethod&& method)
             {
                 bool methodAdded = false;
-                if(method.bindingIsSet() && method.checkIfAllArgsSet())
+                if(method.bindingIsSet())
                 {
                     if(std::find(m_methods.begin(), m_methods.end(), method) == std::end(m_methods))
                     {

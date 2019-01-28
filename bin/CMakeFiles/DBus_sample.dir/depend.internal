@@ -122,8 +122,138 @@ CMakeFiles/DBus_sample.dir/main.cpp.o
  /usr/lib/x86_64-linux-gnu/glib-2.0/include/glibconfig.h
 CMakeFiles/DBus_sample.dir/src/BusConnection.cpp.o
  ../include/BusConnection.h
+ ../include/DBusArgument.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
  ../include/DBusInterface.h
+ ../include/DBusMethod.h
+ ../include/DBusMethodReply.h
  /home/belisarius/DBus_sample/src/BusConnection.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+CMakeFiles/DBus_sample.dir/src/DBusArgument.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ /home/belisarius/DBus_sample/src/DBusArgument.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+CMakeFiles/DBus_sample.dir/src/DBusArgumentFactory.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusArray.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
+ ../include/DBusDictEntry.h
+ ../include/DBusDictionary.h
+ ../include/DBusStruct.h
+ /home/belisarius/DBus_sample/src/DBusArgumentFactory.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+CMakeFiles/DBus_sample.dir/src/DBusArgumentPack.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusArgumentPack.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
+ ../include/DBusInterface.h
+ ../include/DBusMethod.h
+ ../include/DBusMethodReply.h
+ /home/belisarius/DBus_sample/src/DBusArgumentPack.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+CMakeFiles/DBus_sample.dir/src/DBusArray.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusArray.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
+ /home/belisarius/DBus_sample/src/DBusArray.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+CMakeFiles/DBus_sample.dir/src/DBusBasicArgument.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusBasicArgument.h
+ /home/belisarius/DBus_sample/src/DBusBasicArgument.cpp
  /usr/include/dbus-1.0/dbus/dbus-address.h
  /usr/include/dbus-1.0/dbus/dbus-bus.h
  /usr/include/dbus-1.0/dbus/dbus-connection.h
@@ -144,8 +274,15 @@ CMakeFiles/DBus_sample.dir/src/BusConnection.cpp.o
  /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
 CMakeFiles/DBus_sample.dir/src/DBusClient.cpp.o
  ../include/BusConnection.h
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusArgumentPack.h
+ ../include/DBusBasicArgument.h
  ../include/DBusClient.h
+ ../include/DBusContainerArg.h
  ../include/DBusInterface.h
+ ../include/DBusMethod.h
+ ../include/DBusMethodReply.h
  /home/belisarius/DBus_sample/src/DBusClient.cpp
  /usr/include/dbus-1.0/dbus/dbus-address.h
  /usr/include/dbus-1.0/dbus/dbus-bus.h
@@ -165,14 +302,198 @@ CMakeFiles/DBus_sample.dir/src/DBusClient.cpp.o
  /usr/include/dbus-1.0/dbus/dbus-types.h
  /usr/include/dbus-1.0/dbus/dbus.h
  /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+CMakeFiles/DBus_sample.dir/src/DBusContainerArg.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
+ /home/belisarius/DBus_sample/src/DBusContainerArg.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+CMakeFiles/DBus_sample.dir/src/DBusDictEntry.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusContainerArg.h
+ ../include/DBusDictEntry.h
+ /home/belisarius/DBus_sample/src/DBusDictEntry.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+CMakeFiles/DBus_sample.dir/src/DBusDictionary.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
+ ../include/DBusDictEntry.h
+ ../include/DBusDictionary.h
+ /home/belisarius/DBus_sample/src/DBusDictionary.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
 CMakeFiles/DBus_sample.dir/src/DBusInterface.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusArray.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
  ../include/DBusInterface.h
+ ../include/DBusMethod.h
+ ../include/DBusMethodReply.h
  /home/belisarius/DBus_sample/src/DBusInterface.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+CMakeFiles/DBus_sample.dir/src/DBusMethod.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
+ ../include/DBusInterface.h
+ ../include/DBusMethod.h
+ ../include/DBusMethodReply.h
+ /home/belisarius/DBus_sample/src/DBusMethod.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+CMakeFiles/DBus_sample.dir/src/DBusMethodReply.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
+ ../include/DBusInterface.h
+ ../include/DBusMethod.h
+ ../include/DBusMethodReply.h
+ /home/belisarius/DBus_sample/src/DBusMethodReply.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
 CMakeFiles/DBus_sample.dir/src/DBusServer.cpp.o
  ../include/BusConnection.h
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
  ../include/DBusInterface.h
+ ../include/DBusMethod.h
+ ../include/DBusMethodReply.h
  ../include/DBusServer.h
  /home/belisarius/DBus_sample/src/DBusServer.cpp
+ /usr/include/dbus-1.0/dbus/dbus-address.h
+ /usr/include/dbus-1.0/dbus/dbus-bus.h
+ /usr/include/dbus-1.0/dbus/dbus-connection.h
+ /usr/include/dbus-1.0/dbus/dbus-errors.h
+ /usr/include/dbus-1.0/dbus/dbus-macros.h
+ /usr/include/dbus-1.0/dbus/dbus-memory.h
+ /usr/include/dbus-1.0/dbus/dbus-message.h
+ /usr/include/dbus-1.0/dbus/dbus-misc.h
+ /usr/include/dbus-1.0/dbus/dbus-pending-call.h
+ /usr/include/dbus-1.0/dbus/dbus-protocol.h
+ /usr/include/dbus-1.0/dbus/dbus-server.h
+ /usr/include/dbus-1.0/dbus/dbus-shared.h
+ /usr/include/dbus-1.0/dbus/dbus-signature.h
+ /usr/include/dbus-1.0/dbus/dbus-syntax.h
+ /usr/include/dbus-1.0/dbus/dbus-threads.h
+ /usr/include/dbus-1.0/dbus/dbus-types.h
+ /usr/include/dbus-1.0/dbus/dbus.h
+ /usr/lib/x86_64-linux-gnu/dbus-1.0/include/dbus/dbus-arch-deps.h
+CMakeFiles/DBus_sample.dir/src/DBusStruct.cpp.o
+ ../include/DBusArgument.h
+ ../include/DBusArgumentFactory.h
+ ../include/DBusBasicArgument.h
+ ../include/DBusContainerArg.h
+ ../include/DBusStruct.h
+ /home/belisarius/DBus_sample/src/DBusStruct.cpp
  /usr/include/dbus-1.0/dbus/dbus-address.h
  /usr/include/dbus-1.0/dbus/dbus-bus.h
  /usr/include/dbus-1.0/dbus/dbus-connection.h

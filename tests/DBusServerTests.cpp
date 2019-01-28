@@ -24,16 +24,18 @@ namespace
     const std::string serverBusName = "in.Radoslaw.Server";
     const std::string methodName{"add_numbers"};
     const std::string objectName{"/in/Radoslaw/adder"};
-    const std::string interfaceName{"in.Radoslaw.Interface"};
-
-    std::function<DBusMethodReply(const std::vector<std::unique_ptr<DBusArgument>>&)> printBinding =
+    const std::string interfaceName{"in.Radoslaw.Interface"};    
+    const std::function<DBusMethodReply(const std::vector<std::unique_ptr<DBusArgument>>&)> printBinding =
             [](const std::vector<std::unique_ptr<DBusArgument>> &args)
     {
         std::cout << "\nAdd numbers called!" << std::endl;
         std::cout << "Number of method input args : " << args.size() << std::endl;
         for(auto && arg : args)
         {
-            std::cout << "Arg Type: " << arg->getArgType() << std::endl;
+            if(arg)
+            {
+                std::cout << "Arg Type: " << arg->getArgType() << std::endl;
+            }
         }
         DBusMethodReply retVal{DBusArgument::ArgType::String};
         std::unique_ptr<DBusArgument> retArg{new DBusBasicArgument{DBusArgument::ArgType::String}};
@@ -45,36 +47,36 @@ namespace
     // The fixture for testing class Foo.
     class DBusServerTest : public ::testing::Test
     {
-        protected:
-          // You can remove any or all of the following functions if its body
-          // is empty.
+    protected:
+        // You can remove any or all of the following functions if its body
+        // is empty.
 
-          DBusServerTest()
-          {
-            // You can do set-up work for each test here.
-          }
+        DBusServerTest()
+        {
+        // You can do set-up work for each test here.
+        }
 
-          virtual ~DBusServerTest()
-          {
-            // You can do clean-up work that doesn't throw exceptions here.
-          }
+        virtual ~DBusServerTest()
+        {
+        // You can do clean-up work that doesn't throw exceptions here.
+        }
 
-          // If the constructor and destructor are not enough for setting up
-          // and cleaning up each test, you can define the following methods:
+        // If the constructor and destructor are not enough for setting up
+        // and cleaning up each test, you can define the following methods:
 
-          virtual void SetUp()
-          {
-            // Code here will be called immediately after the constructor (right
-            // before each test).
+        virtual void SetUp()
+        {
+        // Code here will be called immediately after the constructor (right
+        // before each test).
 
 
-          }
+        }
 
-          virtual void TearDown()
-          {
-            // Code here will be called immediately after each test (right
-            // before the destructor).
-          }
+        virtual void TearDown()
+        {
+        // Code here will be called immediately after each test (right
+        // before the destructor).
+        }
     };
 
     TEST_F(DBusServerTest, defaultCtor)
@@ -162,7 +164,7 @@ namespace
         EXPECT_EQ(false, interfaces.empty());
         EXPECT_EQ(true, interfaces[0] == dbusInterface);
     }
-/*
+
     TEST_F(DBusServerTest, receiveMethodCall_StringArg)
     {
         using namespace DBUS;
@@ -171,84 +173,25 @@ namespace
         std::vector<DBusArgument::ArgType> bindingArgTypes = {DBusArgument::ArgType::String};
         DBusMethod method{methodName, printBinding, bindingArgTypes.size(), DBusArgument::ArgType::String};
         method.setBindingArgTypes(bindingArgTypes);
-        object.addMethod(method);
+        object.addMethod(std::move(method));
         DBusInterface dbusInterface(interfaceName);
         dbusInterface.addObject(object);
+        DBusArgumentPack methodInputArgs{methodName, objectName, interfaceName};
+        //basic arguments
+        auto arg = static_cast<DBusBasicArgument*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::String));
+        arg->setArgValue("Hello from Client");
         pid_t pid = fork();
         if(pid >= 0)
         {
             if(pid == 0)
             {
-                //client
+                //client                
                 std::cerr << "In Client" << std::endl;
                 DBusClient dbusClient(clientBusName, DBUS_BUS_SYSTEM);
                 std::this_thread::sleep_for(std::chrono::milliseconds(500));
                 bool clientConnected = dbusClient.connect();
                 fprintf(stderr, "\nClient connection %s\n",(clientConnected) ? "success" : "failed");
-                DBusArgumentPack methodInputArgs{methodName, objectName, interfaceName};
-                //basic arguments
-                auto arg = static_cast<DBusBasicArgument*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::String));
-                arg->setArgValue("Hello from Client");
-                std::cerr << "Finished argument pack creation" << std::endl;
-                //check if all args have been set before method call - add this condition also in call server method, don't send msg if method does not have all args set
-                if(methodInputArgs.checkIfAllArgsValid())
-                {
-                    std::cerr << "Client args valid" << std::endl;
-                    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-                    DBusMethodReply reply = dbusClient.callServerMethod(serverBusName, methodInputArgs);
-                    std::cerr << "\nMethod " << method.getName() << " reply: " << std::endl;
-                    auto retArg = static_cast<DBusBasicArgument*>(reply.getReturn());
-                    if(retArg)
-                    {
-                        auto retPtr = static_cast<const char*>(retArg->getArgValuePtr());
-                        if(retPtr)
-                        {
-                            std::string retStr{retPtr};
-                            std::cerr << retStr << std::endl;
-                        }
-                    }
-                    fprintf(stderr, "%s\n",(reply.isValid()) ? "valid" : "invalid");
-                }
-                exit(0);
-            }
-            else
-            {
-                //server
-                DBUS::DBusServer dbusServer(serverBusName, DBUS_BUS_SYSTEM);
-                dbusServer.addInterface(dbusInterface);
-                dbusServer.connect();
-                std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-                EXPECT_EQ(true, dbusServer.checkLastMethodCall(clientBusName, method.getName()));
-            }
-        }
-    }
 
-    TEST_F(DBusServerTest, receiveMethodCall_ByteArg)
-    {
-        using namespace DBUS;
-        //server interface
-        DBusInterface::DBusObject object(objectName);
-        std::vector<DBusArgument::ArgType> bindingArgTypes = {DBusArgument::ArgType::Byte};
-        DBusMethod method{methodName, printBinding, bindingArgTypes.size(), DBusArgument::ArgType::String};
-        method.setBindingArgTypes(bindingArgTypes);
-        object.addMethod(method);
-        DBusInterface dbusInterface(interfaceName);
-        dbusInterface.addObject(object);
-        pid_t pid = fork();
-        if(pid >= 0)
-        {
-            if(pid == 0)
-            {
-                //client
-                std::cerr << "In Client" << std::endl;
-                DBusClient dbusClient(clientBusName, DBUS_BUS_SYSTEM);
-                std::this_thread::sleep_for(std::chrono::milliseconds(500));
-                bool clientConnected = dbusClient.connect();
-                fprintf(stderr, "\nClient connection %s\n",(clientConnected) ? "success" : "failed");
-                DBusArgumentPack methodInputArgs{methodName, objectName, interfaceName};
-                //basic arguments
-                auto arg = static_cast<DBusBasicArgument*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::Byte));
-                arg->setArgValue(static_cast<uint8_t>(10));
                 std::cerr << "Finished argument pack creation" << std::endl;
                 //check if all args have been set before method call - add this condition also in call server method, don't send msg if method does not have all args set
                 if(methodInputArgs.checkIfAllArgsValid())
@@ -256,7 +199,7 @@ namespace
                     std::cerr << "Client args valid" << std::endl;
                     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
                     DBusMethodReply reply = dbusClient.callServerMethod(serverBusName, methodInputArgs);
-                    std::cerr << "\nMethod " << method.getName() << " reply: " << std::endl;
+                    std::cerr << "\nMethod " << methodName << " reply: " << std::endl;
                     auto retArg = static_cast<DBusBasicArgument*>(reply.getReturn());
                     if(retArg)
                     {
@@ -278,11 +221,74 @@ namespace
                 dbusServer.addInterface(dbusInterface);
                 dbusServer.connect();
                 std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-                EXPECT_EQ(true, dbusServer.checkLastMethodCall(clientBusName, method.getName()));
+                EXPECT_EQ(true, dbusServer.checkLastMethodCall(clientBusName, methodName));
             }
         }
-    }    
-*/
+    }
+
+    TEST_F(DBusServerTest, receiveMethodCall_ByteArg)
+    {
+        using namespace DBUS;
+        //server interface
+        DBusInterface::DBusObject object(objectName);
+        std::vector<DBusArgument::ArgType> bindingArgTypes = {DBusArgument::ArgType::Byte};
+        DBusMethod method{methodName, printBinding, bindingArgTypes.size(), DBusArgument::ArgType::String};
+        method.setBindingArgTypes(bindingArgTypes);
+        object.addMethod(std::move(method));
+        DBusInterface dbusInterface(interfaceName);
+        dbusInterface.addObject(object);
+        DBusArgumentPack methodInputArgs{methodName, objectName, interfaceName};
+        //basic arguments
+        auto arg = static_cast<DBusBasicArgument*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::Byte));
+        arg->setArgValue(static_cast<uint8_t>(10));
+        pid_t pid = fork();
+        if(pid >= 0)
+        {
+            if(pid > 0)
+            {
+                //client
+                std::cerr << "In Client" << std::endl;
+                DBusClient dbusClient(clientBusName, DBUS_BUS_SYSTEM);
+                std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+                bool clientConnected = dbusClient.connect();
+                fprintf(stderr, "\nClient connection %s\n",(clientConnected) ? "success" : "failed");
+                //check if all args have been set before method call - add this condition also in call server method, don't send msg if method does not have all args set
+                if(methodInputArgs.checkIfAllArgsValid())
+                {
+                    for(int i = 0; i > 5; i++)
+                    {
+                    std::cerr << "Client args valid" << std::endl;
+                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                    DBusMethodReply reply = dbusClient.callServerMethod(serverBusName, methodInputArgs);
+                    std::cerr << "\nMethod " << methodName << " reply: " << std::endl;
+                    auto retArg = static_cast<DBusBasicArgument*>(reply.getReturn());
+                    if(retArg)
+                    {
+                        auto retPtr = *static_cast<const char**>(retArg->getArgValuePtr());
+                        if(retPtr)
+                        {
+                            std::string retStr{retPtr};
+                            std::cerr << retStr << std::endl;
+                        }
+                    }
+                    fprintf(stderr, "%s\n",(reply.isValid()) ? "valid" : "invalid");
+                    }
+                }
+
+                exit(0);
+            }
+            else
+            {
+                //server
+                DBUS::DBusServer dbusServer(serverBusName, DBUS_BUS_SYSTEM);
+                dbusServer.addInterface(dbusInterface);
+                dbusServer.connect();
+                std::this_thread::sleep_for(std::chrono::milliseconds(15000));
+                EXPECT_EQ(true, dbusServer.checkLastMethodCall(clientBusName, methodName));                
+            }
+        }
+    }
+
     TEST_F(DBusServerTest, receiveMethodCall_ArrayArg)
     {
 

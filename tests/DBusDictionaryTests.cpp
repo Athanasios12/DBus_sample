@@ -129,7 +129,7 @@ namespace
         bool argAdded = dict.addArgument(&string);
         EXPECT_EQ(false, argAdded);
         EXPECT_EQ(0u, dict.getSize());
-        EXPECT_EQ(false, dict.isArgInitlized());
+        EXPECT_EQ(false, dict.isArgInitalized());
         auto expectedSig = std::string{"{"} + std::string{DBUS_TYPE_STRING_AS_STRING} +
                            std::string{DBUS_TYPE_INT32_AS_STRING} + std::string{"}"};
         EXPECT_EQ(std::string{DBUS_TYPE_ARRAY_AS_STRING} + expectedSig, std::string{dict.getSignature()});
@@ -144,7 +144,7 @@ namespace
         bool argAdded = dict.addArgument(&entry);
         EXPECT_EQ(false, argAdded);
         EXPECT_EQ(0u, dict.getSize());
-        EXPECT_EQ(false, dict.isArgInitlized());
+        EXPECT_EQ(false, dict.isArgInitalized());
         auto expectedSig = std::string{"{"} + std::string{DBUS_TYPE_STRING_AS_STRING} +
                            std::string{DBUS_TYPE_INT32_AS_STRING} + std::string{"}"};
         EXPECT_EQ(std::string{DBUS_TYPE_ARRAY_AS_STRING} + expectedSig, std::string{dict.getSignature()});

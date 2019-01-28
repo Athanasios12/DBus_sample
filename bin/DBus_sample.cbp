@@ -37,26 +37,6 @@
             <DistClean command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/Makefile&quot;  VERBOSE=1 clean" />
          </MakeCommands>
       </Target>
-      <Target title="install">
-         <Option working_dir="/home/belisarius/DBus_sample/bin" />
-         <Option type="4" />
-         <MakeCommands>
-            <Build command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/Makefile&quot;  VERBOSE=1 install" />
-            <CompileFile command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
-            <Clean command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/Makefile&quot;  VERBOSE=1 clean" />
-            <DistClean command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/Makefile&quot;  VERBOSE=1 clean" />
-         </MakeCommands>
-      </Target>
-      <Target title="list_install_components">
-         <Option working_dir="/home/belisarius/DBus_sample/bin" />
-         <Option type="4" />
-         <MakeCommands>
-            <Build command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/Makefile&quot;  VERBOSE=1 list_install_components" />
-            <CompileFile command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
-            <Clean command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/Makefile&quot;  VERBOSE=1 clean" />
-            <DistClean command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/Makefile&quot;  VERBOSE=1 clean" />
-         </MakeCommands>
-      </Target>
       <Target title="DBus_sample">
          <Option output="/home/belisarius/DBus_sample/bin/DBus_sample" prefix_auto="0" extension_auto="0" />
          <Option working_dir="/home/belisarius/DBus_sample/bin" />
@@ -113,6 +93,16 @@
             <DistClean command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/Makefile&quot;  VERBOSE=1 clean" />
          </MakeCommands>
       </Target>
+      <Target title="install">
+         <Option working_dir="/home/belisarius/DBus_sample/bin" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/Makefile&quot;  VERBOSE=1 install" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
       <Target title="DBus_sample_Tests">
          <Option output="/home/belisarius/DBus_sample/bin/DBus_sample_Tests" prefix_auto="0" extension_auto="0" />
          <Option working_dir="/home/belisarius/DBus_sample/bin" />
@@ -120,6 +110,7 @@
          <Option type="1" />
          <Option compiler="gcc" />
          <Compiler>
+            <Add directory="/home/belisarius/DBus_sample/bin/googletest-src/googletest" />
             <Add directory="/home/belisarius/DBus_sample/bin/googletest-src/googletest/include" />
             <Add directory="/home/belisarius/DBus_sample/include" />
             <Add directory="/usr/include" />
@@ -149,6 +140,7 @@
          <Option type="1" />
          <Option compiler="gcc" />
          <Compiler>
+            <Add directory="/home/belisarius/DBus_sample/bin/googletest-src/googletest" />
             <Add directory="/home/belisarius/DBus_sample/bin/googletest-src/googletest/include" />
             <Add directory="/home/belisarius/DBus_sample/include" />
             <Add directory="/usr/include" />
@@ -191,62 +183,18 @@
             <DistClean command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/Makefile&quot;  VERBOSE=1 clean" />
          </MakeCommands>
       </Target>
-      <Target title="gmock">
-         <Option output="/home/belisarius/DBus_sample/bin/googletest-build/googlemock/libgmockd.a" prefix_auto="0" extension_auto="0" />
-         <Option working_dir="/home/belisarius/DBus_sample/bin/googletest-build/googlemock" />
-         <Option object_output="./" />
-         <Option type="2" />
-         <Option compiler="gcc" />
-         <Compiler>
-            <Add directory="/home/belisarius/DBus_sample/bin/googletest-src/googlemock" />
-            <Add directory="/home/belisarius/DBus_sample/bin/googletest-src/googlemock/include" />
-            <Add directory="/home/belisarius/DBus_sample/bin/googletest-src/googletest" />
-            <Add directory="/home/belisarius/DBus_sample/bin/googletest-src/googletest/include" />
-            <Add directory="/usr/include" />
-            <Add directory="/usr/include/c++/5" />
-            <Add directory="/usr/include/c++/5/backward" />
-            <Add directory="/usr/include/x86_64-linux-gnu" />
-            <Add directory="/usr/include/x86_64-linux-gnu/c++/5" />
-            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include" />
-            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed" />
-            <Add directory="/usr/local/include" />
-         </Compiler>
+      <Target title="list_install_components">
+         <Option working_dir="/home/belisarius/DBus_sample/bin" />
+         <Option type="4" />
          <MakeCommands>
-            <Build command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/googletest-build/googlemock/Makefile&quot;  VERBOSE=1 gmock" />
-            <CompileFile command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/googletest-build/googlemock/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
-            <Clean command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/googletest-build/googlemock/Makefile&quot;  VERBOSE=1 clean" />
-            <DistClean command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/googletest-build/googlemock/Makefile&quot;  VERBOSE=1 clean" />
-         </MakeCommands>
-      </Target>
-      <Target title="gmock/fast">
-         <Option output="/home/belisarius/DBus_sample/bin/googletest-build/googlemock/libgmockd.a" prefix_auto="0" extension_auto="0" />
-         <Option working_dir="/home/belisarius/DBus_sample/bin/googletest-build/googlemock" />
-         <Option object_output="./" />
-         <Option type="2" />
-         <Option compiler="gcc" />
-         <Compiler>
-            <Add directory="/home/belisarius/DBus_sample/bin/googletest-src/googlemock" />
-            <Add directory="/home/belisarius/DBus_sample/bin/googletest-src/googlemock/include" />
-            <Add directory="/home/belisarius/DBus_sample/bin/googletest-src/googletest" />
-            <Add directory="/home/belisarius/DBus_sample/bin/googletest-src/googletest/include" />
-            <Add directory="/usr/include" />
-            <Add directory="/usr/include/c++/5" />
-            <Add directory="/usr/include/c++/5/backward" />
-            <Add directory="/usr/include/x86_64-linux-gnu" />
-            <Add directory="/usr/include/x86_64-linux-gnu/c++/5" />
-            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include" />
-            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed" />
-            <Add directory="/usr/local/include" />
-         </Compiler>
-         <MakeCommands>
-            <Build command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/googletest-build/googlemock/Makefile&quot;  VERBOSE=1 gmock/fast" />
-            <CompileFile command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/googletest-build/googlemock/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
-            <Clean command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/googletest-build/googlemock/Makefile&quot;  VERBOSE=1 clean" />
-            <DistClean command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/googletest-build/googlemock/Makefile&quot;  VERBOSE=1 clean" />
+            <Build command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/Makefile&quot;  VERBOSE=1 list_install_components" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/Makefile&quot;  VERBOSE=1 clean" />
          </MakeCommands>
       </Target>
       <Target title="gmock_main">
-         <Option output="/home/belisarius/DBus_sample/bin/googletest-build/googlemock/libgmock_maind.a" prefix_auto="0" extension_auto="0" />
+         <Option output="/home/belisarius/DBus_sample/bin/lib/libgmock_maind.a" prefix_auto="0" extension_auto="0" />
          <Option working_dir="/home/belisarius/DBus_sample/bin/googletest-build/googlemock" />
          <Option object_output="./" />
          <Option type="2" />
@@ -273,7 +221,7 @@
          </MakeCommands>
       </Target>
       <Target title="gmock_main/fast">
-         <Option output="/home/belisarius/DBus_sample/bin/googletest-build/googlemock/libgmock_maind.a" prefix_auto="0" extension_auto="0" />
+         <Option output="/home/belisarius/DBus_sample/bin/lib/libgmock_maind.a" prefix_auto="0" extension_auto="0" />
          <Option working_dir="/home/belisarius/DBus_sample/bin/googletest-build/googlemock" />
          <Option object_output="./" />
          <Option type="2" />
@@ -299,8 +247,62 @@
             <DistClean command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/googletest-build/googlemock/Makefile&quot;  VERBOSE=1 clean" />
          </MakeCommands>
       </Target>
+      <Target title="gmock">
+         <Option output="/home/belisarius/DBus_sample/bin/lib/libgmockd.a" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/belisarius/DBus_sample/bin/googletest-build/googlemock" />
+         <Option object_output="./" />
+         <Option type="2" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="/home/belisarius/DBus_sample/bin/googletest-src/googlemock" />
+            <Add directory="/home/belisarius/DBus_sample/bin/googletest-src/googlemock/include" />
+            <Add directory="/home/belisarius/DBus_sample/bin/googletest-src/googletest" />
+            <Add directory="/home/belisarius/DBus_sample/bin/googletest-src/googletest/include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/5" />
+            <Add directory="/usr/include/c++/5/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/5" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/googletest-build/googlemock/Makefile&quot;  VERBOSE=1 gmock" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/googletest-build/googlemock/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/googletest-build/googlemock/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/googletest-build/googlemock/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="gmock/fast">
+         <Option output="/home/belisarius/DBus_sample/bin/lib/libgmockd.a" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/belisarius/DBus_sample/bin/googletest-build/googlemock" />
+         <Option object_output="./" />
+         <Option type="2" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="/home/belisarius/DBus_sample/bin/googletest-src/googlemock" />
+            <Add directory="/home/belisarius/DBus_sample/bin/googletest-src/googlemock/include" />
+            <Add directory="/home/belisarius/DBus_sample/bin/googletest-src/googletest" />
+            <Add directory="/home/belisarius/DBus_sample/bin/googletest-src/googletest/include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/5" />
+            <Add directory="/usr/include/c++/5/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/5" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/googletest-build/googlemock/Makefile&quot;  VERBOSE=1 gmock/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/googletest-build/googlemock/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/googletest-build/googlemock/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/belisarius/DBus_sample/bin/googletest-build/googlemock/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
       <Target title="gtest">
-         <Option output="/home/belisarius/DBus_sample/bin/googletest-build/googlemock/gtest/libgtestd.a" prefix_auto="0" extension_auto="0" />
+         <Option output="/home/belisarius/DBus_sample/bin/lib/libgtestd.a" prefix_auto="0" extension_auto="0" />
          <Option working_dir="/home/belisarius/DBus_sample/bin/googletest-build/googlemock/gtest" />
          <Option object_output="./" />
          <Option type="2" />
@@ -325,7 +327,7 @@
          </MakeCommands>
       </Target>
       <Target title="gtest/fast">
-         <Option output="/home/belisarius/DBus_sample/bin/googletest-build/googlemock/gtest/libgtestd.a" prefix_auto="0" extension_auto="0" />
+         <Option output="/home/belisarius/DBus_sample/bin/lib/libgtestd.a" prefix_auto="0" extension_auto="0" />
          <Option working_dir="/home/belisarius/DBus_sample/bin/googletest-build/googlemock/gtest" />
          <Option object_output="./" />
          <Option type="2" />
@@ -350,7 +352,7 @@
          </MakeCommands>
       </Target>
       <Target title="gtest_main">
-         <Option output="/home/belisarius/DBus_sample/bin/googletest-build/googlemock/gtest/libgtest_maind.a" prefix_auto="0" extension_auto="0" />
+         <Option output="/home/belisarius/DBus_sample/bin/lib/libgtest_maind.a" prefix_auto="0" extension_auto="0" />
          <Option working_dir="/home/belisarius/DBus_sample/bin/googletest-build/googlemock/gtest" />
          <Option object_output="./" />
          <Option type="2" />
@@ -375,7 +377,7 @@
          </MakeCommands>
       </Target>
       <Target title="gtest_main/fast">
-         <Option output="/home/belisarius/DBus_sample/bin/googletest-build/googlemock/gtest/libgtest_maind.a" prefix_auto="0" extension_auto="0" />
+         <Option output="/home/belisarius/DBus_sample/bin/lib/libgtest_maind.a" prefix_auto="0" extension_auto="0" />
          <Option working_dir="/home/belisarius/DBus_sample/bin/googletest-build/googlemock/gtest" />
          <Option object_output="./" />
          <Option type="2" />
@@ -416,7 +418,39 @@
          <Option target="DBus_sample"/>
          <Option target="DBus_sample_Tests"/>
       </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/include/DBusArgument.h">
+         <Option target="DBus_sample"/>
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/include/DBusArgumentFactory.h">
+         <Option target="DBus_sample"/>
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/include/DBusArgumentPack.h">
+         <Option target="DBus_sample"/>
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/include/DBusArray.h">
+         <Option target="DBus_sample"/>
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/include/DBusBasicArgument.h">
+         <Option target="DBus_sample"/>
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
       <Unit filename="/home/belisarius/DBus_sample/include/DBusClient.h">
+         <Option target="DBus_sample"/>
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/include/DBusContainerArg.h">
+         <Option target="DBus_sample"/>
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/include/DBusDictEntry.h">
+         <Option target="DBus_sample"/>
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/include/DBusDictionary.h">
          <Option target="DBus_sample"/>
          <Option target="DBus_sample_Tests"/>
       </Unit>
@@ -424,7 +458,19 @@
          <Option target="DBus_sample"/>
          <Option target="DBus_sample_Tests"/>
       </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/include/DBusMethod.h">
+         <Option target="DBus_sample"/>
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/include/DBusMethodReply.h">
+         <Option target="DBus_sample"/>
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
       <Unit filename="/home/belisarius/DBus_sample/include/DBusServer.h">
+         <Option target="DBus_sample"/>
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/include/DBusStruct.h">
          <Option target="DBus_sample"/>
          <Option target="DBus_sample_Tests"/>
       </Unit>
@@ -435,7 +481,39 @@
          <Option target="DBus_sample"/>
          <Option target="DBus_sample_Tests"/>
       </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/src/DBusArgument.cpp">
+         <Option target="DBus_sample"/>
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/src/DBusArgumentFactory.cpp">
+         <Option target="DBus_sample"/>
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/src/DBusArgumentPack.cpp">
+         <Option target="DBus_sample"/>
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/src/DBusArray.cpp">
+         <Option target="DBus_sample"/>
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/src/DBusBasicArgument.cpp">
+         <Option target="DBus_sample"/>
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
       <Unit filename="/home/belisarius/DBus_sample/src/DBusClient.cpp">
+         <Option target="DBus_sample"/>
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/src/DBusContainerArg.cpp">
+         <Option target="DBus_sample"/>
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/src/DBusDictEntry.cpp">
+         <Option target="DBus_sample"/>
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/src/DBusDictionary.cpp">
          <Option target="DBus_sample"/>
          <Option target="DBus_sample_Tests"/>
       </Unit>
@@ -443,8 +521,26 @@
          <Option target="DBus_sample"/>
          <Option target="DBus_sample_Tests"/>
       </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/src/DBusMethod.cpp">
+         <Option target="DBus_sample"/>
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/src/DBusMethodReply.cpp">
+         <Option target="DBus_sample"/>
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
       <Unit filename="/home/belisarius/DBus_sample/src/DBusServer.cpp">
          <Option target="DBus_sample"/>
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/src/DBusStruct.cpp">
+         <Option target="DBus_sample"/>
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/tests/DBusArrayTests.cpp">
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/tests/DBusBasicArgumentTests.cpp">
          <Option target="DBus_sample_Tests"/>
       </Unit>
       <Unit filename="/home/belisarius/DBus_sample/tests/DBusClientTests.cpp">
@@ -453,7 +549,25 @@
       <Unit filename="/home/belisarius/DBus_sample/tests/DBusConnectionTests.cpp">
          <Option target="DBus_sample_Tests"/>
       </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/tests/DBusDictEntryTests.cpp">
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/tests/DBusDictionaryTests.cpp">
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/tests/DBusInterfaceTests.cpp">
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/tests/DBusMethodReplyTests.cpp">
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/tests/DBusMethodTests.cpp">
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
       <Unit filename="/home/belisarius/DBus_sample/tests/DBusServerTests.cpp">
+         <Option target="DBus_sample_Tests"/>
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/tests/DBusStructTests.cpp">
          <Option target="DBus_sample_Tests"/>
       </Unit>
       <Unit filename="/home/belisarius/DBus_sample/CMakeLists.txt">
@@ -513,13 +627,7 @@
       <Unit filename="/home/belisarius/DBus_sample/bin/googletest-src/googletest/cmake/internal_utils.cmake">
           <Option virtualFolder="CMake Files\bin\googletest-src\googletest\cmake\" />
       </Unit>
-      <Unit filename="/home/belisarius/DBus_sample/bin/googletest-src/googletest/cmake/gtest.pc.in">
-          <Option virtualFolder="CMake Files\bin\googletest-src\googletest\cmake\" />
-      </Unit>
-      <Unit filename="/home/belisarius/DBus_sample/bin/googletest-src/googletest/cmake/gtest_main.pc.in">
-          <Option virtualFolder="CMake Files\bin\googletest-src\googletest\cmake\" />
-      </Unit>
-      <Unit filename="/home/belisarius/DBus_sample/bin/googletest-src/googletest/cmake/internal_utils.cmake">
+      <Unit filename="/home/belisarius/DBus_sample/bin/googletest-src/googletest/cmake/Config.cmake.in">
           <Option virtualFolder="CMake Files\bin\googletest-src\googletest\cmake\" />
       </Unit>
       <Unit filename="/home/belisarius/DBus_sample/bin/googletest-src/googletest/cmake/gtest.pc.in">
@@ -531,6 +639,9 @@
       <Unit filename="/home/belisarius/DBus_sample/bin/googletest-src/googletest/cmake/internal_utils.cmake">
           <Option virtualFolder="CMake Files\bin\googletest-src\googletest\cmake\" />
       </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/bin/googletest-src/googletest/cmake/Config.cmake.in">
+          <Option virtualFolder="CMake Files\bin\googletest-src\googletest\cmake\" />
+      </Unit>
       <Unit filename="/home/belisarius/DBus_sample/bin/googletest-src/googletest/cmake/gtest.pc.in">
           <Option virtualFolder="CMake Files\bin\googletest-src\googletest\cmake\" />
       </Unit>
@@ -538,6 +649,21 @@
           <Option virtualFolder="CMake Files\bin\googletest-src\googletest\cmake\" />
       </Unit>
       <Unit filename="/home/belisarius/DBus_sample/bin/googletest-src/googletest/cmake/internal_utils.cmake">
+          <Option virtualFolder="CMake Files\bin\googletest-src\googletest\cmake\" />
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/bin/googletest-src/googletest/cmake/Config.cmake.in">
+          <Option virtualFolder="CMake Files\bin\googletest-src\googletest\cmake\" />
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/bin/googletest-src/googletest/cmake/gtest.pc.in">
+          <Option virtualFolder="CMake Files\bin\googletest-src\googletest\cmake\" />
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/bin/googletest-src/googletest/cmake/gtest_main.pc.in">
+          <Option virtualFolder="CMake Files\bin\googletest-src\googletest\cmake\" />
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/bin/googletest-src/googletest/cmake/internal_utils.cmake">
+          <Option virtualFolder="CMake Files\bin\googletest-src\googletest\cmake\" />
+      </Unit>
+      <Unit filename="/home/belisarius/DBus_sample/bin/googletest-src/googletest/cmake/Config.cmake.in">
           <Option virtualFolder="CMake Files\bin\googletest-src\googletest\cmake\" />
       </Unit>
       <Unit filename="/home/belisarius/DBus_sample/bin/googletest-src/googletest/cmake/gtest.pc.in">

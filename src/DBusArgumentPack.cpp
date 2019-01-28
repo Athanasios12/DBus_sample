@@ -144,7 +144,7 @@ namespace DBUS
             size_t numOfAppendedArgs = 0;
             for(auto && arg : m_args)
             {
-                if(arg && arg->isArgInitlized())
+                if(arg && arg->isArgInitalized())
                 {
                     if(DBusInterface::appendArg(arg.get(), msgItr))
                     {
