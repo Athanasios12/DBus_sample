@@ -30,6 +30,86 @@ DBusError dbus_error;
 void print_dbus_error (char *str);
 bool isinteger (char *ptr);
 
+DBusHandlerResult printCallback(DBusConnection *conn, DBusMessage *message, void *data)
+{
+    DBusHandlerResult result = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    DBusMessage *reply = NULL;
+    DBusError err;
+
+    fprintf(stderr, "Got D-Bus request: %s.%s on %s\n",
+            dbus_message_get_interface(message),
+            dbus_message_get_member(message),
+            dbus_message_get_path(message));
+    if (dbus_message_is_method_call(message, INTERFACE_NAME, METHOD_NAME))
+    {
+        char *s;
+        char *str1 = NULL, *str2 = NULL;
+        const char space [4] = " \n\t";
+        int i, j;
+        bool error = false;
+
+        if (dbus_message_get_args (message, &err, DBUS_TYPE_STRING, &s, DBUS_TYPE_INVALID))
+        {
+            printf ("%s", s);
+            // Validate received message
+            str1 = strtok (s, space);
+            if (str1)
+                str2 = strtok (NULL, space);
+
+            if (isinteger (str1))
+                i = atoi (str1);
+            else
+                error = true;
+            if (isinteger (str2))
+                j = atoi (str2);
+            else
+                error = true;
+
+            if (!error)
+            {
+                // send reply
+                char answer [40];
+                sprintf (answer, "Sum is %d", i + j);
+                if ((reply = dbus_message_new_method_return (message)) == NULL)
+                {
+                    DBusMessageIter iter;
+                    dbus_message_iter_init_append (reply, &iter);
+                    char *ptr = answer;
+                    if (dbus_message_iter_append_basic (&iter, DBUS_TYPE_STRING, &ptr))
+                    {
+                        if (dbus_connection_send(conn, reply, NULL))
+                        {
+                            result = DBUS_HANDLER_RESULT_HANDLED;
+                        }
+                        else
+                        {
+                            fprintf (stderr, "Error in dbus_connection_send\n");
+                        }
+                    }
+                    else
+                    {
+                        fprintf (stderr, "Error in dbus_message_iter_append_basic\n");
+                    }
+                }
+                else
+                {
+                    fprintf (stderr, "Error in dbus_message_new_method_return\n");
+                }
+            }
+        }
+
+    }
+    dbus_message_unref (reply);
+    return result;
+}
+
+
+const DBusObjectPathVTable server_vtable =
+{
+    .message_function = printCallback
+};
+
+
 void dbusClient()
 {
     //client
@@ -362,6 +442,11 @@ void dbusServer()
     }
 }
 
+void dbusServer2()
+{
+
+}
+
 int main (int argc, char **argv)
 {
     pid_t pid = fork();
@@ -378,7 +463,7 @@ int main (int argc, char **argv)
         else
         {
             dbusServer();
-            sleep(1);
+            sleep(10);
             pid = fork();
             if(pid >= 0)
             {
@@ -392,6 +477,7 @@ int main (int argc, char **argv)
                 else
                 {
                     dbusServer();
+                    sleep(10);
                 }
             }
         }
