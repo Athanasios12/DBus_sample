@@ -1,5 +1,4 @@
 #!/bin/bash
-@echo off
 echo "Launch server client test"
 #launch server app
 ./DBusServer &

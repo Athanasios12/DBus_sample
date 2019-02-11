@@ -9,25 +9,23 @@ echo -e "\nLaunched server pid = $server_pid\n"
 #sleep_pid=$!
 #test input to client
 echo "20 30" > pipe
-sleep 3 
-echo "80 30" > pipe
-sleep 3
+sleep 10 
+echo -e "\n-------\n"
 echo -e "\nList the processes:\n"
 ps
 echo -e "\n-------\n"
 echo "Killing first server"
 kill $server_pid
-sleep 6
-echo "Creating new server"
-./DBusServer -i < pipe &
-server_pid=$!
-echo -e "\nLaunched new server pid = $server_pid\n"
-echo -e "\nList the processes:\n"
-ps
-sleep 6
-echo "20 50" > pipe
-sleep 6
-echo "killing new server"
-kill $server_pid
+#sleep 6
+#echo "Creating new server"
+#./DBusServer -i < pipe &
+#server_pid=$!
+#echo -e "\nLaunched new server pid = $server_pid\n"
+#echo -e "\nList the processes:\n"
+#ps
+#sleep 6
+#echo "20 50" > pipe
+#sleep 6
+#echo "killing new server"
+#kill $server_pid
 
-#kill $sleep_pid
