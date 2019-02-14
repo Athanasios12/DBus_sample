@@ -14,6 +14,9 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <dbus/dbus.h>
+#include <dbus/dbus-glib-lowlevel.h>
+#include <glib/gprintf.h>
+#include <gio/gio.h>
 /*
 const char *const INTERFACE_NAME = "in.softprayog.dbus_example";
 const char *const SERVER_BUS_NAME = "in.softprayog.add_server";
@@ -26,89 +29,97 @@ const char *const CLIENT_BUS_NAME = "in.Radoslaw.Client";
 const char *const SERVER_OBJECT_PATH_NAME = "/in/Radoslaw/adder";
 const char *const METHOD_NAME = "add_numbers";
 
+
+const char *server_introspection_xml =
+        DBUS_INTROSPECT_1_0_XML_DOCTYPE_DECL_NODE
+        "<node>\n"
+
+        "  <interface name='org.freedesktop.DBus.Introspectable'>\n"
+        "    <method name='Introspect'>\n"
+        "      <arg name='data' type='s' direction='out' />\n"
+        "    </method>\n"
+        "  </interface>\n"
+
+        "  <interface name='org.freedesktop.DBus.Properties'>\n"
+        "    <method name='Get'>\n"
+        "      <arg name='interface' type='s' direction='in' />\n"
+        "      <arg name='property'  type='s' direction='in' />\n"
+        "      <arg name='value'     type='s' direction='out' />\n"
+        "    </method>\n"
+        "    <method name='GetAll'>\n"
+        "      <arg name='interface'  type='s'     direction='in'/>\n"
+        "      <arg name='properties' type='a{sv}' direction='out'/>\n"
+        "    </method>\n"
+        "  </interface>\n"
+
+        "  <interface name='org.example.TestInterface'>\n"
+        "    <property name='Version' type='s' access='read' />\n"
+        "    <method name='Ping' >\n"
+        "      <arg type='s' direction='out' />\n"
+        "    </method>\n"
+        "    <method name='Echo'>\n"
+        "      <arg name='string' direction='in' type='s'/>\n"
+        "      <arg type='s' direction='out' />\n"
+        "    </method>\n"
+        "    <method name='EmitSignal'>\n"
+        "    </method>\n"
+        "    <method name='Quit'>\n"
+        "    </method>\n"
+        "    <signal name='OnEmitSignal'>\n"
+        "    </signal>"
+        "  </interface>\n"
+
+        "</node>\n";
+
 DBusError dbus_error;
+GMainLoop *mainloop;
 void print_dbus_error (char *str);
 bool isinteger (char *ptr);
 
-DBusHandlerResult printCallback(DBusConnection *conn, DBusMessage *message, void *data)
+DBusHandlerResult server_message_handler(DBusConnection *conn, DBusMessage *message, void *data)
 {
     DBusHandlerResult result = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     DBusMessage *reply = NULL;
     DBusError err;
+    bool quit = false;
 
     fprintf(stderr, "Got D-Bus request: %s.%s on %s\n",
             dbus_message_get_interface(message),
             dbus_message_get_member(message),
             dbus_message_get_path(message));
-    if (dbus_message_is_method_call(message, INTERFACE_NAME, METHOD_NAME))
+    if (dbus_message_is_method_call(message, "org.example.TestInterface", "Ping"))
     {
-        char *s;
-        char *str1 = NULL, *str2 = NULL;
-        const char space [4] = " \n\t";
-        int i, j;
-        bool error = false;
+        fprintf(stderr, "\nMethod ping called by client\n");
+        const char *pong = "Pong";
 
-        if (dbus_message_get_args (message, &err, DBUS_TYPE_STRING, &s, DBUS_TYPE_INVALID))
+        if (reply = dbus_message_new_method_return(message))
         {
-            printf ("%s", s);
-            // Validate received message
-            str1 = strtok (s, space);
-            if (str1)
-                str2 = strtok (NULL, space);
-
-            if (isinteger (str1))
-                i = atoi (str1);
-            else
-                error = true;
-            if (isinteger (str2))
-                j = atoi (str2);
-            else
-                error = true;
-
-            if (!error)
-            {
-                // send reply
-                char answer [40];
-                sprintf (answer, "Sum is %d", i + j);
-                if ((reply = dbus_message_new_method_return (message)) == NULL)
-                {
-                    DBusMessageIter iter;
-                    dbus_message_iter_init_append (reply, &iter);
-                    char *ptr = answer;
-                    if (dbus_message_iter_append_basic (&iter, DBUS_TYPE_STRING, &ptr))
-                    {
-                        if (dbus_connection_send(conn, reply, NULL))
-                        {
-                            result = DBUS_HANDLER_RESULT_HANDLED;
-                        }
-                        else
-                        {
-                            fprintf (stderr, "Error in dbus_connection_send\n");
-                        }
-                    }
-                    else
-                    {
-                        fprintf (stderr, "Error in dbus_message_iter_append_basic\n");
-                    }
-                }
-                else
-                {
-                    fprintf (stderr, "Error in dbus_message_new_method_return\n");
-                }
-            }
+            dbus_message_append_args(reply,
+                                 DBUS_TYPE_STRING, &pong,
+                                 DBUS_TYPE_INVALID);
         }
-
     }
-    dbus_message_unref (reply);
+    else if (dbus_message_is_method_call(message, "org.example.TestInterface", "Quit"))
+    {
+        reply = dbus_message_new_method_return(message);
+        quit  = true;
+    }
+    if(reply)
+    {
+        if(dbus_connection_send(conn, reply, NULL))
+        {
+            fprintf(stderr, "\nServer sent response\n");
+            result = DBUS_HANDLER_RESULT_HANDLED;
+        }
+        dbus_message_unref (reply);
+        if(quit)
+        {
+            fprintf(stderr, "Server exiting...\n");
+            g_main_loop_quit(mainloop);
+        }
+    }
     return result;
 }
-
-
-const DBusObjectPathVTable server_vtable =
-{
-    .message_function = printCallback
-};
-
 
 void dbusClient()
 {
@@ -442,9 +453,116 @@ void dbusServer()
     }
 }
 
-void dbusServer2()
-{
 
+void dbusServer2(DBusConnection *conn)
+{
+    int ret;
+
+    dbus_error_init (&dbus_error);
+
+    conn = dbus_bus_get (DBUS_BUS_SESSION, &dbus_error);
+
+    if (dbus_error_is_set (&dbus_error))
+        print_dbus_error ("dbus_bus_get");
+
+    if (!conn)
+        exit (1);
+    //server
+    // Get a well known name
+    DBusObjectPathVTable server_vtable;
+    server_vtable.message_function = server_message_handler;
+    ret = dbus_bus_request_name(conn, "org.example.TestServer", DBUS_NAME_FLAG_REPLACE_EXISTING , &dbus_error);
+
+    if (dbus_error_is_set (&dbus_error))
+        print_dbus_error ("dbus_bus_get");
+    if (!dbus_connection_register_object_path(conn, "/org/example/TestObject", &server_vtable, NULL))
+    {
+        fprintf(stderr, "Failed to request name on bus: %s\n", dbus_error.message);
+        exit(1);
+    }
+
+    mainloop = g_main_loop_new(NULL, false);
+    /* Set up the DBus connection to work in a GLib event loop */
+    dbus_connection_setup_with_g_main(conn, NULL);
+    /* Start the glib event loop */
+    g_main_loop_run(mainloop);
+}
+
+void test_Ping(GDBusProxy *proxy)
+{
+        GVariant *result;
+        GError *error = NULL;
+        const gchar *str;
+
+        g_printf("Calling Ping()...\n");
+        result = g_dbus_proxy_call_sync(proxy,
+                                        "Ping",
+                                        NULL,
+                                        G_DBUS_CALL_FLAGS_NONE,
+                                        -1,
+                                        NULL,
+                                        &error);
+        g_assert_no_error(error);
+        g_variant_get(result, "(&s)", &str);
+        g_printf("The server answered: '%s'\n", str);
+        g_variant_unref(result);
+}
+
+void test_Quit(GDBusProxy *proxy)
+{
+        GVariant *result;
+        GError *error = NULL;
+
+        g_printf("Calling method Quit()...\n");
+        result = g_dbus_proxy_call_sync(proxy,
+                                        "Quit",
+                                        NULL,
+                                        G_DBUS_CALL_FLAGS_NONE,
+                                        -1,
+                                        NULL,
+                                        &error);
+        g_assert_no_error(error);
+        g_variant_unref(result);
+}
+
+void dbusClient3(bool quit = false)
+{
+    GDBusProxy *proxy;
+    GDBusConnection *conn;
+    GError *error = NULL;
+    const char *version;
+    GVariant *variant;
+
+    conn = g_bus_get_sync(G_BUS_TYPE_SESSION, NULL, &error);
+    g_assert_no_error(error);
+
+    proxy = g_dbus_proxy_new_sync(conn,
+                                  G_DBUS_PROXY_FLAGS_NONE,
+                                  NULL,				/* GDBusInterfaceInfo */
+                                  "org.example.TestServer",		/* name */
+                                  "/org/example/TestObject",	/* object path */
+                                  "org.example.TestInterface",	/* interface */
+                                  NULL,
+                                  &error);
+    g_assert_no_error(error);
+
+    /* read the version property of the interface */
+//    variant = g_dbus_proxy_get_cached_property(proxy, "Version");
+//    g_assert(variant != NULL);
+//    g_variant_get(variant, "s", &version);
+//    g_variant_unref(variant);
+//    printf("Testing server interface v%s\n", version);
+
+    /* Test all server methods */
+    test_Ping(proxy);
+    sleep(1);
+    if(quit)
+    {
+        test_Quit(proxy);
+    }
+
+    g_object_unref(proxy);
+    g_object_unref(conn);
 }
 
 int main (int argc, char **argv)
@@ -456,32 +574,21 @@ int main (int argc, char **argv)
         {
             //client
             printf("\n-----Started first Client ----\n");
-            dbusClient();
+            dbusClient2();
             printf("\n-----First Client Finished successfully-----\n");
+            sleep(5);
+            printf("\n-----Started second Client ----\n");
+            dbusClient2();
+            printf("\n-----Second Client Finished successfully-----\n");
             exit(0);
         }
         else
         {
             dbusServer();
             sleep(10);
-            pid = fork();
-            if(pid >= 0)
-            {
-                if(pid == 0)
-                {
-                    printf("\n-----Started Second Client ----\n");
-                    dbusClient2();
-                    printf("\n-----Second Client Finished successfully-----\n");
-                    exit(0);
-                }
-                else
-                {
-                    dbusServer();
-                    sleep(10);
-                }
-            }
         }
     }
+    dbus_error_free(&dbus_error);
 }
 
 
