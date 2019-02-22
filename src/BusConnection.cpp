@@ -63,7 +63,7 @@ namespace DBUS
             DBusConnection *connection = dbus_bus_get(m_busType, NULL);
             if(connection)
             {
-                auto ret = dbus_bus_request_name(connection, m_busName.c_str(), DBUS_NAME_FLAG_REPLACE_EXISTING, NULL);
+                auto ret = dbus_bus_request_name(connection, m_busName.c_str(), DBUS_NAME_FLAG_DO_NOT_QUEUE, NULL);
                 if(DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER == ret)
                 {
                     m_connected = true;

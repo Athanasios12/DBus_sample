@@ -10,7 +10,7 @@ namespace DBUS
     {
     public:
         DBusServer();
-        DBusServer(const std::string& busName, DBusBusType busType);
+        DBusServer(const std::string& busName, DBusBusType busType, int timeout = -1);
         ~DBusServer();
         DBusServer& operator=(const DBusServer& other) = delete;
         DBusServer(const DBusServer& other) = delete;
@@ -20,15 +20,18 @@ namespace DBUS
         bool connect();
         bool disconnect();
 
-        bool checkLastMethodCall(const std::string& clientBusName, const std::__cxx11::string &methodName) const;
+        bool checkLastMethodCall(const std::string& clientBusName, const std::string &methodName) const;
+
+        bool isServerRunning() const;
     private:
         void pollForMsgs();
         bool processMethodCall(DBusMessage *msg);
 
         std::thread m_rxThread;
-        std::pair<std::string, std::string> m_lastMethodCall; // clientBus name  and method name
+        std::pair<std::string, std::string> m_lastMethodCall; // clientBus name and method name
         bool m_listening;
         bool m_runThread;
+        int m_readMsgTimeout;
     };
 }
 

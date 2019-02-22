@@ -64,10 +64,11 @@ namespace DBUS
                 DBusInterface::appendArg(&clientNameArg, &iter);
                 //send with reply request
                 DBusPendingCall *pending_return = nullptr;
-                if(dbus_connection_send_with_reply(m_connection, request, &pending_return, 2000))
+                if(dbus_connection_send_with_reply(m_connection, request, &pending_return, -1))
                 {
                     if(pending_return)
                     {
+                        dbus_connection_flush(m_connection);
                         dbus_pending_call_block(pending_return);
                         DBusMessage *replyMsg = dbus_pending_call_steal_reply(pending_return);
                         if(replyMsg)

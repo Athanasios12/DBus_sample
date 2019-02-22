@@ -8,180 +8,377 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <thread>
+#include "DBusClient.h"
+#include "DBusServer.h"
+#include "DBusArgumentPack.h"
+
+using namespace DBUS;
 
 const char SERVER_CONNECTION_NAME[] = "in.Radoslaw.Server";
 const char CLIENT_CONNECTION_NAME[] = "in.Radoslaw.Client";
 const char MSG_OBJECT[] = "/in/Radoslaw/Object";
 const char MSG_INTERFACE[] = "in.Radoslaw.Interface";
 
-bool connectToSessionDBus(DBusConnection* &conn, DBusError *error)
+struct DBusTestSettings
 {
-    bool connected = true;
+    std::string clientBusName;
+    std::string serverBusName;
+    std::string methodName;
+    std::string objectName;
+    std::string interfaceName;
+};
+const std::vector<DBusTestSettings> sessionBusSettings{ {"org.example.TestClient2",
+                                                        "org.example.TestServer",
+                                                        "add_numbers",
+                                                        "/org/example/TestObject",
+                                                        "org.example.TestInterface"}
+                                                      };
 
-    dbus_error_init(error);
-    conn = dbus_bus_get(DBUS_BUS_SYSTEM, error);
-    if(!conn)
-    {
-        std::cerr << error->name << ": " << error->message << std::endl;
-        connected = false;
-    }
-    return connected;
-}
-
-bool aquireDBusService(DBusConnection* &connection, DBusError *error, const char* busName)
+const std::function<DBusMethodReply(const std::vector<std::unique_ptr<DBusArgument>>&)> printBinding =
+        [](const std::vector<std::unique_ptr<DBusArgument>> &args)
 {
-    bool nameAquired = true;
-    auto ret = dbus_bus_request_name(connection, busName, DBUS_NAME_FLAG_REPLACE_EXISTING , error);
-    //check if service after call is the primary owner of specified name connection
-    //otherwise the name request failed
-    if(DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER != ret)
+    std::cout << "\nAdd numbers called!" << std::endl;
+    std::cout << "Number of method input args : " << args.size() << std::endl;
+    for(auto && arg : args)
     {
-        nameAquired = false;
-        if(dbus_error_is_set(error))
+        if(arg)
         {
-            std::cerr << error->name << ": " << error->message << std::endl;
+            std::cout << "Arg Type: " << arg->getArgType() << std::endl;
         }
     }
-    return nameAquired;
+    DBusMethodReply retVal{DBusArgument::ArgType::String};
+    std::unique_ptr<DBusArgument> retArg{new DBusBasicArgument{DBusArgument::ArgType::String}};
+    static_cast<DBusBasicArgument*>(retArg.get())->setArgValue("Function add_numbers called");
+    retVal.setRetArg(retArg);
+    return retVal;
+};
+
+DBusError dbus_error;
+bool isinteger (char *ptr)
+{
+
+    if (*ptr == '+' || *ptr == '-')
+        ptr++;
+
+    while (*ptr) {
+        if (!isdigit ((int) *ptr++))
+            return false;
+    }
+
+    return true;
 }
 
-bool broadcastToDBus(DBusConnection* connection, const char* msgObject, const char* msgInterface, const char* sigName)
+void print_dbus_error (char *str)
 {
-    bool signalSent = false;
-    DBusMessage* msg;
-    DBusMessageIter args;
+    fprintf (stderr, "%s: %s\n", str, dbus_error.message);
+    dbus_error_free (&dbus_error);
+}
 
-    // create a signal and check for errors
-    msg = dbus_message_new_signal(msgObject, msgInterface, sigName);
-    // append arguments onto signal
-    dbus_message_iter_init_append(msg, &args);
-    if(nullptr != msg)
+void dbusServer3()
+{
+    DBusConnection *conn;
+    int ret;
+
+    dbus_error_init (&dbus_error);
+
+    conn = dbus_bus_get (DBUS_BUS_SESSION, &dbus_error);
+
+    if (dbus_error_is_set (&dbus_error))
+        print_dbus_error ("dbus_bus_get");
+
+    if (!conn)
+        exit (1);
+    //server
+    // Get a well known name
+    ret = dbus_bus_request_name (conn, "org.example.TestServer", DBUS_NAME_FLAG_DO_NOT_QUEUE, &dbus_error);
+
+    if (dbus_error_is_set (&dbus_error))
+        print_dbus_error ("dbus_bus_get");
+
+    if (ret != DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER)
     {
-        char* msgStr = static_cast<char*>(malloc(100));
-        while(true)
+        fprintf (stderr, "Dbus: not primary owner, ret = %d\n", ret);
+        exit (1);
+    }
+    while (1)
+    {
+        // Block for msg from client
+        if (!dbus_connection_read_write_dispatch (conn, -1))
         {
-            std::cout << "Type message to send : " << std::endl;
-            fgets(msgStr, 100, stdin);
-            printf("\nYour message : %s\n", msgStr);
-            msg = dbus_message_new_signal(msgObject, msgInterface, sigName);
-            // append arguments onto signal
-            dbus_message_iter_init_append(msg, &args);
-            if(dbus_message_iter_append_basic(&args, DBUS_TYPE_STRING, &msgStr))
+            fprintf (stderr, "Not connected now.\n");
+            exit (1);
+        }
+        sleep(1);
+        DBusMessage *message;
+
+        if ((message = dbus_connection_pop_message (conn)) == NULL)
+        {
+            fprintf (stderr, "Did not get message\n");
+            continue;
+        }
+        else
+        {
+            printf("\nServer received message\n");
+        }
+
+        if (dbus_message_is_method_call (message, "org.example.TestInterface", "add_numbers"))
+        {
+            printf("\nServer method called\n");
+            char *s;
+            char *str1 = NULL, *str2 = NULL;
+            const char space [4] = " \n\t";
+            int i, j;
+            bool error = false;
+
+            if (dbus_message_get_args (message, &dbus_error, DBUS_TYPE_STRING, &s, DBUS_TYPE_INVALID))
             {
-                // send the message and flush the connection
-                if(dbus_connection_send(connection, msg, NULL))
-                {
-                    // free the message
-                    dbus_message_unref(msg);
-                }
+                printf ("\nMethod called with args : %s\n", s);
+                // Validate received message
+                str1 = strtok (s, space);
+                if (str1)
+                    str2 = strtok (NULL, space);
+
+                if (isinteger (str1))
+                    i = atoi (str1);
                 else
+                    error = true;
+                if (isinteger (str2))
+                    j = atoi (str2);
+                else
+                    error = true;
+                if (!error)
                 {
-                    std::cerr << "Out Of Memory!" << std::endl;
+                    // send reply
+                    DBusMessage *reply;
+                    char answer [40];
+
+                    sprintf (answer, "Sum is %d", i + j);
+                    if ((reply = dbus_message_new_method_return (message)) == NULL)
+                    {
+                        fprintf (stderr, "Error in dbus_message_new_method_return\n");
+                        exit (1);
+                    }
+
+                    DBusMessageIter iter;
+                    dbus_message_iter_init_append (reply, &iter);
+                    char *ptr = answer;
+                    if (!dbus_message_iter_append_basic (&iter, DBUS_TYPE_STRING, &ptr))
+                    {
+                        fprintf (stderr, "Error in dbus_message_iter_append_basic\n");
+                        exit (1);
+                    }
+                    printf("\nSending reply\n");
+                    if (!dbus_connection_send (conn, reply, NULL))
+                    {
+                        fprintf (stderr, "Error in dbus_connection_send\n");
+                        exit (1);
+                    }
+
+                    dbus_connection_flush (conn);
+
+                    dbus_message_unref (reply);
+                    dbus_connection_unref(conn);
+                    dbus_bus_release_name(conn, "org.example.TestServer", NULL);
+                    break;
+                }
+                else // There was an error
+                {
+                    DBusMessage *dbus_error_msg;
+                    char error_msg [] = "Error in input";
+                    if ((dbus_error_msg = dbus_message_new_error (message, DBUS_ERROR_FAILED, error_msg)) == NULL)
+                    {
+                         fprintf (stderr, "Error in dbus_message_new_error\n");
+                         exit (1);
+                    }
+
+                    if (!dbus_connection_send (conn, dbus_error_msg, NULL))
+                    {
+                        fprintf (stderr, "Error in dbus_connection_send\n");
+                        exit (1);
+                    }
+
+                    dbus_connection_flush (conn);
+
+                    dbus_message_unref (dbus_error_msg);
                 }
             }
             else
             {
-                std::cerr << "Out Of Memory!" << std::endl;
+                print_dbus_error ("Error getting message");
             }
-            if(strcmp(msgStr, "q") == 0)
-            {
-                dbus_connection_flush(connection);
-                dbus_message_unref(msg);
-                signalSent = true;
-                break;
-            }
-            usleep(250000);
         }
     }
-    else
-    {
-        std::cerr << "Msg is NULL" << std::endl;
-    }
-    //dbus_message_unref(msg);
-    return signalSent;
 }
 
-bool receiveMsgFromDBus(DBusConnection *connection, DBusError *err, const char* interface, const char* sigName)
+void dbusClient4()
 {
-    bool msgReceived = false;
-    char *sigvalue = nullptr;
-    DBusMessageIter args;
+    //client
+    DBusConnection *conn;
+    int ret;
 
-    // add a rule for which messages we want to see
-    std::string matchRule = std::string{"type='signal',interface='"} + std::string{interface} + std::string{"'"};
-    dbus_bus_add_match(connection, matchRule.c_str(), err); // see signals from the given interface
-    dbus_connection_flush(connection);
-    if (dbus_error_is_set(err))
+    dbus_error_init (&dbus_error);
+
+    conn = dbus_bus_get (DBUS_BUS_SESSION, &dbus_error);
+
+    if (dbus_error_is_set (&dbus_error))
+        print_dbus_error ("dbus_bus_get");
+
+    if (!conn)
+        exit (1);
+    char input [80];
+    //sleep(1);
+    printf ("Please type two numbers: ");
+    while (fgets (input, 78, stdin) != NULL)
     {
-        std::cerr << "Msg is NULL!" << std::endl;
-    }
-    //loop unitl message is read successfully
-    while (true)
-    {
-        //blocking read of the next available message
-        dbus_connection_read_write(connection, 0);
-        auto msg = dbus_connection_pop_message(connection);
-        // loop again if we haven't read a message
-        if (NULL != msg)
+        // Get a well known name
+        while (1)
         {
-            // check if the message is a signal from the correct interface and with the correct name
-            if (dbus_message_is_signal(msg, interface, sigName))
-            {
-                // read the parameters
-                if (!dbus_message_iter_init(msg, &args))
-                {
-                    std::cerr << "Message has no arguments!" << std::endl;
-                }
-                else if (DBUS_TYPE_STRING != dbus_message_iter_get_arg_type(&args))
-                {
-                    std::cerr << "Argument is not string!" << std::endl;
-                }
-                else
-                {
-                    dbus_message_iter_get_basic(&args, &sigvalue);
-                    printf("Got Signal with value %s\n", sigvalue);
-                    if(strcmp(sigvalue, "q") == 0)
-                    {
-                        msgReceived = true;
-                        printf("\nStopped communitaction\n");
-                        // free the message
-                        dbus_message_unref(msg);
-                        break;
-                    }
-                }
-            }
+            ret = dbus_bus_request_name (conn, "org.example.TestClient", DBUS_NAME_FLAG_DO_NOT_QUEUE , &dbus_error);
+            if (ret == DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER)
+               break;
 
+            if (ret == DBUS_REQUEST_NAME_REPLY_IN_QUEUE)
+            {
+               fprintf (stderr, "Waiting for the bus ... \n");
+               sleep (1);
+               continue;
+            }
+            if (dbus_error_is_set (&dbus_error))
+               print_dbus_error ("dbus_bus_get");
+            printf("\nDidn't get dbus name\n");
         }
-        usleep(250000);
+
+        DBusMessage *request;
+        sleep(1);
+        if ((request = dbus_message_new_method_call ("org.example.TestServer", "/org/example/TestObject",
+                           "org.example.TestInterface", "add_numbers")) == NULL)
+        {
+            fprintf (stderr, "Error in dbus_message_new_method_call\n");
+            exit (1);
+        }
+
+        DBusMessageIter iter;
+        dbus_message_iter_init_append (request, &iter);
+        char *ptr = input;
+        printf("\nClient method call input args : %s\n", ptr);
+        if (!dbus_message_iter_append_basic (&iter, DBUS_TYPE_STRING, &ptr))
+        {
+            fprintf (stderr, "Error in dbus_message_iter_append_basic\n");
+            exit (1);
+        }
+        DBusPendingCall *pending_return;
+        if (!dbus_connection_send_with_reply (conn, request, &pending_return, -1))
+        {
+            fprintf (stderr, "Error in dbus_connection_send_with_reply\n");
+            exit (1);
+        }
+
+        if (pending_return == NULL)
+        {
+            fprintf (stderr, "pending return is NULL");
+            exit (1);
+        }
+        dbus_connection_flush (conn);
+
+        dbus_message_unref (request);
+
+        dbus_pending_call_block (pending_return);
+        DBusMessage *reply;
+        if ((reply = dbus_pending_call_steal_reply (pending_return)) == NULL) {
+            fprintf (stderr, "Error in dbus_pending_call_steal_reply");
+            exit (1);
+        }
+
+        dbus_pending_call_unref	(pending_return);
+
+        char *s;
+        if (dbus_message_get_args (reply, &dbus_error, DBUS_TYPE_STRING, &s, DBUS_TYPE_INVALID))
+        {
+            printf ("%s\n", s);
+            break;
+        }
+        else
+        {
+             fprintf (stderr, "Did not get arguments in reply\n");
+             exit (1);
+        }
+        dbus_message_unref (reply);
+        printf("\nReleasing client name\n");
+        if (dbus_bus_release_name (conn, "test.method.caller", &dbus_error) == -1) {
+             fprintf (stderr, "Error in dbus_bus_release_name\n");
+             exit (1);
+        }
+
+        printf ("Please type two numbers: ");
     }
-    return msgReceived;
+    dbus_connection_unref(conn);
+}
+
+void myClient()
+{
+    DBusArgumentPack methodInputArgs{sessionBusSettings[0].methodName, sessionBusSettings[0].objectName, sessionBusSettings[0].interfaceName};
+    auto arg = static_cast<DBusBasicArgument*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::Byte));
+    arg->setArgValue<uint8_t>(10);
+
+    DBusClient dbusClient(sessionBusSettings[0].clientBusName, DBUS_BUS_SESSION);
+    bool clientConnected = dbusClient.connect();
+    fprintf(stderr, "\nClient connection %s\n",(clientConnected) ? "success" : "failed");
+    //check if all args have been set before method call - add this condition also in call server method, don't send msg if method does not have all args set
+    if(methodInputArgs.checkIfAllArgsValid())
+    {
+        std::cerr << "Client args valid" << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        DBusMethodReply reply = dbusClient.callServerMethod(sessionBusSettings[0].serverBusName, methodInputArgs);
+        std::cerr << "\nMethod " << sessionBusSettings[0].methodName << " reply: " << std::endl;
+        auto retArg = static_cast<DBusBasicArgument*>(reply.getReturn());
+        if(retArg)
+        {
+            auto retPtr = *static_cast<const char**>(retArg->getArgValuePtr());
+            if(retPtr)
+            {
+                std::string retStr{retPtr};
+                std::cerr << retStr << std::endl;
+            }
+        }
+        fprintf(stderr, "%s\n",(reply.isValid()) ? "valid" : "invalid");
+    }
+}
+
+void myServer(DBUS::DBusServer &dbusServer)
+{
+    DBusInterface::DBusObject object(sessionBusSettings[0].objectName);
+    std::vector<DBusArgument::ArgType> bindingArgTypes = {DBusArgument::ArgType::Byte};
+    DBusMethod method{sessionBusSettings[0].methodName, printBinding, bindingArgTypes.size(), DBusArgument::ArgType::String};
+    method.setBindingArgTypes(bindingArgTypes);
+    object.addMethod(std::move(method));
+    DBusInterface dbusInterface(sessionBusSettings[0].interfaceName);
+    dbusInterface.addObject(object);
+
+    dbusServer.addInterface(dbusInterface);
+    dbusServer.connect();
 }
 
 int main(int argv, char **argc)
 {
-    DBusError err;
-    DBusConnection *connection = nullptr;
-    if(argv > 1)
+    pid_t pid = fork();
+    if(pid >= 0)
     {
-        if(strcmp(argc[1], "Client") == 0)
+        if(pid > 0)
         {
             //client
-            assert(connectToSessionDBus(connection, &err));
-            assert(aquireDBusService(connection, &err, CLIENT_CONNECTION_NAME));
-            std::thread rxThread(receiveMsgFromDBus, connection, &err, MSG_INTERFACE, "Test");
-            assert(broadcastToDBus(connection, MSG_OBJECT, MSG_INTERFACE, "Test"));
-            rxThread.join();
-            dbus_error_free(&err);
+            printf("\n-----Started first Client ----\n");
+            sleep(1);
+            myClient();
+            printf("\n-----First Client Finished successfully-----\n");
+            exit(0);
         }
-        else if(strcmp(argc[1], "Server") == 0)
+        else
         {
-            //server
-            assert(connectToSessionDBus(connection, &err));
-            assert(aquireDBusService(connection, &err, SERVER_CONNECTION_NAME));
-            std::thread rxThread(receiveMsgFromDBus, connection, &err, MSG_INTERFACE, "Test");
-            //assert(broadcastToDBus(connection, MSG_OBJECT, MSG_INTERFACE, "Test"));
-            rxThread.join();
-            dbus_error_free(&err);
+            printf("\nStarted server:\n");
+            DBUS::DBusServer dbusServer(sessionBusSettings[0].serverBusName, DBUS_BUS_SESSION);
+            myServer(dbusServer);
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+            printf("\nEnded server:\n");
         }
     }
     return 0;

@@ -45,7 +45,7 @@ namespace DBUS
             argValType argVariant = value;
             if(static_cast<int>(argVariant.index()) == index)
             {
-                m_arg =  value;
+                m_arg = value;
                 m_argIsInitalized = true;
                 argSet = true;
             }
@@ -57,17 +57,17 @@ namespace DBUS
     bool DBusBasicArgument::resetArg(ArgType argType, T value)
     {
         bool argReset = false;
-        int index = getArgTypeIndex(argType);
-        if(index >= 0)
+        if(argType != ArgType::Invalid)
         {
+            int index = getArgTypeIndex(argType);
             argValType argVariant = value;
             if(static_cast<int>(argVariant.index()) == index)
             {
                 m_argType = argType;
-                m_arg = argVariant;
+                m_arg = value;
                 m_signature = getArgTypeSignature(argType);
-                argReset = true;
                 m_argIsInitalized = true;
+                argReset = true;
             }
         }
         return argReset;

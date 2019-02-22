@@ -24,10 +24,10 @@ const char *const CLIENT_OBJECT_PATH_NAME = "/in/softprayog/add_client";
 const char *const METHOD_NAME = "add_numbers";
 */
 
-const char *const INTERFACE_NAME = "in.Radoslaw.Interface";
-const char *const SERVER_BUS_NAME = "in.Radoslaw.Server";
-const char *const CLIENT_BUS_NAME = "in.Radoslaw.Client";
-const char *const SERVER_OBJECT_PATH_NAME = "/in/Radoslaw/adder";
+const char *const INTERFACE_NAME = "org.example.TestInterface";
+const char *const SERVER_BUS_NAME = "org.example.TestServer";
+const char *const CLIENT_BUS_NAME = "org.example.TestClient1";
+const char *const SERVER_OBJECT_PATH_NAME = "/org/example/TestObject";
 const char *const METHOD_NAME = "add_numbers";
 
 DBusError dbus_error;
@@ -41,7 +41,7 @@ int main (int argc, char **argv)
 
     dbus_error_init (&dbus_error);
 
-    conn = dbus_bus_get (DBUS_BUS_SYSTEM, &dbus_error);
+    conn = dbus_bus_get (DBUS_BUS_SESSION, &dbus_error);
 
     if (dbus_error_is_set (&dbus_error))
         print_dbus_error ("dbus_bus_get");

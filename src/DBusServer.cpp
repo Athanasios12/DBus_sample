@@ -21,10 +21,11 @@ namespace DBUS
 
     }
 
-    DBusServer::DBusServer(const std::string &busName, DBusBusType busType):
+    DBusServer::DBusServer(const std::string &busName, DBusBusType busType, int timeout):
         BusConnection(busName, busType),
         m_listening(false),
-        m_runThread(false)
+        m_runThread(false),
+        m_readMsgTimeout(timeout)
     {
 
     }
@@ -92,6 +93,11 @@ namespace DBUS
         return methodCalled;
     }
 
+    bool DBusServer::isServerRunning() const
+    {
+        return m_runThread;
+    }
+
     void DBusServer::pollForMsgs()
     {
         bool runPolling = true;
@@ -102,10 +108,11 @@ namespace DBUS
             if(runPolling)
             {
                 //process incoming messages
-                dbus_connection_read_write_dispatch (m_connection, 0);
+                dbus_connection_read_write_dispatch (m_connection, m_readMsgTimeout);
                 DBusMessage *message = dbus_connection_pop_message (m_connection);
                 if(message)
                 {
+                    printf("\nServer received message\n");
                     processMethodCall(message);
                 }
             }

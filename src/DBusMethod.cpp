@@ -285,13 +285,15 @@ namespace DBUS
                     {
                         //initialize arg
                         arg = std::move(DBusArgumentFactory::getArgument(m_argTypes[argNum]));
-                        if(m_argTypes[argNum] == dbus_message_iter_get_arg_type(msgItr))
+                        DBusArgument::ArgType argType = static_cast<DBusArgument::ArgType>(dbus_message_iter_get_arg_type(msgItr));
+                        if(m_argTypes[argNum] == argType)
                         {
                             if(DBusInterface::extractDBusMessageArgData(arg.get(), msgItr))
                             {
                                 ++numOfMatchedArgs;
                             }
                             dbus_message_iter_next(msgItr);
+                            ++argNum;
                         }
                         else
                         {

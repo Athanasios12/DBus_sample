@@ -33,7 +33,7 @@ namespace DBUS
         bool isElementTypeSet() const;
     private:
         bool containedSignatureMatch(DBusArgument *arg);
-
+        bool checkElemType(ArgType type);
         ArgType m_elemType;
         bool m_elemTypeSet{false};
     };

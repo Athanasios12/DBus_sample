@@ -9,7 +9,7 @@ echo -e "\nLaunched server pid = $server_pid\n"
 #sleep_pid=$!
 #test input to client
 echo "20 30" > pipe
-sleep 18 
+sleep 4
 echo -e "\n-------\n"
 echo -e "\nList the processes:\n"
 ps
