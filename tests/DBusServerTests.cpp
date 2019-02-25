@@ -262,9 +262,9 @@ namespace
 
         std::vector<DBusArgument::ArgType> bindingArgTypes = {DBusArgument::ArgType::String,
                                                               DBusArgument::ArgType::Byte,
-                                                              DBusArgument::ArgType::Array};
-//                                                              DBusArgument::ArgType::Struct,
-//                                                              DBusArgument::ArgType::Dictionary,
+                                                              DBusArgument::ArgType::Array,
+                                                              DBusArgument::ArgType::Struct,
+                                                              DBusArgument::ArgType::Dictionary};
 //                                                              DBusArgument::ArgType::Array,
 //                                                              DBusArgument::ArgType::Array,
 //                                                              DBusArgument::ArgType::Array};
@@ -296,16 +296,16 @@ namespace
                 arg2->setElementsType(DBusArgument::ArgType::Byte);
                 arg2->addArgument<uint8_t>(10);
                 arg2->addArgument(static_cast<DBusArgument*>(arg1));
-//                //struct argument
-//                auto arg3 = static_cast<DBusStruct*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::Struct));
-//                arg3->addField(DBusArgument::ArgType::String, "Hello");
-//                arg3->addArgument(static_cast<DBusArgument*>(arg2));
-//                //dictionary argument
-//                auto arg4 = static_cast<DBusDictionary*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::Dictionary));
-//                arg4->setEntryType(DBusArgument::ArgType::String, DBusArgument::ArgType::Byte);
-//                arg4->addEntry<const char*, uint8_t>("Entry 0", 86);
-//                arg4->addEntry<const char*, uint8_t>("Entry 1", 132);
-//                arg4->addEntry(static_cast<DBusArgument*>(arg), static_cast<DBusArgument*>(arg1));
+                //struct argument
+                auto arg3 = static_cast<DBusStruct*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::Struct));
+                arg3->addField(DBusArgument::ArgType::String, "Hello");
+                arg3->addArgument(static_cast<DBusArgument*>(arg2));
+                //dictionary argument
+                auto arg4 = static_cast<DBusDictionary*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::Dictionary));
+                arg4->setEntryType(DBusArgument::ArgType::String, DBusArgument::ArgType::Byte);
+                arg4->addEntry<const char*, uint8_t>("Entry 0", 86);
+                arg4->addEntry<const char*, uint8_t>("Entry 1", 132);
+                arg4->addEntry(static_cast<DBusArgument*>(arg), static_cast<DBusArgument*>(arg1));
 //                //add array of structs
 //                auto arg5 = static_cast<DBusArray*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::Array));
 //                arg5->setElementsType(DBusArgument::ArgType::Struct);

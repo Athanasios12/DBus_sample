@@ -134,7 +134,7 @@ namespace DBUS
             //get element type
             DBusMessageIter elementIterator;
             dbus_message_iter_recurse(iterator, &elementIterator);
-            auto type = dbus_message_iter_get_arg_type(&elementIterator);
+            auto type = static_cast<DBusArgument::ArgType>(dbus_message_iter_get_arg_type(&elementIterator));
             while(type != DBusArgument::ArgType::Invalid)
             {
                 bool argExtracted = false;
@@ -166,7 +166,7 @@ namespace DBUS
                     break;
                 }
                 dbus_message_iter_next(&elementIterator);
-                type = dbus_message_iter_get_arg_type(&elementIterator);
+                type = static_cast<DBusArgument::ArgType>(dbus_message_iter_get_arg_type(&elementIterator));
             }
         }
         return containerProcessed;

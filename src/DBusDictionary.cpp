@@ -90,27 +90,30 @@ namespace DBUS
 
     bool DBusDictionary::addArgument(DBusArgument *arg)
     {
-        bool addedNewArg = false;
-        if(m_entryTypeSet)
+        bool addedNewArg = false;        
+        if(arg)
         {
-            if(arg)
+            if(arg->getArgType() == ArgType::Dictionary_Entry)
             {
-                if(arg->getArgType() == ArgType::Dictionary_Entry)
+                if(arg->isArgInitalized())
                 {
-                    if(arg->isArgInitalized())
+                    auto entry = static_cast<DBusDictEntry*>(arg);
+                    if(entry->getKeySet() && entry->getValueSet())
                     {
-                        auto entry = static_cast<DBusDictEntry*>(arg);
-                        if(entry->getKeySet() && entry->getValueSet())
+                        if(!m_entryTypeSet)
                         {
-                            if((entry->getKeyType() == m_entryType.first) && (entry->getValueType() == m_entryType.second))
+                            //init type set
+                            m_entryType = std::make_pair(entry->getKeyType(), entry->getValueType());
+                            m_entryTypeSet = true;
+                        }
+                        if((entry->getKeyType() == m_entryType.first) && (entry->getValueType() == m_entryType.second))
+                        {
+                            auto newArg = DBusArgumentFactory::getArgCopy(arg);
+                            if(newArg)
                             {
-                                auto newArg = DBusArgumentFactory::getArgCopy(arg);
-                                if(newArg)
-                                {
-                                    m_subArgs.push_back(std::move(newArg));
-                                    m_argIsInitalized = true;
-                                    addedNewArg = true;
-                                }
+                                m_subArgs.push_back(std::move(newArg));
+                                m_argIsInitalized = true;
+                                addedNewArg = true;
                             }
                         }
                     }
