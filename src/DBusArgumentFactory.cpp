@@ -24,8 +24,6 @@ namespace DBUS
         case DBusArgument::ArgType::String:
             arg.reset(new DBusBasicArgument{argType});
             break;
-        case DBusArgument::ArgType::Variant:
-            break;
         case DBusArgument::ArgType::Array:
             arg.reset(new DBusArray{});
             break;
@@ -43,73 +41,71 @@ namespace DBUS
     }
 
     std::unique_ptr<DBusArgument> DBusArgumentFactory::getArgCopy(DBusArgument *arg)
-    {
+    {        
         std::unique_ptr<DBusArgument> argCopy{nullptr};
-        switch(arg->getArgType())
+        if(arg)
         {
-        case DBusArgument::ArgType::Byte:
-        case DBusArgument::ArgType::Bool:
-        case DBusArgument::ArgType::Int16:
-        case DBusArgument::ArgType::UInt16:
-        case DBusArgument::ArgType::Int32:
-        case DBusArgument::ArgType::UInt32:
-        case DBusArgument::ArgType::Int64:
-        case DBusArgument::ArgType::UInt64:
-        case DBusArgument::ArgType::Double:
-        case DBusArgument::ArgType::String:
-            argCopy.reset(new DBusBasicArgument{*(static_cast<DBusBasicArgument*>(arg))});
-            break;
-        case DBusArgument::ArgType::Variant:
-            break;
-        case DBusArgument::ArgType::Array:
-            argCopy.reset(new DBusArray{*(static_cast<DBusArray*>(arg))});
-            break;
-        case DBusArgument::ArgType::Struct:
-            argCopy.reset(new DBusStruct{*(static_cast<DBusStruct*>(arg))});
-            break;
-        case DBusArgument::ArgType::Dictionary:
-            argCopy.reset(new DBusDictionary{*(static_cast<DBusDictionary*>(arg))});
-            break;
-        case DBusArgument::ArgType::Dictionary_Entry:
-            argCopy.reset(new DBusDictEntry{*(static_cast<DBusDictEntry*>(arg))});
-            break;
+            if(!arg->argIsContainerType())
+            {
+                argCopy.reset(new DBusBasicArgument{*(static_cast<DBusBasicArgument*>(arg))});
+            }
+            else
+            {
+                DBusContainerArg *cArg = static_cast<DBusContainerArg*>(arg);
+                switch(cArg->getContainerType())
+                {
+                case DBusArgument::ArgType::Array:
+                    argCopy.reset(new DBusArray{*(static_cast<DBusArray*>(cArg))});
+                    break;
+                case DBusArgument::ArgType::Struct:
+                    argCopy.reset(new DBusStruct{*(static_cast<DBusStruct*>(cArg))});
+                    break;
+                case DBusArgument::ArgType::Dictionary:
+                    argCopy.reset(new DBusDictionary{*(static_cast<DBusDictionary*>(cArg))});
+                    break;
+                case DBusArgument::ArgType::Dictionary_Entry:
+                    argCopy.reset(new DBusDictEntry{*(static_cast<DBusDictEntry*>(cArg))});
+                    break;
+                }
+            }
         }
         return argCopy;
     }
 
-    bool DBusArgumentFactory::checkIfArgsEqual(DBusArgument *arg1, DBusArgument *arg2)
+    bool DBusArgumentFactory::checkIfArgsEqual(const DBusArgument *arg1, const DBusArgument *arg2)
     {
-        bool equal = arg1->getArgType() == arg2->getArgType();
-        if(equal)
+        bool equal = false;
+        if(arg1 && arg2)
         {
-            switch(arg1->getArgType())
+            if(arg1->getArgType() && arg2->getArgType())
             {
-            case DBusArgument::ArgType::Byte:
-            case DBusArgument::ArgType::Bool:
-            case DBusArgument::ArgType::Int16:
-            case DBusArgument::ArgType::UInt16:
-            case DBusArgument::ArgType::Int32:
-            case DBusArgument::ArgType::UInt32:
-            case DBusArgument::ArgType::Int64:
-            case DBusArgument::ArgType::UInt64:
-            case DBusArgument::ArgType::Double:
-            case DBusArgument::ArgType::String:
-                equal = *static_cast<DBusBasicArgument*>(arg1) == *static_cast<DBusBasicArgument*>(arg2);
-                break;
-            case DBusArgument::ArgType::Array:
-                equal = *static_cast<DBusArray*>(arg1) == *static_cast<DBusArray*>(arg2);
-                break;
-            case DBusArgument::ArgType::Struct:
-                equal = *static_cast<DBusStruct*>(arg1) == *static_cast<DBusStruct*>(arg2);
-                break;
-            case DBusArgument::ArgType::Dictionary:
-                equal = *static_cast<DBusDictionary*>(arg1) == *static_cast<DBusDictionary*>(arg2);
-                break;
-            case DBusArgument::ArgType::Dictionary_Entry:
-                equal = *static_cast<DBusDictEntry*>(arg1) == *static_cast<DBusDictEntry*>(arg2);
-                break;
-            default:
-                equal = false;
+                if(!arg1->argIsContainerType())
+                {
+                    equal = *static_cast<const DBusBasicArgument*>(arg1) == *static_cast<const DBusBasicArgument*>(arg2);
+                }
+                else
+                {
+                    auto *cArg1 = static_cast<const DBusContainerArg*>(arg1);
+                    auto *cArg2 = static_cast<const DBusContainerArg*>(arg2);
+                    if(cArg1->getContainerType() == cArg2->getContainerType())
+                    {
+                        switch(cArg1->getContainerType())
+                        {
+                        case DBusArgument::ArgType::Array:
+                            equal = *static_cast<const DBusArray*>(cArg1) == *static_cast<const DBusArray*>(cArg2);
+                            break;
+                        case DBusArgument::ArgType::Struct:
+                            equal = *static_cast<const DBusStruct*>(cArg1) == *static_cast<const DBusStruct*>(cArg2);
+                            break;
+                        case DBusArgument::ArgType::Dictionary:
+                            equal = *static_cast<const DBusDictionary*>(cArg1) == *static_cast<const DBusDictionary*>(cArg2);
+                            break;
+                        case DBusArgument::ArgType::Dictionary_Entry:
+                            equal = *static_cast<const DBusDictEntry*>(cArg1) == *static_cast<const DBusDictEntry*>(cArg2);
+                            break;
+                        }
+                    }
+                }
             }
         }
         return equal;

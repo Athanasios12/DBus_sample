@@ -131,6 +131,7 @@ namespace DBUS
                 if(setElemType)
                 {
                     m_elemType = argType;
+                    m_elemTypeSet = true;
                     m_containedSignature = getArgTypeSignature(argType);
                     m_signature = getArgTypeSignature(ArgType::Array) + m_containedSignature;
                 }

@@ -25,45 +25,9 @@ namespace
 //    const std::string methodName{"add_numbers"};
 //    const std::string objectName{"/in/Radoslaw/adder"};
 //    const std::string interfaceName{"in.Radoslaw.Interface"};
-    struct DBusTestSettings
-    {
-        std::string clientBusName;
-        std::string serverBusName;
-        std::string methodName;
-        std::string objectName;
-        std::string interfaceName;
-    };
-    const DBusTestSettings systemBusSettings{ "in.Radoslaw.Client",
-                                              "in.Radoslaw.Server",
-                                              "add_numbers",
-                                              "/in/Radoslaw/adder",
-                                              "in.Radoslaw.Interface"};
 
-    const std::vector<DBusTestSettings> sessionBusSettings{ {"org.example.TestClient",
-                                                            "org.example.TestServer",
-                                                            "add_numbers",
-                                                            "/org/example/TestObject",
-                                                            "org.example.TestInterface"}
-                                                          };
 
-    const std::function<DBusMethodReply(const std::vector<std::unique_ptr<DBusArgument>>&)> printBinding =
-            [](const std::vector<std::unique_ptr<DBusArgument>> &args)
-    {
-        std::cout << "\nAdd numbers called!" << std::endl;
-        std::cout << "Number of method input args : " << args.size() << std::endl;
-        for(auto && arg : args)
-        {
-            if(arg)
-            {
-                std::cout << "Arg Type: " << arg->getArgType() << std::endl;
-            }
-        }
-        DBusMethodReply retVal{DBusArgument::ArgType::String};
-        std::unique_ptr<DBusArgument> retArg{new DBusBasicArgument{DBusArgument::ArgType::String}};
-        static_cast<DBusBasicArgument*>(retArg.get())->setArgValue("Function add_numbers called");
-        retVal.setRetArg(retArg);
-        return retVal;
-    };
+
 
     // The fixture for testing class Foo.
     class DBusServerTest : public ::testing::Test
@@ -74,7 +38,39 @@ namespace
 
         DBusServerTest()
         {
-        // You can do set-up work for each test here.
+            // You can do set-up work for each test here.
+            //basic arguments
+            auto arg = static_cast<DBusBasicArgument*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::String));
+            arg->setArgValue("Hello from Client");;
+            auto arg1 = static_cast<DBusBasicArgument*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::Byte));
+            arg1->setArgValue<uint8_t>(10);
+            //array argument
+            auto arg2 = static_cast<DBusArray*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::Array));
+            arg2->setElementsType(DBusArgument::ArgType::Byte);
+            arg2->addArgument<uint8_t>(10);
+            arg2->addArgument(static_cast<DBusArgument*>(arg1));
+            //struct argument
+            auto arg3 = static_cast<DBusStruct*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::Struct));
+            arg3->addField(DBusArgument::ArgType::String, "Hello");
+            arg3->addArgument(static_cast<DBusArgument*>(arg2));
+            //dictionary argument
+            auto arg4 = static_cast<DBusDictionary*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::Dictionary));
+            arg4->setEntryType(DBusArgument::ArgType::String, DBusArgument::ArgType::Byte);
+            arg4->addEntry<const char*, uint8_t>("Entry 0", 86);
+            arg4->addEntry<const char*, uint8_t>("Entry 1", 132);
+            arg4->addEntry(static_cast<DBusArgument*>(arg), static_cast<DBusArgument*>(arg1));
+            //add array of structs
+            auto arg5 = static_cast<DBusArray*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::Array));
+            arg5->setElementsType(DBusArgument::ArgType::Struct);
+            arg5->addArgument(static_cast<DBusArgument*>(arg3));
+            //add array of dictionaries
+            auto arg6 = static_cast<DBusArray*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::Array));
+            arg6->setElementsType(DBusArgument::ArgType::Dictionary);
+            arg6->addArgument(static_cast<DBusArgument*>(arg4));
+            //add array of arrays
+            auto arg7 = static_cast<DBusArray*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::Array));
+            arg7->setElementsType(DBusArgument::ArgType::Array);
+            arg7->addArgument(static_cast<DBusArgument*>(arg2));
         }
 
         virtual ~DBusServerTest()
@@ -90,7 +86,6 @@ namespace
         // Code here will be called immediately after the constructor (right
         // before each test).
 
-
         }
 
         virtual void TearDown()
@@ -98,6 +93,60 @@ namespace
         // Code here will be called immediately after each test (right
         // before the destructor).
         }
+
+        struct DBusTestSettings
+        {
+            std::string clientBusName;
+            std::string serverBusName;
+            std::string methodName;
+            std::string objectName;
+            std::string interfaceName;
+        };
+        DBusArgumentPack methodInputArgs;
+        const DBusTestSettings systemBusSettings{ "in.Radoslaw.Client",
+                                                  "in.Radoslaw.Server",
+                                                  "add_numbers",
+                                                  "/in/Radoslaw/adder",
+                                                  "in.Radoslaw.Interface"
+                                                };
+
+        const std::vector<DBusTestSettings> sessionBusSettings{ {
+                                                                "org.example.TestClient",
+                                                                "org.example.TestServer",
+                                                                "add_numbers",
+                                                                "/org/example/TestObject",
+                                                                "org.example.TestInterface"
+                                                                }
+                                                              };
+        const std::function<DBusMethodReply(const std::vector<std::unique_ptr<DBusArgument>>&)> printBinding =
+                [this](const std::vector<std::unique_ptr<DBusArgument>> &args)
+        {
+            std::cout << "\nAdd numbers called!" << std::endl;
+            std::cout << "Number of method input args : " << args.size() << std::endl;
+            size_t argNum = 0;
+            for(auto && arg : args)
+            {
+                EXPECT_NE(nullptr, arg);
+                if(arg)
+                {
+                    std::cout << "Arg Type: " << arg->getArgType() << std::endl;
+                    bool equal = DBusArgumentFactory::checkIfArgsEqual(methodInputArgs.getInputArg(argNum), arg.get());
+                    fprintf(stdout, "\nArgument transmit %s\n------\n", (equal) ? "success" : "failed");
+                    EXPECT_EQ(true, equal);
+                }
+                else
+                {
+                    break;
+                }
+                ++argNum;
+            }
+            DBusMethodReply retVal{DBusArgument::ArgType::String};
+            std::unique_ptr<DBusArgument> retArg{new DBusBasicArgument{DBusArgument::ArgType::String}};
+            static_cast<DBusBasicArgument*>(retArg.get())->setArgValue("Function add_numbers called");
+            retVal.setRetArg(retArg);
+
+            return retVal;
+        };
     };
 
     TEST_F(DBusServerTest, defaultCtor)
@@ -186,92 +235,23 @@ namespace
         EXPECT_EQ(true, interfaces[0] == dbusInterface);
     }
 
-//    TEST_F(DBusServerTest, receiveMethodCall_StringArg)
-//    {
-//        using namespace DBUS;
-//        //server interface
-//        DBusInterface::DBusObject object(systemBusSettings.objectName);
-//        std::vector<DBusArgument::ArgType> bindingArgTypes = {DBusArgument::ArgType::String};
-//        DBusMethod method{systemBusSettings.methodName, printBinding, bindingArgTypes.size(), DBusArgument::ArgType::String};
-//        method.setBindingArgTypes(bindingArgTypes);
-//        object.addMethod(std::move(method));
-//        DBusInterface dbusInterface(systemBusSettings.interfaceName);
-//        dbusInterface.addObject(object);
-//        DBusArgumentPack methodInputArgs{systemBusSettings.methodName, systemBusSettings.objectName, systemBusSettings.interfaceName};
-//        //basic arguments
-//        auto arg = static_cast<DBusBasicArgument*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::String));
-//        arg->setArgValue("Hello from Client");
-//        pid_t pid = fork();
-//        if(pid >= 0)
-//        {
-//            if(pid == 0)
-//            {
-//                //client
-//                std::cerr << "In Client" << std::endl;
-//                DBusClient dbusClient(systemBusSettings.clientBusName, DBUS_BUS_SYSTEM);
-//                std::this_thread::sleep_for(std::chrono::milliseconds(500));
-//                bool clientConnected = dbusClient.connect();
-//                fprintf(stderr, "\nClient connection %s\n",(clientConnected) ? "success" : "failed");
-
-//                std::cerr << "Finished argument pack creation" << std::endl;
-//                //check if all args have been set before method call - add this condition also in call server method, don't send msg if method does not have all args set
-//                if(methodInputArgs.checkIfAllArgsValid())
-//                {
-//                    std::cerr << "Client args valid" << std::endl;
-//                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-//                    DBusMethodReply reply = dbusClient.callServerMethod(systemBusSettings.serverBusName, methodInputArgs);
-//                    std::cerr << "\nMethod " << systemBusSettings.methodName << " reply: " << std::endl;
-//                    auto retArg = static_cast<DBusBasicArgument*>(reply.getReturn());
-//                    if(retArg)
-//                    {
-//                        auto retPtr = *static_cast<const char**>(retArg->getArgValuePtr());
-//                        if(retPtr)
-//                        {
-//                            std::string retStr{retPtr};
-//                            std::cerr << retStr << std::endl;
-//                        }
-//                    }
-//                    fprintf(stderr, "%s\n",(reply.isValid()) ? "valid" : "invalid");
-//                }
-//                exit(0);
-//            }
-//            else
-//            {
-//                //server
-//                DBUS::DBusServer dbusServer(systemBusSettings.serverBusName, DBUS_BUS_SYSTEM);
-//                dbusServer.addInterface(dbusInterface);
-//                dbusServer.connect();
-//                std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-//                EXPECT_EQ(true, dbusServer.checkLastMethodCall(systemBusSettings.clientBusName, systemBusSettings.methodName));
-//            }
-//        }
-//    }
-
-
     TEST_F(DBusServerTest, receiveMethodCall)
-    {
-        using namespace DBUS;
-        std::string clientBusName = "in.Radoslaw.Client";
-        std::string serverBusName = "in.Radoslaw.Server";
-        const std::string methodName{"add_numbers"};
-        const std::string objectName{"/in/Radoslaw/adder"};
-        const std::string interfaceName{"in.Radoslaw.Interface"};
-        //server interface
-        DBusInterface::DBusObject object(objectName);
-
-
+    {        
+        //server interface        
         std::vector<DBusArgument::ArgType> bindingArgTypes = {DBusArgument::ArgType::String,
                                                               DBusArgument::ArgType::Byte,
                                                               DBusArgument::ArgType::Array,
                                                               DBusArgument::ArgType::Struct,
-                                                              DBusArgument::ArgType::Dictionary};
-//                                                              DBusArgument::ArgType::Array,
-//                                                              DBusArgument::ArgType::Array,
-//                                                              DBusArgument::ArgType::Array};
-        DBusMethod method{methodName, printBinding, bindingArgTypes.size(), DBusArgument::ArgType::String};
+                                                              DBusArgument::ArgType::Dictionary,
+                                                              DBusArgument::ArgType::Array,
+                                                              DBusArgument::ArgType::Array,
+                                                              DBusArgument::ArgType::Array};
+
+        DBusInterface dbusInterface(systemBusSettings.interfaceName);
+        DBusInterface::DBusObject object(systemBusSettings.objectName);
+        DBusMethod method{systemBusSettings.methodName, printBinding, bindingArgTypes.size(), DBusArgument::ArgType::String};
         method.setBindingArgTypes(bindingArgTypes);
         object.addMethod(std::move(method));
-        DBusInterface dbusInterface(interfaceName);
         dbusInterface.addObject(object);
         pid_t pid = fork();
         if(pid >= 0)
@@ -280,46 +260,15 @@ namespace
             {
                 //client
                 std::cerr << "In Client" << std::endl;
-                DBusClient dbusClient(clientBusName, DBUS_BUS_SYSTEM);
+                DBusClient dbusClient(systemBusSettings.clientBusName, DBUS_BUS_SYSTEM);
                 std::this_thread::sleep_for(std::chrono::milliseconds(500));
                 bool clientConnected = dbusClient.connect();
                 fprintf(stderr, "Client connection %s\n",(clientConnected) ? "success" : "failed");
-                DBusArgumentPack methodInputArgs{methodName, objectName, interfaceName};
-                //basic arguments
-                auto arg = static_cast<DBusBasicArgument*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::String));
-                arg->setArgValue("Hello from Client");;
-
-                auto arg1 = static_cast<DBusBasicArgument*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::Byte));
-                arg1->setArgValue<uint8_t>(10);
-                //array argument
-                auto arg2 = static_cast<DBusArray*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::Array));
-                arg2->setElementsType(DBusArgument::ArgType::Byte);
-                arg2->addArgument<uint8_t>(10);
-                arg2->addArgument(static_cast<DBusArgument*>(arg1));
-                //struct argument
-                auto arg3 = static_cast<DBusStruct*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::Struct));
-                arg3->addField(DBusArgument::ArgType::String, "Hello");
-                arg3->addArgument(static_cast<DBusArgument*>(arg2));
-                //dictionary argument
-                auto arg4 = static_cast<DBusDictionary*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::Dictionary));
-                arg4->setEntryType(DBusArgument::ArgType::String, DBusArgument::ArgType::Byte);
-                arg4->addEntry<const char*, uint8_t>("Entry 0", 86);
-                arg4->addEntry<const char*, uint8_t>("Entry 1", 132);
-                arg4->addEntry(static_cast<DBusArgument*>(arg), static_cast<DBusArgument*>(arg1));
-//                //add array of structs
-//                auto arg5 = static_cast<DBusArray*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::Array));
-//                arg5->setElementsType(DBusArgument::ArgType::Struct);
-//                arg5->addArgument(static_cast<DBusArgument*>(arg3));
-//                //add array of dictionaries
-//                auto arg6 = static_cast<DBusArray*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::Array));
-//                arg6->setElementsType(DBusArgument::ArgType::Dictionary);
-//                arg6->addArgument(static_cast<DBusArgument*>(arg4));
-//                //add array of arrays
-//                auto arg7 = static_cast<DBusArray*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::Array));
-//                arg7->setElementsType(DBusArgument::ArgType::Array);
-//                arg7->addArgument(static_cast<DBusArgument*>(arg2));
-                std::cerr << "Finished argument pack creation" << std::endl;
                 //check if all args have been set before method call - add this condition also in call server method, don't send msg if method does not have all args set
+                methodInputArgs.setInterfaceName(systemBusSettings.interfaceName);
+                methodInputArgs.setObjectName(systemBusSettings.objectName);
+                methodInputArgs.setMethodName(systemBusSettings.methodName);
+                methodInputArgs.setMethodReturnType(method.getReturnType());
                 if(methodInputArgs.checkIfAllArgsValid())
                 {
                     std::cerr << "Client args valid" << std::endl;
@@ -343,11 +292,11 @@ namespace
             else
             {
                 //server
-                DBUS::DBusServer dbusServer(serverBusName, DBUS_BUS_SYSTEM, 1000);
+                DBUS::DBusServer dbusServer(systemBusSettings.serverBusName, DBUS_BUS_SYSTEM, 1000);
                 dbusServer.addInterface(dbusInterface);
                 dbusServer.connect();
                 std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-                EXPECT_EQ(true, dbusServer.checkLastMethodCall(clientBusName, methodName));
+                EXPECT_EQ(true, dbusServer.checkLastMethodCall(systemBusSettings.clientBusName, systemBusSettings.methodName));
             }
         }
     }

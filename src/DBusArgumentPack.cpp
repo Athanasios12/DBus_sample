@@ -230,4 +230,14 @@ namespace DBUS
         return m_methodReturnType;
     }
 
+    const DBusArgument *DBusArgumentPack::getInputArg(size_t argNum) const
+    {
+        DBusArgument *retArg = nullptr;
+        if(argNum < m_args.size())
+        {
+            retArg = m_args[argNum].get();
+        }
+        return const_cast<const DBusArgument*>(retArg);
+    }
+
 }

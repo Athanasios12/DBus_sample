@@ -292,7 +292,8 @@ namespace DBUS
                         {
                             if(!argSignature.empty())
                             {
-                                if(argSignature.find('{') != std::string::npos && argSignature.find('}') != std::string::npos)
+                                auto pos = argSignature.find('{');
+                                if(pos == 1)
                                 {
                                     argType = DBusArgument::ArgType::Dictionary;
                                 }

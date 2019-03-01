@@ -38,6 +38,7 @@ namespace DBUS
         bool getRequestReply() const;
         std::size_t getNumOfArgs() const;
         DBusArgument::ArgType getReturnType() const;
+        const DBusArgument *getInputArg(size_t argNum) const;
     private:
         bool m_isInitialized{false};
         bool m_requestReply{false};
