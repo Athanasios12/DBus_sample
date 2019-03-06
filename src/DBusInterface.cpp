@@ -108,6 +108,25 @@ namespace DBUS
         return argAdded;
     }
 
+    bool DBusInterface::checkIfInputArgIsDictionary(DBusArgument::ArgType argType, DBusMessageIter *msgItr)
+    {
+        bool isDictionary = false;
+        std::string argSignature{dbus_message_iter_get_signature(msgItr)};
+        //special case for dictionary
+        if(argType == DBusArgument::ArgType::Array)
+        {
+            if(!argSignature.empty())
+            {
+                auto pos = argSignature.find('{');
+                if(pos == 1)
+                {
+                    isDictionary = true;
+                }
+            }
+        }
+        return isDictionary;
+    }
+
     bool DBusInterface::extractDBusBasicArg(DBusBasicArgument &bArg, DBusMessageIter *argIter)
     {
         bool argMatched = false;
@@ -135,9 +154,15 @@ namespace DBUS
             DBusMessageIter elementIterator;
             dbus_message_iter_recurse(iterator, &elementIterator);
             auto type = static_cast<DBusArgument::ArgType>(dbus_message_iter_get_arg_type(&elementIterator));
+            //special case for dictionary : DBus protocol registers it as ARRAY type
+            if(checkIfInputArgIsDictionary(type, &elementIterator))
+            {
+                type = DBusArgument::ArgType::Dictionary;
+            }
             while(type != DBusArgument::ArgType::Invalid)
             {
                 bool argExtracted = false;
+
                 auto subArg = DBusArgumentFactory::getArgument(static_cast<DBusArgument::ArgType>(type));
                 if(subArg)
                 {

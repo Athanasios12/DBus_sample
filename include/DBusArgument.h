@@ -25,7 +25,7 @@ namespace DBUS
 
         enum ArgType
         {
-            Dictionary          = 0, // also an array but all elements are of dict entry type            
+            Dictionary          = 0xFF, // also an array but all elements are of dict entry type
             UInt16              = DBUS_TYPE_UINT16,
             UInt32              = DBUS_TYPE_UINT32,
             UInt64              = DBUS_TYPE_UINT64,

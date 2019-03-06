@@ -91,16 +91,13 @@ namespace DBUS
                 {
                     //special case for dictionary - because it type return is different than container type
                     //dictionary is special array of entries in DBus protocol
-                    bool elemIsMatchingDictionary = false;
+                    ArgType argType = arg->getArgType();
                     if(arg->argIsContainerType())
                     {
                         auto cArg = static_cast<DBusContainerArg*>(arg);
-                        if((cArg->getContainerType() == m_elemType) && (cArg->getArgType() != m_elemType))
-                        {
-                            elemIsMatchingDictionary = true;
-                        }
+                        argType = cArg->getContainerType();
                     }
-                    if(checkElemType(arg->getArgType()) || elemIsMatchingDictionary)
+                    if(checkElemType(argType))
                     {
                         auto newArg = DBusArgumentFactory::getArgCopy(arg);
                         if(newArg)

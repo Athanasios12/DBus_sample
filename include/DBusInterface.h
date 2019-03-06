@@ -65,6 +65,7 @@ namespace DBUS
         static bool extractDBusBasicArg(DBusBasicArgument &bArg, DBusMessageIter *argIter);
         static bool extractDBusMessageArgData(DBusArgument *arg, DBusMessageIter *argIter);
         static bool appendArg(DBusArgument *arg, DBusMessageIter *iterator);
+        static bool checkIfInputArgIsDictionary(DBusArgument::ArgType argType, DBusMessageIter *msgItr);
 
         std::vector<DBusObject> m_objects;//make private and instead provide iterators
     private:

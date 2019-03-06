@@ -103,8 +103,7 @@ namespace DBUS
                         if(!m_entryTypeSet)
                         {
                             //init type set
-                            m_entryType = std::make_pair(entry->getKeyType(), entry->getValueType());
-                            m_entryTypeSet = true;
+                            setEntryType(entry->getKeyType(), entry->getValueType());
                         }
                         if((entry->getKeyType() == m_entryType.first) && (entry->getValueType() == m_entryType.second))
                         {

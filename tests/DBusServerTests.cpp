@@ -18,17 +18,6 @@
 using namespace DBUS;
 namespace
 {
-    // Those names are defined in /etc/dbus-1/system.d/in.Radoslaw.Client.conf , in.Radoslaw.Server.conf
-    // To use system bus these configuration files are needed to be created at specified directory
-//    const std::string clientBusName = "in.Radoslaw.Client";
-//    const std::string serverBusName = "in.Radoslaw.Server";
-//    const std::string methodName{"add_numbers"};
-//    const std::string objectName{"/in/Radoslaw/adder"};
-//    const std::string interfaceName{"in.Radoslaw.Interface"};
-
-
-
-
     // The fixture for testing class Foo.
     class DBusServerTest : public ::testing::Test
     {
@@ -124,12 +113,22 @@ namespace
             std::cout << "\nAdd numbers called!" << std::endl;
             std::cout << "Number of method input args : " << args.size() << std::endl;
             size_t argNum = 0;
+            DBusContainerArg *cArg = nullptr;
+            DBusBasicArgument *bArg = nullptr;
             for(auto && arg : args)
             {
                 EXPECT_NE(nullptr, arg);
                 if(arg)
                 {
                     std::cout << "Arg Type: " << arg->getArgType() << std::endl;
+                    if(arg->argIsContainerType())
+                    {
+                        cArg = static_cast<DBusContainerArg*>(arg.get());
+                    }
+                    else
+                    {
+                        bArg = static_cast<DBusBasicArgument*>(arg.get());
+                    }
                     bool equal = DBusArgumentFactory::checkIfArgsEqual(methodInputArgs.getInputArg(argNum), arg.get());
                     fprintf(stdout, "\nArgument transmit %s\n------\n", (equal) ? "success" : "failed");
                     EXPECT_EQ(true, equal);

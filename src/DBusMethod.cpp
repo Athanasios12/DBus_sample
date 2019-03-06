@@ -286,18 +286,10 @@ namespace DBUS
                         //initialize arg
                         arg = std::move(DBusArgumentFactory::getArgument(m_argTypes[argNum]));
                         DBusArgument::ArgType argType = static_cast<DBusArgument::ArgType>(dbus_message_iter_get_arg_type(msgItr));
-                        std::string argSignature(dbus_message_iter_get_signature(msgItr));
-                        //special case for dictionary
-                        if(argType == DBusArgument::ArgType::Array)
-                        {
-                            if(!argSignature.empty())
-                            {
-                                auto pos = argSignature.find('{');
-                                if(pos == 1)
-                                {
-                                    argType = DBusArgument::ArgType::Dictionary;
-                                }
-                            }
+                        //special case for dictionary : DBus protocol registers it as ARRAY type
+                        if(DBusInterface::checkIfInputArgIsDictionary(argType, msgItr))
+                        {                            
+                            argType = DBusArgument::ArgType::Dictionary;
                         }
                         if(m_argTypes[argNum] == argType)
                         {
