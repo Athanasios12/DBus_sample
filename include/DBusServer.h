@@ -10,7 +10,7 @@ namespace DBUS
     {
     public:
         DBusServer();
-        DBusServer(const std::string& busName, DBusBusType busType, int timeout = -1);
+        DBusServer(const std::string& busName, DBusBusType busType, int timeout = 0);
         ~DBusServer();
         DBusServer& operator=(const DBusServer& other) = delete;
         DBusServer(const DBusServer& other) = delete;

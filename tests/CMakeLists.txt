@@ -1,6 +1,12 @@
 
 ##${CMAKE_CURRENT_SOURCE_DIR}/) # can't use relative paths
 file(GLOB TEST_SRCFILES *.cpp)
+file(GLOB TEST_HEADERS *.h)
+set(TESTS_INCLUDES
+   ${TESTS_INCLUDES}
+   ${TEST_HEADERS}
+   PARENT_SCOPE
+)
 set(TESTS_SRC
    ${TESTS_SRC}
    ${TEST_SRCFILES}

@@ -112,7 +112,6 @@ namespace DBUS
                 DBusMessage *message = dbus_connection_pop_message (m_connection);
                 if(message)
                 {
-                    printf("\nServer received message\n");
                     processMethodCall(message);
                 }
             }
@@ -135,7 +134,6 @@ namespace DBUS
                 {
                     if (dbus_message_is_method_call(msg, interface.getName().c_str(), method.getName().c_str()))
                     {
-                        std::cerr << "\nMethod " <<  method.getName() << " called" << std::endl;
                         //extract input arguments
                         DBusMessageIter argIter;
                         dbus_message_iter_init(msg, &argIter);

@@ -18,16 +18,36 @@
 using namespace DBUS;
 namespace
 {
-    // The fixture for testing class Foo.
-    class DBusServerTest : public ::testing::Test
+    struct DBusTestSettings
     {
-    protected:
-        // You can remove any or all of the following functions if its body
-        // is empty.
+        std::string clientBusName;
+        std::string serverBusName;
+        std::string methodName;
+        std::string objectName;
+        std::string interfaceName;
+    };
+    const DBusTestSettings systemBusSettings{ "in.Radoslaw.Client",
+                                              "in.Radoslaw.Server",
+                                              "add_numbers",
+                                              "/in/Radoslaw/adder",
+                                              "in.Radoslaw.Interface"
+                                            };
 
-        DBusServerTest()
+    const std::vector<DBusTestSettings> sessionBusSettings{ {
+                                                            "org.example.TestClient",
+                                                            "org.example.TestServer",
+                                                            "add_numbers",
+                                                            "/org/example/TestObject",
+                                                            "org.example.TestInterface"
+                                                            }
+                                                          };
+    // The fixture for testing class Foo.
+    class DBusClientServerTest : public ::testing::Test
+    {
+    public:
+        static void SetUpTestSuite() //googletest stup function override
         {
-            // You can do set-up work for each test here.
+            //Setup input arguments pack
             //basic arguments
             auto arg = static_cast<DBusBasicArgument*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::String));
             arg->setArgValue("Hello from Client");;
@@ -60,9 +80,21 @@ namespace
             auto arg7 = static_cast<DBusArray*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::Array));
             arg7->setElementsType(DBusArgument::ArgType::Array);
             arg7->addArgument(static_cast<DBusArgument*>(arg2));
+
+            //setup server connection
+            dbusSystemBusServer = DBUS::DBusServer(systemBusSettings.serverBusName, DBUS_BUS_SYSTEM);
         }
 
-        virtual ~DBusServerTest()
+        static DBusArgumentPack methodInputArgs;
+        static DBUS::DBusServer dbusSystemBusServer;
+    protected:
+
+        DBusClientServerTest()
+        {
+
+        }
+
+        virtual ~DBusClientServerTest()
         {
         // You can do clean-up work that doesn't throw exceptions here.
         }
@@ -83,35 +115,11 @@ namespace
         // before the destructor).
         }
 
-        struct DBusTestSettings
-        {
-            std::string clientBusName;
-            std::string serverBusName;
-            std::string methodName;
-            std::string objectName;
-            std::string interfaceName;
-        };
-        DBusArgumentPack methodInputArgs;
-        const DBusTestSettings systemBusSettings{ "in.Radoslaw.Client",
-                                                  "in.Radoslaw.Server",
-                                                  "add_numbers",
-                                                  "/in/Radoslaw/adder",
-                                                  "in.Radoslaw.Interface"
-                                                };
-
-        const std::vector<DBusTestSettings> sessionBusSettings{ {
-                                                                "org.example.TestClient",
-                                                                "org.example.TestServer",
-                                                                "add_numbers",
-                                                                "/org/example/TestObject",
-                                                                "org.example.TestInterface"
-                                                                }
-                                                              };
+        const std::string methodReturn{"Function add_numbers called"};
+        //Server method binding
         const std::function<DBusMethodReply(const std::vector<std::unique_ptr<DBusArgument>>&)> printBinding =
                 [this](const std::vector<std::unique_ptr<DBusArgument>> &args)
         {
-            std::cout << "\nAdd numbers called!" << std::endl;
-            std::cout << "Number of method input args : " << args.size() << std::endl;
             size_t argNum = 0;
             DBusContainerArg *cArg = nullptr;
             DBusBasicArgument *bArg = nullptr;
@@ -120,7 +128,6 @@ namespace
                 EXPECT_NE(nullptr, arg);
                 if(arg)
                 {
-                    std::cout << "Arg Type: " << arg->getArgType() << std::endl;
                     if(arg->argIsContainerType())
                     {
                         cArg = static_cast<DBusContainerArg*>(arg.get());
@@ -130,8 +137,7 @@ namespace
                         bArg = static_cast<DBusBasicArgument*>(arg.get());
                     }
                     bool equal = DBusArgumentFactory::checkIfArgsEqual(methodInputArgs.getInputArg(argNum), arg.get());
-                    fprintf(stdout, "\nArgument transmit %s\n------\n", (equal) ? "success" : "failed");
-                    EXPECT_EQ(true, equal);
+                    EXPECT_TRUE(equal);
                 }
                 else
                 {
@@ -141,14 +147,16 @@ namespace
             }
             DBusMethodReply retVal{DBusArgument::ArgType::String};
             std::unique_ptr<DBusArgument> retArg{new DBusBasicArgument{DBusArgument::ArgType::String}};
-            static_cast<DBusBasicArgument*>(retArg.get())->setArgValue("Function add_numbers called");
+            static_cast<DBusBasicArgument*>(retArg.get())->setArgValue(methodReturn.c_str());
             retVal.setRetArg(retArg);
-
             return retVal;
         };
     };
 
-    TEST_F(DBusServerTest, defaultCtor)
+    DBusArgumentPack DBusClientServerTest::methodInputArgs;
+    DBUS::DBusServer DBusClientServerTest::dbusSystemBusServer;
+
+    TEST_F(DBusClientServerTest, defaultCtor)
     {
         DBUS::DBusServer dbusServer;
         EXPECT_EQ(true, dbusServer.getBusName().empty());
@@ -157,7 +165,7 @@ namespace
         EXPECT_EQ(DBUS_BUS_SYSTEM, dbusServer.getBusType());
     }
 
-    TEST_F(DBusServerTest, ctor)
+    TEST_F(DBusClientServerTest, ctor)
     {
         DBUS::DBusServer dbusServer("in.example.bus", DBUS_BUS_SESSION);
         EXPECT_EQ(0, dbusServer.getBusName().compare("in.example.bus"));
@@ -166,7 +174,7 @@ namespace
         EXPECT_EQ(DBUS_BUS_SESSION, dbusServer.getBusType());
     }
 
-    TEST_F(DBusServerTest, moveCtor)
+    TEST_F(DBusClientServerTest, moveCtor)
     {
         DBUS::DBusServer dbusServer("in.example.bus", DBUS_BUS_SESSION);
         DBUS::DBusInterface interface("in.example.interface");
@@ -186,7 +194,7 @@ namespace
         EXPECT_EQ(DBUS_BUS_SESSION, dbusServer1.getBusType());
     }
 
-    TEST_F(DBusServerTest, moveAssignment)
+    TEST_F(DBusClientServerTest, moveAssignment)
     {
         DBUS::DBusServer dbusServer("in.example.bus", DBUS_BUS_SESSION);
         DBUS::DBusInterface interface("in.example.interface");
@@ -207,7 +215,7 @@ namespace
         EXPECT_EQ(DBUS_BUS_SESSION, dbusServer1.getBusType());
     }
 
-    TEST_F(DBusServerTest, connect)
+    TEST_F(DBusClientServerTest, connect)
     {
         DBUS::DBusServer dbusServer("in.example.bus", DBUS_BUS_SESSION);
         dbusServer.connect();
@@ -215,7 +223,7 @@ namespace
         EXPECT_EQ(DBUS_BUS_SESSION, dbusServer.getBusType());
     }
 
-    TEST_F(DBusServerTest, disconnect)
+    TEST_F(DBusClientServerTest, disconnect)
     {
         DBUS::DBusServer dbusServer("in.example.bus", DBUS_BUS_SESSION);
         dbusServer.connect();
@@ -224,7 +232,7 @@ namespace
         EXPECT_EQ(false, dbusServer.isConnected());
     }
 
-    TEST_F(DBusServerTest, addInterface)
+    TEST_F(DBusClientServerTest, addInterface)
     {
         DBUS::DBusServer dbusServer("in.example.bus", DBUS_BUS_SESSION);
         DBUS::DBusInterface dbusInterface("in.example.interface");
@@ -234,7 +242,7 @@ namespace
         EXPECT_EQ(true, interfaces[0] == dbusInterface);
     }
 
-    TEST_F(DBusServerTest, receiveMethodCall)
+    TEST_F(DBusClientServerTest, receiveMethodCall)
     {        
         //server interface        
         std::vector<DBusArgument::ArgType> bindingArgTypes = {DBusArgument::ArgType::String,
@@ -255,14 +263,12 @@ namespace
         pid_t pid = fork();
         if(pid >= 0)
         {
-            if(pid == 0)
+            if(pid > 0)
             {
                 //client
-                std::cerr << "In Client" << std::endl;
                 DBusClient dbusClient(systemBusSettings.clientBusName, DBUS_BUS_SYSTEM);
                 std::this_thread::sleep_for(std::chrono::milliseconds(500));
-                bool clientConnected = dbusClient.connect();
-                fprintf(stderr, "Client connection %s\n",(clientConnected) ? "success" : "failed");
+                dbusClient.connect();
                 //check if all args have been set before method call - add this condition also in call server method, don't send msg if method does not have all args set
                 methodInputArgs.setInterfaceName(systemBusSettings.interfaceName);
                 methodInputArgs.setObjectName(systemBusSettings.objectName);
@@ -270,37 +276,35 @@ namespace
                 methodInputArgs.setMethodReturnType(method.getReturnType());
                 if(methodInputArgs.checkIfAllArgsValid())
                 {
-                    std::cerr << "Client args valid" << std::endl;
                     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
                     DBusMethodReply reply = dbusClient.callServerMethod(systemBusSettings.serverBusName, methodInputArgs);
-                    std::cerr << "\nMethod " << systemBusSettings.methodName << " reply: " << std::endl;
+                    EXPECT_TRUE(reply.isValid());
                     auto retArg = static_cast<DBusBasicArgument*>(reply.getReturn());
+                    EXPECT_NE(nullptr, retArg);
                     if(retArg)
                     {
                         auto retPtr = *static_cast<const char**>(retArg->getArgValuePtr());
                         if(retPtr)
                         {
                             std::string retStr{retPtr};
-                            std::cerr << retStr << std::endl;
+                            EXPECT_EQ(methodReturn, retStr);
                         }
                     }
-                    fprintf(stderr, "%s\n",(reply.isValid()) ? "valid" : "invalid");
-                }
-                exit(0);
+                }                
             }
             else
             {
                 //server
-                DBUS::DBusServer dbusServer(systemBusSettings.serverBusName, DBUS_BUS_SYSTEM, 1000);
-                dbusServer.addInterface(dbusInterface);
-                dbusServer.connect();
-                std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-                EXPECT_EQ(true, dbusServer.checkLastMethodCall(systemBusSettings.clientBusName, systemBusSettings.methodName));
+                dbusSystemBusServer.addInterface(dbusInterface);
+                dbusSystemBusServer.connect();
+                std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+                EXPECT_EQ(true, dbusSystemBusServer.checkLastMethodCall(systemBusSettings.clientBusName, systemBusSettings.methodName));
+                exit(0);
             }
         }
     }
 
-    TEST_F(DBusServerTest, receiveBroadcastSignal)
+    TEST_F(DBusClientServerTest, receiveBroadcastSignal)
     {
         DBUS::DBusServer dbusServer("in.example.bus", DBUS_BUS_SESSION);
         dbusServer.connect();
@@ -309,7 +313,7 @@ namespace
         EXPECT_EQ(false, dbusServer.isConnected());
     }
 
-    TEST_F(DBusServerTest, broadcastMsg)
+    TEST_F(DBusClientServerTest, broadcastMsg)
     {
         DBUS::DBusServer dbusServer("in.example.bus", DBUS_BUS_SESSION);
         dbusServer.connect();
