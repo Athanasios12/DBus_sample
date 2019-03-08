@@ -283,7 +283,7 @@ namespace
                     EXPECT_NE(nullptr, retArg);
                     if(retArg)
                     {
-                        auto retPtr = *static_cast<const char**>(retArg->getArgValuePtr());
+                        auto retPtr = static_cast<const char*>(retArg->getArgValuePtr());
                         if(retPtr)
                         {
                             std::string retStr{retPtr};

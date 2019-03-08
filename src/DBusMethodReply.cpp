@@ -109,12 +109,20 @@ namespace DBUS
 
     bool DBusMethodReply::processDBusMsgReply(DBusMessageIter *msgItr)
     {
-        if(m_return)
+        bool msgProcessed = false;
+        if(msgItr)
         {
+            auto retArg = std::move(DBusArgumentFactory::getArgument(static_cast<DBusArgument::ArgType>(dbus_message_iter_get_arg_type(msgItr))));
             //get reply return from message using passed iterator
-            m_valid = DBusInterface::extractDBusMessageArgData(m_return.get(), msgItr);
+            m_valid = DBusInterface::extractDBusMessageArgData(retArg.get(), msgItr);
+            if(retArg)
+            {
+                m_return = std::move(retArg);
+                m_returnType = m_return->getArgType();
+                msgProcessed = m_valid;
+            }
         }
-        return m_valid;
+        return msgProcessed;
     }
 
     bool DBusMethodReply::setRetArg(std::unique_ptr<DBusArgument> &retArg)
