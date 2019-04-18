@@ -1,16 +1,19 @@
 project(DBus_sample)
 cmake_minimum_required(VERSION 3.5)
 
-configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
+#Set cached global variable for google test lib location
+set(GTEST_DIR "/opt/GTest" CACHE STRING "")
+
+configure_file(CMakeLists.txt.in ${GTEST_DIR}/googletest-download/CMakeLists.txt)
 execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
   RESULT_VARIABLE result
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
+  WORKING_DIRECTORY ${GTEST_DIR}/googletest-download )
 if(result)
   message(FATAL_ERROR "CMake step for googletest failed: ${result}")
 endif()
 execute_process(COMMAND ${CMAKE_COMMAND} --build .
   RESULT_VARIABLE result
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
+  WORKING_DIRECTORY ${GTEST_DIR}/googletest-download )
 if(result)
   message(FATAL_ERROR "Build step for googletest failed: ${result}")
 endif()
@@ -21,8 +24,8 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
 # Add googletest directly to our build. This defines
 # the gtest and gtest_main targets.
-add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
-                 ${CMAKE_BINARY_DIR}/googletest-build
+add_subdirectory(${GTEST_DIR}/googletest-src
+                 ${GTEST_DIR}/googletest-build
                  EXCLUDE_FROM_ALL)
 
 # The gtest/gtest_main targets carry header search path
@@ -48,9 +51,8 @@ include_directories (${GLIB_INCLUDE_DIRS})
 link_directories (${GLIB_LIBRARY_DIRS})
 ##############
 
-
 set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wshadow-compatible-local -std=c++17 -ldbus-1 -pthread")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 --coverage")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/src")
@@ -62,16 +64,21 @@ include_directories("${PROJECT_SOURCE_DIR}/include")
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/tests")
 message(STATUS "Tests Source files: " ${TESTS_SRC})
+message(STATUS "Tests Header files: " ${TESTS_INCLUDES})
 
 set(UNIT_TESTS "${PROJECT_NAME}_Tests")
-add_executable(${PROJECT_NAME} main.cpp ${SRC} ${HEADERS})
-target_link_libraries(${PROJECT_NAME} ${DBUS_LIBRARIES} ${GLIB_LIBRARIES})
 #unit tests executable
-add_executable(${UNIT_TESTS} ${TESTS_SRC} ${SRC} ${HEADERS})
+add_executable(${UNIT_TESTS} ${TESTS_SRC} ${TESTS_INCLUDES} ${SRC} ${HEADERS})
 
 target_link_libraries(${UNIT_TESTS} ${DBUS_LIBRARIES} ${GLIB_LIBRARIES} gtest_main)
 add_test(NAME ${UNIT_TESTS} COMMAND test)
-
+#############################################
+project(CppDBusLib VERSION 1.0.0)
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+include_directories("${PROJECT_SOURCE_DIR}/include")
+set_target_properties(CppDBusLib PROPERTIES VERSION ${PROJECT_VERSION})
+set_target_properties(CppDBusLib PROPERTIES SOVERSION 1)
+add_library(CppDBusLib SHARED ${SRC})
 
 
 

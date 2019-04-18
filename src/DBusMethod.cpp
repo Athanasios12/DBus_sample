@@ -15,9 +15,9 @@ namespace DBUS
     }
 
     DBusMethod::DBusMethod(const std::string& name):
-        m_numOfArgs{0},
-        m_returnType{DBusArgument::ArgType::Invalid},
-        m_name{name}
+        m_numOfArgs{0},        
+        m_name{name},
+        m_returnType{DBusArgument::ArgType::Invalid}
     {
 
     }

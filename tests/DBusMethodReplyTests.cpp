@@ -61,7 +61,6 @@ namespace
     {
         //add input arguments
         DBusArgumentPack argPack{"Test", "/test/signal/Object", "test.signal.Type"};
-        auto stringArg = static_cast<DBusBasicArgument*>(argPack.addNewArgument(DBusArgument::ArgType::String));
         //create reply msg
         DBusMessage *replyMsg = dbus_message_new_signal("/test/signal/Object","test.signal.Type","Test");
         DBusMessageIter txIter;

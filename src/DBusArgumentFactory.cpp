@@ -36,6 +36,8 @@ namespace DBUS
         case DBusArgument::ArgType::Dictionary_Entry:
             arg.reset(new DBusDictEntry{});
             break;
+        default:
+            break;
         }
         return arg;
     }
@@ -65,6 +67,8 @@ namespace DBUS
                     break;
                 case DBusArgument::ArgType::Dictionary_Entry:
                     argCopy.reset(new DBusDictEntry{*(static_cast<DBusDictEntry*>(cArg))});
+                    break;
+                default:
                     break;
                 }
             }
@@ -102,6 +106,8 @@ namespace DBUS
                             break;
                         case DBusArgument::ArgType::Dictionary_Entry:
                             equal = *static_cast<const DBusDictEntry*>(cArg1) == *static_cast<const DBusDictEntry*>(cArg2);
+                            break;
+                        default:
                             break;
                         }
                     }

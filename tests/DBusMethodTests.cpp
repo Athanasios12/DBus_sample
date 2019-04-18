@@ -223,10 +223,7 @@ namespace
 
     TEST_F(DBusMethodTest, extractMsgInputArguments_allArgsNotExtracted)
     {
-        DBusArgumentPack methodInputArgs{methodName, objectName, interfaceName};
-        //add method call input arguments
-        //added not initialized argument, will not be extracted
-        auto arg = static_cast<DBusBasicArgument*>(methodInputArgs.addNewArgument(DBusArgument::ArgType::String));
+        DBusArgumentPack methodInputArgs{methodName, objectName, interfaceName};       
         //create method call dbus msg
         DBusMessage *request = dbus_message_new_method_call(serverBusName.c_str(),
                                                             methodInputArgs.getObjectName().c_str(),

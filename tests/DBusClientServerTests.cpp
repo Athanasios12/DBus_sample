@@ -121,21 +121,11 @@ namespace
                 [this](const std::vector<std::unique_ptr<DBusArgument>> &args)
         {
             size_t argNum = 0;
-            DBusContainerArg *cArg = nullptr;
-            DBusBasicArgument *bArg = nullptr;
             for(auto && arg : args)
             {
                 EXPECT_NE(nullptr, arg);
                 if(arg)
                 {
-                    if(arg->argIsContainerType())
-                    {
-                        cArg = static_cast<DBusContainerArg*>(arg.get());
-                    }
-                    else
-                    {
-                        bArg = static_cast<DBusBasicArgument*>(arg.get());
-                    }
                     bool equal = DBusArgumentFactory::checkIfArgsEqual(methodInputArgs.getInputArg(argNum), arg.get());
                     EXPECT_TRUE(equal);
                 }
