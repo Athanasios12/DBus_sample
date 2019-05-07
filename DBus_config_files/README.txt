@@ -1,1 +1,4 @@
-Client and Server configs should be put to /etc/dbus-1/session.d or system.d. The interface file should be in /etx/dbus-1/interfaces/.
+To connect to DBUS_BUS_SYSTEM bus the config files client and sever have to be added
+to /etc/system.d/
+
+Otherwise any name can be used for DBUS_BUS_SESSION(valid one as in API specification).

@@ -1,4 +1,4 @@
-project(DBus_sample)
+project(CppDBusLib)
 cmake_minimum_required(VERSION 3.5)
 
 #Set cached global variable for google test lib location
@@ -72,14 +72,9 @@ add_executable(${UNIT_TESTS} ${TESTS_SRC} ${TESTS_INCLUDES} ${SRC} ${HEADERS})
 
 target_link_libraries(${UNIT_TESTS} ${DBUS_LIBRARIES} ${GLIB_LIBRARIES} gtest_main)
 add_test(NAME ${UNIT_TESTS} COMMAND test)
-#############################################
-project(CppDBusLib VERSION 1.0.0)
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
-include_directories("${PROJECT_SOURCE_DIR}/include")
-set_target_properties(CppDBusLib PROPERTIES VERSION ${PROJECT_VERSION})
-set_target_properties(CppDBusLib PROPERTIES SOVERSION 1)
+#create libraries
 add_library(CppDBusLib SHARED ${SRC})
-
+add_library(CppDBusLibStatic STATIC ${SRC})
 
 
 
