@@ -1,1 +1,0 @@
-/usr/bin/c++   -Wall -Wextra -Wshadow-compatible-local -std=c++17   CMakeFiles/TestLib.dir/main.cpp.o  -o TestLib -ldbus-1 -lglib-2.0 /usr/lib/libCppDBusLib.so 

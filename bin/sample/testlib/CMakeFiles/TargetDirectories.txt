@@ -1,3 +1,0 @@
-/home/belisarius/DBus_sample/bin/sample/testlib/CMakeFiles/edit_cache.dir
-/home/belisarius/DBus_sample/bin/sample/testlib/CMakeFiles/TestLib.dir
-/home/belisarius/DBus_sample/bin/sample/testlib/CMakeFiles/rebuild_cache.dir
